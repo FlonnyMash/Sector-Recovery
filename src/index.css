@@ -15,6 +15,28 @@ body {
   cursor: default;
 }
 
+.cursor-modern {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='white' d='M3.5 2.2 L3.5 18.8 L8.2 14.6 L12.4 22.4 L15.2 21 L11 13.2 L17.6 13.2 Z'/%3E%3Cpath fill='%23111' d='M5 4 L5 16.5 L8.8 13.1 L12.6 20.2 L14.2 19.4 L10.3 12.2 L15.8 12.2 Z'/%3E%3C/svg%3E")
+      2 2,
+    auto;
+}
+
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+a {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+input,
+textarea,
+[contenteditable='true'] {
+  cursor: text;
+}
+
 .os-chrome {
   user-select: none;
 }
@@ -34,4 +56,38 @@ body {
 
 .win7-raised:active:not(:disabled) {
   box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.bios-scanline {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(51, 255, 102, 0.035) 2px,
+    rgba(51, 255, 102, 0.035) 4px
+  );
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.cursor-blink {
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes restart-pulse {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 rgba(217, 118, 0, 0);
+  }
+  50% {
+    box-shadow: inset 0 0 12px rgba(217, 118, 0, 0.55);
+  }
+}
+
+.restart-ready {
+  animation: restart-pulse 1.6s ease-in-out infinite;
 }
