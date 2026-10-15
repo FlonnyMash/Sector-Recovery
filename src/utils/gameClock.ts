@@ -8,6 +8,15 @@ export function resetGameClock(now = Date.now()) {
   startedAtMs = now
 }
 
+export function getGameClockOrigin() {
+  return startedAtMs
+}
+
+export function restoreGameClock(origin: number) {
+  if (!Number.isFinite(origin) || origin <= 0) return
+  startedAtMs = origin
+}
+
 export function getGameNow(now = Date.now()): Date {
   const elapsed = now - startedAtMs
   const start = new Date(startedAtMs)

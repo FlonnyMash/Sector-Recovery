@@ -1,10 +1,13 @@
+/** App registry. No JSX here, so React Fast Refresh can update importers. */
 import type { ComponentType, ReactNode } from 'react'
 import { DevTools } from '../components/apps/DevTools'
+import { Messenger } from '../components/apps/Messenger'
 import { MiniGame } from '../components/apps/MiniGame'
 import { ModernChat } from '../components/apps/ModernChat'
 import { NetExplorer } from '../components/apps/NetExplorer'
 import { NewsBrowser } from '../components/apps/NewsBrowser'
 import { OperatorNotes } from '../components/apps/OperatorNotes'
+import { PhotoViewer } from '../components/apps/PhotoViewer'
 import { SectorRecover } from '../components/apps/SectorRecover'
 import { SystemExplorer } from '../components/apps/SystemExplorer'
 import {
@@ -14,7 +17,9 @@ import {
   ComputerIcon,
   DevSwitchIcon,
   IeIcon,
+  MessengerIcon,
   NotesIcon,
+  PhotoIcon,
   RecoverToolIcon,
 } from '../components/os/icons'
 import { strings } from '../i18n'
@@ -43,7 +48,7 @@ export const APPS: Record<AppType, AppDefinition> = {
     type: 'news-browser',
     title: strings.apps.newsBrowser,
     os: APP_OS['news-browser'],
-    icon: ({ size }) => <BrowserIcon size={size} />,
+    icon: BrowserIcon,
     component: NewsBrowser,
     defaultSize: { width: 880, height: 620 },
     minSize: { width: 600, height: 440 },
@@ -52,7 +57,7 @@ export const APPS: Record<AppType, AppDefinition> = {
     type: 'friend-chat',
     title: strings.apps.friendChat,
     os: APP_OS['friend-chat'],
-    icon: ({ size, badge }) => <ChatIcon size={size} badge={badge} />,
+    icon: ChatIcon,
     component: ModernChat,
     defaultSize: { width: 860, height: 600 },
     minSize: { width: 580, height: 400 },
@@ -61,16 +66,16 @@ export const APPS: Record<AppType, AppDefinition> = {
     type: 'arcade',
     title: strings.apps.arcade,
     os: APP_OS.arcade,
-    icon: ({ size }) => <ArcadeIcon size={size} />,
+    icon: ArcadeIcon,
     component: MiniGame,
-    defaultSize: { width: 640, height: 520 },
-    minSize: { width: 580, height: 440 },
+    defaultSize: { width: 900, height: 560 },
+    minSize: { width: 720, height: 480 },
   },
   'system-explorer': {
     type: 'system-explorer',
     title: strings.apps.systemExplorer,
     os: APP_OS['system-explorer'],
-    icon: ({ size }) => <ComputerIcon size={size} />,
+    icon: ComputerIcon,
     component: SystemExplorer,
     defaultSize: { width: 780, height: 520 },
     minSize: { width: 560, height: 400 },
@@ -79,16 +84,16 @@ export const APPS: Record<AppType, AppDefinition> = {
     type: 'net-explorer',
     title: strings.apps.netExplorer,
     os: APP_OS['net-explorer'],
-    icon: ({ size }) => <IeIcon size={size} />,
+    icon: IeIcon,
     component: NetExplorer,
-    defaultSize: { width: 820, height: 580 },
-    minSize: { width: 560, height: 420 },
+    defaultSize: { width: 820, height: 740 },
+    minSize: { width: 560, height: 520 },
   },
   'sector-recover': {
     type: 'sector-recover',
     title: strings.apps.sectorRecover,
     os: APP_OS['sector-recover'],
-    icon: ({ size }) => <RecoverToolIcon size={size} />,
+    icon: RecoverToolIcon,
     component: SectorRecover,
     defaultSize: { width: 720, height: 520 },
     minSize: { width: 600, height: 440 },
@@ -98,16 +103,34 @@ export const APPS: Record<AppType, AppDefinition> = {
     type: 'operator-notes',
     title: strings.apps.operatorNotes,
     os: APP_OS['operator-notes'],
-    icon: ({ size }) => <NotesIcon size={size} />,
+    icon: NotesIcon,
     component: OperatorNotes,
     defaultSize: { width: 420, height: 360 },
     minSize: { width: 320, height: 260 },
+  },
+  'photo-viewer': {
+    type: 'photo-viewer',
+    title: strings.apps.photoViewer,
+    os: APP_OS['photo-viewer'],
+    icon: PhotoIcon,
+    component: PhotoViewer,
+    defaultSize: { width: 760, height: 560 },
+    minSize: { width: 480, height: 380 },
+  },
+  messenger: {
+    type: 'messenger',
+    title: strings.apps.messenger,
+    os: APP_OS.messenger,
+    icon: MessengerIcon,
+    component: Messenger,
+    defaultSize: { width: 760, height: 540 },
+    minSize: { width: 560, height: 400 },
   },
   'dev-tools-host': {
     type: 'dev-tools-host',
     title: strings.apps.devTools,
     os: APP_OS['dev-tools-host'],
-    icon: ({ size }) => <DevSwitchIcon size={size} />,
+    icon: DevSwitchIcon,
     component: DevTools,
     ...DEV_TOOLS_SIZE,
     devOnly: true,
@@ -116,7 +139,7 @@ export const APPS: Record<AppType, AppDefinition> = {
     type: 'dev-tools-target',
     title: strings.apps.devTools,
     os: APP_OS['dev-tools-target'],
-    icon: ({ size }) => <DevSwitchIcon size={size} />,
+    icon: DevSwitchIcon,
     component: DevTools,
     ...DEV_TOOLS_SIZE,
     devOnly: true,

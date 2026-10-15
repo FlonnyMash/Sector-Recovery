@@ -1,9 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { APPS } from '../../game/apps'
 import { strings } from '../../i18n'
 import { useGameStore } from '../../store/useGameStore'
 import { cn } from '../../utils/cn'
+import { DesktopIcon } from './DesktopIcon'
 import { OsWallpaper } from './OsWallpaper'
+import { WindowManager } from './WindowManager'
 
 const UNLOCK_MS = 2600
 const UNLOCK_SWAP_MS = 1200
@@ -22,6 +25,12 @@ interface ConsoleLine {
 
 export function LoginScreen() {
   const unlockLegacyOS = useGameStore((state) => state.unlockLegacyOS)
+  const restartSystem = useGameStore((state) => state.restartSystem)
+  const openWindow = useGameStore((state) => state.openWindow)
+  const desktopRef = useRef<HTMLDivElement>(null)
+  const [devSelected, setDevSelected] = useState(false)
+  const showDevTools = import.meta.env.DEV
+  const devApp = APPS['dev-tools-target']
   const [overlayOpen, setOverlayOpen] = useState(false)
   const [unlocking, setUnlocking] = useState(false)
   const [unlockPhase, setUnlockPhase] = useState<'override' | 'mount'>('override')
@@ -103,6 +112,19 @@ export function LoginScreen() {
       <OsWallpaper host={false} />
       <div className="absolute inset-0 bg-black/15" />
 
+      {showDevTools ? (
+        <div className="absolute top-3 left-3 z-20">
+          <DesktopIcon
+            title={devApp.title}
+            selected={devSelected}
+            variant="retro"
+            icon={devApp.icon({ size: 48 })}
+            onSelect={() => setDevSelected(true)}
+            onOpen={() => openWindow('dev-tools-target')}
+          />
+        </div>
+      ) : null}
+
       <div className="pointer-events-none absolute top-4 right-5 max-w-[min(92vw,480px)] text-right font-mono text-[10px] tracking-wide text-white/70">
         <motion.div
           animate={{ opacity: [0.4, 0.9, 0.55, 0.9] }}
@@ -134,7 +156,44 @@ export function LoginScreen() {
           />
         ) : null}
       </AnimatePresence>
+
+      <button
+        type="button"
+        onClick={restartSystem}
+        className="absolute right-6 bottom-6 z-20 flex h-8 items-center gap-2 rounded-[3px] border border-[#9ab4c8] bg-gradient-to-b from-[#f4f8fc] to-[#d3e1ee] px-3 text-[12px] text-[#1a1a1a] shadow-[0_2px_6px_rgba(0,0,0,0.4)] hover:from-white hover:to-[#dfeaf4] active:translate-y-px"
+      >
+        <RestartIcon />
+        {strings.os.restartSystem}
+      </button>
+
+      {showDevTools ? (
+        <div ref={desktopRef} className="pointer-events-none absolute inset-0 z-30">
+          <WindowManager desktopRef={desktopRef} os="target_os" />
+        </div>
+      ) : null}
     </div>
+  )
+}
+
+function RestartIcon() {
+  return (
+    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" aria-hidden="true">
+      <path
+        d="M13.2 8A5.2 5.2 0 1 1 8 2.8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M8 1.2 10.4 3.4 8 5.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   )
 }
 

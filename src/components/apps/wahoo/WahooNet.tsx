@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { strings } from '../../../i18n'
 import { useGameStore } from '../../../store/useGameStore'
-import type { AuctionLotId } from '../../../types/game'
+import type { AuctionLotId, WahooTab } from '../../../types/game'
 import { cn } from '../../../utils/cn'
 import { KEY_ARTICLE_ID, UNI_ARTICLE_ID } from './constants'
 import { WahooAuctions } from './WahooAuctions'
@@ -9,7 +9,7 @@ import { WahooGaming } from './WahooGaming'
 import { WahooHome } from './WahooHome'
 import { WahooNews, type NewsArticle } from './WahooNews'
 
-export type WahooTab = 'home' | 'news' | 'auctions' | 'gaming'
+export type { WahooTab }
 
 const COPY = strings.wahoo
 
@@ -36,6 +36,8 @@ export function WahooNet() {
   const clearNewsArticleRequest = useGameStore((state) => state.clearNewsArticleRequest)
   const auctionLotRequest = useGameStore((state) => state.auctionLotRequest)
   const clearAuctionLotRequest = useGameStore((state) => state.clearAuctionLotRequest)
+  const wahooTabRequest = useGameStore((state) => state.wahooTabRequest)
+  const clearWahooTabRequest = useGameStore((state) => state.clearWahooTabRequest)
   const isColdCasePublished = useGameStore((state) => state.prologue.isColdCasePublished)
 
   useEffect(() => {
@@ -62,6 +64,14 @@ export function WahooNet() {
     setSelectedLotId(auctionLotRequest)
     clearAuctionLotRequest()
   }, [auctionLotRequest, clearAuctionLotRequest])
+
+  useEffect(() => {
+    if (!wahooTabRequest) return
+    setArticle(null)
+    setSelectedLotId(null)
+    setTab(wahooTabRequest)
+    clearWahooTabRequest()
+  }, [wahooTabRequest, clearWahooTabRequest])
 
   const goTab = (next: WahooTab) => {
     setArticle(null)

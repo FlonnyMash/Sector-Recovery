@@ -28,6 +28,16 @@ export function formatChatClock(date = getGameNow()): string {
   return `${hours}:${minutes}`
 }
 
+/** Current game-clock stamp. Never advances past now (rapid lines may share a minute). */
+export function nextChatTime(_previous?: string | null, date = getGameNow()): string {
+  return formatChatClock(date)
+}
+
+export function sequentialChatTimes(count: number, previous?: string | null): string[] {
+  const stamp = nextChatTime(previous)
+  return Array.from({ length: count }, () => stamp)
+}
+
 export function formatRate(value: number): string {
   if (value >= 100) return value.toFixed(0)
   if (value >= 10) return value.toFixed(1)

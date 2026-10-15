@@ -4,12 +4,26 @@ import { APPS } from '../../game/apps'
 import { strings } from '../../i18n'
 import { useGameStore } from '../../store/useGameStore'
 import { cn } from '../../utils/cn'
+import { playTypingSound } from '../../utils/sounds'
 import { DesktopIcon } from './DesktopIcon'
 import { OsWallpaper } from './OsWallpaper'
 import { WindowManager } from './WindowManager'
 
 const SAVED_PASSWORD = 'campusok'
-const FILL_STEP_MS = 55
+/** Length of /sounds/typing.wav, which plays once for the whole auto-fill. */
+const TYPING_CLIP_MS = 1620
+/** Keystroke transients in the clip; character i appears on keystroke i. */
+const TYPING_KEYSTROKES_MS = [75, 275, 500, 600, 775, 925, 1100, 1300]
+
+function keystrokeOffsetMs(index: number) {
+  const known = TYPING_KEYSTROKES_MS[index]
+  if (known !== undefined) return known
+  // Password longer than the recorded keystrokes: spread the rest evenly.
+  const last = TYPING_KEYSTROKES_MS[TYPING_KEYSTROKES_MS.length - 1] ?? 0
+  const remaining = SAVED_PASSWORD.length - TYPING_KEYSTROKES_MS.length
+  const step = (TYPING_CLIP_MS - last) / (remaining + 1)
+  return last + step * (index - TYPING_KEYSTROKES_MS.length + 1)
+}
 
 export function HostLoginScreen() {
   const signInHostOS = useGameStore((state) => state.signInHostOS)
@@ -17,20 +31,34 @@ export function HostLoginScreen() {
   const openWindow = useGameStore((state) => state.openWindow)
   const desktopRef = useRef<HTMLDivElement>(null)
   const [filledChars, setFilledChars] = useState(0)
+  const [fillStartedAt, setFillStartedAt] = useState<number | null>(null)
   const [devSelected, setDevSelected] = useState(false)
   const filled = filledChars >= SAVED_PASSWORD.length
   const copy = strings.hostLogin
   const showDevTools = import.meta.env.DEV
   const devApp = APPS['dev-tools-host']
 
+  // Drop any focus carried over from the previous screen so the field starts idle.
   useEffect(() => {
-    if (filledChars === 0 || filled) return
-    const id = window.setTimeout(() => setFilledChars((count) => count + 1), FILL_STEP_MS)
+    const active = document.activeElement
+    if (active instanceof HTMLElement) active.blur()
+  }, [])
+
+  // Reveal each character in step with the keystrokes in the typing clip.
+  useEffect(() => {
+    if (fillStartedAt === null || filled) return
+    const due = fillStartedAt + keystrokeOffsetMs(filledChars)
+    const id = window.setTimeout(
+      () => setFilledChars((count) => count + 1),
+      Math.max(0, due - performance.now()),
+    )
     return () => window.clearTimeout(id)
-  }, [filledChars, filled])
+  }, [fillStartedAt, filledChars, filled])
 
   function startFill() {
-    if (filledChars === 0) setFilledChars(1)
+    if (fillStartedAt !== null) return
+    playTypingSound()
+    setFillStartedAt(performance.now())
   }
 
   return (
@@ -72,7 +100,9 @@ export function HostLoginScreen() {
               value={SAVED_PASSWORD.slice(0, filledChars)}
               placeholder={copy.passwordPlaceholder}
               onClick={startFill}
-              onFocus={startFill}
+              onKeyDown={(event) => {
+                if (event.key !== 'Tab') startFill()
+              }}
               className="h-9 min-w-0 flex-1 rounded-md border border-white/25 bg-white/92 px-2.5 text-[13px] text-[#1d1730] shadow-sm outline-none placeholder:text-[#8a8494] focus:border-white/60"
             />
             <button

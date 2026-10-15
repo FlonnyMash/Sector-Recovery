@@ -1,84 +1,142 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { ARCADE_CATALOG, arcadeGameById, type ArcadeGameId } from '../../game/arcadeCatalog'
 import { strings } from '../../i18n'
+import { useGameStore } from '../../store/useGameStore'
+import { cn } from '../../utils/cn'
 import { getBestTime, getHighScore } from '../../utils/highScores'
 import { Blackjack } from './minigames/Blackjack'
 import { JumpRun } from './minigames/JumpRun'
 import { SectorSweeper } from './minigames/SectorSweeper'
 
-type CabinetId = 'sweeper' | 'blackjack' | 'jump-run'
+function gameScore(id: ArcadeGameId): string {
+  if (id === 'sweeper') {
+    const best = getBestTime('sweeper')
+    return `${strings.arcade.bestTime}: ${best === null ? strings.arcade.noScore : `${best}s`}`
+  }
+  if (id === 'blackjack') {
+    return `${strings.arcade.highScore}: ${getHighScore('blackjack') || strings.arcade.noScore}`
+  }
+  return `${strings.arcade.highScore}: ${getHighScore('jumprun') || strings.arcade.noScore}`
+}
 
-const CABINETS: Array<{
-  id: CabinetId
-  title: string
-  blurb: string
-  accent: string
-  score: () => string
-}> = [
-  {
-    id: 'sweeper',
-    title: strings.arcade.sweeper.title,
-    blurb: strings.arcade.sweeper.blurb,
-    accent: 'from-[#1c2430] to-[#3b5366]',
-    score: () => {
-      const best = getBestTime('sweeper')
-      return `${strings.arcade.bestTime}: ${best === null ? strings.arcade.noScore : `${best}s`}`
-    },
-  },
-  {
-    id: 'blackjack',
-    title: strings.arcade.blackjack.title,
-    blurb: strings.arcade.blackjack.blurb,
-    accent: 'from-[#14261c] to-[#2f5a38]',
-    score: () => `${strings.arcade.highScore}: ${getHighScore('blackjack') || strings.arcade.noScore}`,
-  },
-  {
-    id: 'jump-run',
-    title: strings.arcade.jumpRun.title,
-    blurb: strings.arcade.jumpRun.blurb,
-    accent: 'from-[#140c1e] to-[#3a2048]',
-    score: () => `${strings.arcade.highScore}: ${getHighScore('jumprun') || strings.arcade.noScore}`,
-  },
-]
+function openGamingStore() {
+  const store = useGameStore.getState()
+  store.requestWahooTab('gaming')
+  store.openWindow('news-browser')
+}
 
 export function MiniGame() {
-  const [active, setActive] = useState<CabinetId | null>(null)
+  const installedIds = useGameStore((state) => state.installedArcadeGames)
+  const [selectedId, setSelectedId] = useState<ArcadeGameId | null>(null)
+  const [playing, setPlaying] = useState<ArcadeGameId | null>(null)
 
-  if (active) {
+  const library = ARCADE_CATALOG.filter((game) => installedIds.includes(game.id))
+
+  useEffect(() => {
+    if (selectedId && installedIds.includes(selectedId)) return
+    setSelectedId(installedIds[0] ?? null)
+  }, [installedIds, selectedId])
+
+  if (playing) {
     return (
       <div className="flex h-full flex-col bg-[#111]">
         <button
           type="button"
-          onClick={() => setActive(null)}
+          onClick={() => setPlaying(null)}
           className="h-8 shrink-0 border-b border-white/15 bg-[#1c1c1c] px-3 text-left text-[11px] text-[#f0c14a] hover:bg-[#262626]"
         >
           ← {strings.arcade.back}
         </button>
         <div className="min-h-0 flex-1">
-          {active === 'sweeper' ? <SectorSweeper /> : null}
-          {active === 'blackjack' ? <Blackjack /> : null}
-          {active === 'jump-run' ? <JumpRun /> : null}
+          {playing === 'sweeper' ? <SectorSweeper /> : null}
+          {playing === 'blackjack' ? <Blackjack /> : null}
+          {playing === 'jump-run' ? <JumpRun /> : null}
         </div>
       </div>
     )
   }
 
+  const selected = selectedId ? arcadeGameById(selectedId) : null
+
   return (
-    <div className="flex h-full flex-col bg-[#16121c] p-4 font-[Tahoma,'Segoe_UI',sans-serif] text-[#f7e6c8]">
-      <div className="text-[18px] font-bold tracking-wide">{strings.arcade.title}</div>
-      <div className="mb-4 text-[12px] text-[#c4b09a]">{strings.arcade.subtitle}</div>
-      <div className="grid gap-3">
-        {CABINETS.map((cabinet) => (
-          <button
-            key={cabinet.id}
-            type="button"
-            onClick={() => setActive(cabinet.id)}
-            className={`rounded-sm border border-[#f0c14a]/40 bg-gradient-to-r ${cabinet.accent} px-4 py-3 text-left hover:border-[#f0c14a]`}
-          >
-            <div className="text-[15px] font-bold">{cabinet.title}</div>
-            <div className="mt-1 text-[12px] text-[#d9cbb8]">{cabinet.blurb}</div>
-            <div className="mt-2 font-mono text-[11px] text-[#f0c14a]">{cabinet.score()}</div>
-          </button>
-        ))}
+    <div className="flex h-full flex-col bg-[#1b1d22] font-['Segoe_UI',Tahoma,sans-serif] text-[#c7d5e0]">
+      <header className="flex h-10 shrink-0 items-center gap-3 border-b border-black/40 bg-[#17191e] px-3">
+        <div className="font-[Georgia,Times,serif] text-[15px] font-bold italic text-[#ffcc00]">
+          {strings.arcade.title}
+        </div>
+        <button
+          type="button"
+          onClick={openGamingStore}
+          className="rounded-sm px-2 py-1 text-[12px] font-semibold text-[#9aa8b5] hover:bg-white/5 hover:text-white"
+        >
+          {strings.arcade.store}
+        </button>
+      </header>
+
+      <div className="flex min-h-0 flex-1">
+        <aside className="flex w-[220px] shrink-0 flex-col border-r border-black/50 bg-[#14161b]">
+          <div className="px-3 py-2 text-[10px] font-bold tracking-[0.16em] text-[#6b7380] uppercase">
+            {strings.arcade.library}
+          </div>
+          <div className="min-h-0 flex-1 overflow-auto">
+            {library.map((game) => (
+              <button
+                key={game.id}
+                type="button"
+                onClick={() => setSelectedId(game.id)}
+                className={cn(
+                  'flex w-full items-center px-3 py-2 text-left text-[13px]',
+                  selectedId === game.id
+                    ? 'bg-[#2a475e] text-white'
+                    : 'text-[#b8c5d1] hover:bg-white/5 hover:text-white',
+                )}
+              >
+                {game.title}
+              </button>
+            ))}
+          </div>
+        </aside>
+
+        <main className="min-h-0 flex-1 overflow-auto bg-[#1b2838]">
+          {selected ? (
+            <div className="flex h-full flex-col">
+              <div className={`h-[180px] shrink-0 bg-gradient-to-r ${selected.accent}`} />
+              <div className="flex flex-1 flex-col gap-3 p-5">
+                <div className="text-[22px] font-bold text-white">{selected.title}</div>
+                <p className="text-[13px] text-[#c7d5e0]">{selected.blurb}</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-0.5 font-mono text-[11px] text-[#8f98a0]">
+                  <span>
+                    {strings.wahoo.gaming.version} {selected.version}
+                  </span>
+                  <span>
+                    {strings.wahoo.gaming.size} {selected.size}
+                  </span>
+                  <span>{gameScore(selected.id)}</span>
+                  <span>{strings.arcade.installed}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPlaying(selected.id)}
+                  className="mt-auto h-[36px] w-[140px] rounded-sm bg-[#5c7e10] text-[14px] font-bold text-[#beee11] hover:bg-[#6b8f14]"
+                >
+                  {strings.arcade.play}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-3 px-8 text-center">
+              <div className="text-[18px] font-bold text-white">{strings.arcade.emptyTitle}</div>
+              <p className="max-w-[360px] text-[13px] text-[#9aa8b5]">{strings.arcade.emptyBody}</p>
+              <button
+                type="button"
+                onClick={openGamingStore}
+                className="h-[32px] rounded-sm bg-[#7b1fa2] px-4 text-[13px] font-bold text-white hover:bg-[#6a1b9a]"
+              >
+                {strings.arcade.emptyCta}
+              </button>
+            </div>
+          )}
+        </main>
       </div>
     </div>
   )

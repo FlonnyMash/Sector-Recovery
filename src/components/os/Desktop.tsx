@@ -4,6 +4,7 @@ import { selectCurrentOs, useGameStore } from '../../store/useGameStore'
 import type { AppType } from '../../types/game'
 import { cn } from '../../utils/cn'
 import { DesktopIcon } from './DesktopIcon'
+import { GhostBootBurst } from './GhostBootBurst'
 import { NotificationToasts } from './NotificationToasts'
 import { OsWallpaper } from './OsWallpaper'
 import { Taskbar } from './Taskbar'
@@ -68,6 +69,8 @@ export function Desktop() {
       >
         <WindowManager desktopRef={desktopRef} os={os} />
       </div>
+
+      {!host ? <GhostBootBurst /> : null}
 
       <NotificationToasts />
 

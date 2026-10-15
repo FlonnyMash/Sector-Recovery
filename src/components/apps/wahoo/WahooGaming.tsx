@@ -1,65 +1,29 @@
 import { useEffect, useState } from 'react'
+import { ARCADE_CATALOG, type ArcadeGameId } from '../../../game/arcadeCatalog'
 import { strings } from '../../../i18n'
+import { useGameStore } from '../../../store/useGameStore'
 import { getBestTime, getHighScore } from '../../../utils/highScores'
 import { cn } from '../../../utils/cn'
-import { Blackjack } from '../minigames/Blackjack'
-import { JumpRun } from '../minigames/JumpRun'
-import { SectorSweeper } from '../minigames/SectorSweeper'
-
-type GameId = 'sweeper' | 'blackjack' | 'jump-run'
 
 const COPY = strings.wahoo.gaming
 const DOWNLOAD_MS = 1400
 
-const GAMES: Array<{
-  id: GameId
-  title: string
-  blurb: string
-  version: string
-  size: string
-  rating: string
-  score: () => string
-}> = [
-  {
-    id: 'sweeper',
-    title: strings.arcade.sweeper.title,
-    blurb: strings.arcade.sweeper.blurb,
-    version: COPY.sweeper.version,
-    size: COPY.sweeper.size,
-    rating: COPY.sweeper.rating,
-    score: () => {
-      const best = getBestTime('sweeper')
-      return `${strings.arcade.bestTime}: ${best === null ? strings.arcade.noScore : `${best}s`}`
-    },
-  },
-  {
-    id: 'blackjack',
-    title: strings.arcade.blackjack.title,
-    blurb: strings.arcade.blackjack.blurb,
-    version: COPY.blackjack.version,
-    size: COPY.blackjack.size,
-    rating: COPY.blackjack.rating,
-    score: () => `${strings.arcade.highScore}: ${getHighScore('blackjack') || strings.arcade.noScore}`,
-  },
-  {
-    id: 'jump-run',
-    title: strings.arcade.jumpRun.title,
-    blurb: strings.arcade.jumpRun.blurb,
-    version: COPY.jumpRun.version,
-    size: COPY.jumpRun.size,
-    rating: COPY.jumpRun.rating,
-    score: () => `${strings.arcade.highScore}: ${getHighScore('jumprun') || strings.arcade.noScore}`,
-  },
-]
+function gameScore(id: ArcadeGameId): string {
+  if (id === 'sweeper') {
+    const best = getBestTime('sweeper')
+    return `${strings.arcade.bestTime}: ${best === null ? strings.arcade.noScore : `${best}s`}`
+  }
+  if (id === 'blackjack') {
+    return `${strings.arcade.highScore}: ${getHighScore('blackjack') || strings.arcade.noScore}`
+  }
+  return `${strings.arcade.highScore}: ${getHighScore('jumprun') || strings.arcade.noScore}`
+}
 
 export function WahooGaming() {
-  const [playing, setPlaying] = useState<GameId | null>(null)
-  const [installed, setInstalled] = useState<Record<GameId, boolean>>({
-    sweeper: false,
-    blackjack: false,
-    'jump-run': false,
-  })
-  const [downloading, setDownloading] = useState<GameId | null>(null)
+  const installedIds = useGameStore((state) => state.installedArcadeGames)
+  const installArcadeGame = useGameStore((state) => state.installArcadeGame)
+  const openWindow = useGameStore((state) => state.openWindow)
+  const [downloading, setDownloading] = useState<ArcadeGameId | null>(null)
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
@@ -70,42 +34,22 @@ export function WahooGaming() {
       setProgress(next)
       if (next >= 100) {
         window.clearInterval(id)
-        setInstalled((current) => ({ ...current, [downloading]: true }))
+        installArcadeGame(downloading)
         setDownloading(null)
         setProgress(0)
-        setPlaying(downloading)
       }
     }, 50)
     return () => window.clearInterval(id)
-  }, [downloading])
-
-  if (playing) {
-    return (
-      <div className="flex h-full flex-col bg-[#111]">
-        <button
-          type="button"
-          onClick={() => setPlaying(null)}
-          className="h-8 shrink-0 border-b border-white/15 bg-[#1c1c1c] px-3 text-left text-[11px] text-[#f0c14a] hover:bg-[#262626]"
-        >
-          ← {COPY.back}
-        </button>
-        <div className="min-h-0 flex-1">
-          {playing === 'sweeper' ? <SectorSweeper /> : null}
-          {playing === 'blackjack' ? <Blackjack /> : null}
-          {playing === 'jump-run' ? <JumpRun /> : null}
-        </div>
-      </div>
-    )
-  }
+  }, [downloading, installArcadeGame])
 
   return (
     <div className="h-full overflow-auto bg-[#16121c] p-4 text-[#f7e6c8]">
       <div className="font-[Georgia,Times,serif] text-[22px] font-bold text-[#ffcc00]">{COPY.heading}</div>
       <div className="mb-4 text-[12px] text-[#c4b09a]">{COPY.subheading}</div>
       <div className="grid gap-3">
-        {GAMES.map((game) => {
+        {ARCADE_CATALOG.map((game) => {
           const isDownloading = downloading === game.id
-          const isInstalled = installed[game.id]
+          const isInstalled = installedIds.includes(game.id)
           return (
             <div
               key={game.id}
@@ -127,7 +71,7 @@ export function WahooGaming() {
                 <span>
                   {COPY.size} {game.size}
                 </span>
-                <span>{game.score()}</span>
+                <span>{gameScore(game.id)}</span>
               </div>
               {isDownloading ? (
                 <div className="mt-3">
@@ -139,27 +83,31 @@ export function WahooGaming() {
                     />
                   </div>
                 </div>
+              ) : isInstalled ? (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] font-semibold text-[#9dffb0]">{COPY.installed}</span>
+                  <button
+                    type="button"
+                    onClick={() => openWindow('arcade')}
+                    className="h-[26px] min-w-[110px] rounded-sm border border-[#5ad46a] bg-[#1e3a24] px-3 text-[12px] font-bold text-[#9dffb0] hover:bg-[#24482c]"
+                  >
+                    {COPY.openLauncher}
+                  </button>
+                </div>
               ) : (
                 <button
                   type="button"
                   disabled={downloading !== null}
                   onClick={() => {
-                    if (isInstalled) {
-                      setPlaying(game.id)
-                      return
-                    }
                     setProgress(0)
                     setDownloading(game.id)
                   }}
                   className={cn(
-                    'mt-3 h-[26px] min-w-[110px] rounded-sm border px-3 text-[12px] font-bold',
-                    isInstalled
-                      ? 'border-[#5ad46a] bg-[#1e3a24] text-[#9dffb0] hover:bg-[#24482c]'
-                      : 'border-[#f0c14a] bg-[#3a2a08] text-[#ffe08a] hover:bg-[#4a360c]',
-                    downloading !== null && !isInstalled ? 'opacity-50' : '',
+                    'mt-3 h-[26px] min-w-[110px] rounded-sm border border-[#f0c14a] bg-[#3a2a08] px-3 text-[12px] font-bold text-[#ffe08a] hover:bg-[#4a360c]',
+                    downloading !== null ? 'opacity-50' : '',
                   )}
                 >
-                  {isInstalled ? COPY.play : COPY.download}
+                  {COPY.download}
                 </button>
               )}
             </div>

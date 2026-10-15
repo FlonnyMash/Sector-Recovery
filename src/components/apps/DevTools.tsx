@@ -1,9 +1,17 @@
 import { useState, type ReactNode } from 'react'
 import { APP_LIST, type AppDefinition } from '../../game/apps'
+import {
+  CLICKS_PER_SECOND,
+  ECONOMY_SIM_STRATEGY,
+  FRAGMENTS_PER_CLICK,
+  runEconomySim,
+  summarizeEconomySim,
+  type EconomySimResult,
+} from '../../game/economySim'
 import { LOOT_NAMES } from '../../game/loot'
 import { UPGRADES } from '../../game/upgrades'
 import { strings } from '../../i18n'
-import { selectCurrentOs, useGameStore } from '../../store/useGameStore'
+import { discardDevSession, selectCurrentOs, useGameStore } from '../../store/useGameStore'
 import {
   KENJI_AUCTION_NUDGE_MS,
   LIVE_MESSAGE_COUNT,
@@ -13,7 +21,7 @@ import {
   type PrologueState,
 } from '../../types/game'
 import { cn } from '../../utils/cn'
-import { formatChatClock, formatDataSize, formatRate } from '../../utils/format'
+import { formatDataSize, formatRate, nextChatTime, sequentialChatTimes } from '../../utils/format'
 
 const COPY = strings.devTools
 
@@ -36,7 +44,27 @@ const QUICK_AMOUNTS = [100, 1_000, 10_000, 100_000, 1_000_000]
 const TIME_SCALES = [1, 2, 5, 10, 50]
 const NARRATIVE_SCALES = [1, 10, 30, 60]
 
+type DevTab = 'tools' | 'economy-sim'
+
+function reloadFresh() {
+  discardDevSession()
+  window.location.reload()
+}
+
+function unlockEverythingNow() {
+  const store = useGameStore.getState()
+  store.devCompletePrologue()
+  store.devSetRecoveryTool(true)
+  store.devSetInventory([...LOOT_NAMES])
+  const upgrades = useGameStore.getState().upgrades
+  for (const upgrade of UPGRADES) {
+    if ((upgrades[upgrade.id] ?? 0) === 0) store.devGrantUpgrade(upgrade.id, 1)
+  }
+}
+
 export function DevTools() {
+  const [tab, setTab] = useState<DevTab>('tools')
+
   return (
     <div className="flex h-full flex-col bg-[#15171c] font-mono text-[12px] text-[#d8dbe2]">
       <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
@@ -47,15 +75,40 @@ export function DevTools() {
         <span className="ml-auto text-[10px] text-[#6a7080]">{COPY.devOnly}</span>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
-        <EnvironmentSection />
-        <EconomySection />
-        <UnlocksSection />
-        <ProgramsSection />
-        <PrologueSection />
-        <UpgradesSection />
-        <ToolsSection />
+      <div className="flex flex-wrap gap-2 border-b border-white/10 px-4 py-2">
+        <DevButton onClick={reloadFresh} variant="danger" title={COPY.quick.reloadHint}>
+          {COPY.quick.reload}
+        </DevButton>
+        <DevButton onClick={unlockEverythingNow} variant="primary">
+          {COPY.quick.unlockEverything}
+        </DevButton>
+        <DevButton onClick={() => useGameStore.getState().devCompletePrologue()} variant="primary">
+          {COPY.quick.completePrologue}
+        </DevButton>
       </div>
+
+      <div className="flex border-b border-white/10 px-2">
+        <TabButton active={tab === 'tools'} onClick={() => setTab('tools')}>
+          {COPY.tabs.tools}
+        </TabButton>
+        <TabButton active={tab === 'economy-sim'} onClick={() => setTab('economy-sim')}>
+          {COPY.tabs.economySim}
+        </TabButton>
+      </div>
+
+      {tab === 'tools' ? (
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-4">
+          <EnvironmentSection />
+          <EconomySection />
+          <UnlocksSection />
+          <ProgramsSection />
+          <PrologueSection />
+          <UpgradesSection />
+          <ToolsSection />
+        </div>
+      ) : (
+        <EconomySimTab />
+      )}
     </div>
   )
 }
@@ -224,18 +277,6 @@ function UnlocksSection() {
   const inventory = useGameStore((state) => state.inventory)
   const devSetRecoveryTool = useGameStore((state) => state.devSetRecoveryTool)
   const devSetInventory = useGameStore((state) => state.devSetInventory)
-  const devCompletePrologue = useGameStore((state) => state.devCompletePrologue)
-  const devGrantUpgrade = useGameStore((state) => state.devGrantUpgrade)
-  const upgrades = useGameStore((state) => state.upgrades)
-
-  const unlockEverything = () => {
-    devCompletePrologue()
-    devSetRecoveryTool(true)
-    devSetInventory([...LOOT_NAMES])
-    for (const upgrade of UPGRADES) {
-      if ((upgrades[upgrade.id] ?? 0) === 0) devGrantUpgrade(upgrade.id, 1)
-    }
-  }
 
   const ownedNames = inventory.map((file) => file.name)
 
@@ -294,7 +335,7 @@ function UnlocksSection() {
       </div>
 
       <div className="rounded-sm border border-[#ffd166]/30 bg-[#ffd166]/10 p-3">
-        <DevButton onClick={unlockEverything} variant="primary">
+        <DevButton onClick={unlockEverythingNow} variant="primary">
           {COPY.unlocks.unlockEverything}
         </DevButton>
         <p className="mt-2 text-[10px] leading-snug text-[#c9b77a]">
@@ -446,8 +487,11 @@ function PrologueSection() {
       key: 'kenjiAuctionNudgeSent',
       patch: {
         kenjiAuctionNudgeSent: true,
-        kenjiAuctionNudgeTime: formatChatClock(),
+        kenjiAuctionNudgeTime: nextChatTime(
+          prologue.kenjiAuctionNudgeTime ?? strings.chat.earlier[strings.chat.earlier.length - 1]?.time,
+        ),
         chatNotificationPending: false,
+        chatRecency: { ...prologue.chatRecency, kenji: Date.now() },
       },
     },
     {
@@ -455,22 +499,48 @@ function PrologueSection() {
       key: 'kenjiAuctionWonSent',
       patch: {
         kenjiAuctionWonSent: true,
-        kenjiAuctionWonTime: formatChatClock(),
+        kenjiAuctionWonTime: nextChatTime(
+          prologue.kenjiAuctionWonTime ??
+            prologue.kenjiAuctionNudgeTime ??
+            strings.chat.earlier[strings.chat.earlier.length - 1]?.time,
+        ),
         chatNotificationPending: false,
+        chatRecency: { ...prologue.chatRecency, kenji: Date.now() },
       },
     },
     {
       label: COPY.prologue.friendMessage,
       key: 'friendMessageReceived',
-      patch: { friendMessageReceived: true, chatNotificationPending: false },
+      patch: {
+        friendMessageReceived: true,
+        chatNotificationPending: false,
+        liveMessagesRevealed: Math.max(1, prologue.liveMessagesRevealed),
+        liveMessageTimes:
+          prologue.liveMessageTimes.length > 0
+            ? prologue.liveMessageTimes
+            : [
+                nextChatTime(
+                  prologue.kenjiAuctionWonTime ??
+                    prologue.kenjiAuctionNudgeTime ??
+                    strings.chat.earlier[strings.chat.earlier.length - 1]?.time,
+                ),
+              ],
+        chatRecency: { ...prologue.chatRecency, kenji: Date.now() },
+      },
     },
     {
       label: COPY.prologue.momNudge,
       key: 'momNudgeReceived',
       patch: {
         momNudgeReceived: true,
+        momNudgeRevealed: Math.max(1, prologue.momNudgeRevealed),
         momChatNotificationPending: false,
-        momNudgeTime: formatChatClock(),
+        momNudgeTime: prologue.momNudgeTime ?? nextChatTime(strings.chat.mom[strings.chat.mom.length - 1]?.time),
+        momNudgeTimes:
+          prologue.momNudgeTimes.length > 0
+            ? prologue.momNudgeTimes
+            : [prologue.momNudgeTime ?? nextChatTime(strings.chat.mom[strings.chat.mom.length - 1]?.time)],
+        chatRecency: { ...prologue.chatRecency, mom: Date.now() },
       },
     },
     {
@@ -478,7 +548,13 @@ function PrologueSection() {
       key: 'liveMessagesRevealed',
       patch: {
         liveMessagesRevealed: LIVE_MESSAGE_COUNT,
-        liveMessageTimes: Array.from({ length: LIVE_MESSAGE_COUNT }, () => formatChatClock()),
+        liveMessageTimes: sequentialChatTimes(
+          LIVE_MESSAGE_COUNT,
+          prologue.kenjiAuctionWonTime ??
+            prologue.kenjiAuctionNudgeTime ??
+            strings.chat.earlier[strings.chat.earlier.length - 1]?.time,
+        ),
+        chatRecency: { ...prologue.chatRecency, kenji: Date.now() },
       },
     },
     {
@@ -487,7 +563,12 @@ function PrologueSection() {
       patch: {
         isPartitionDownloaded: true,
         imageDownloadProgress: 100,
-        partitionMountedTime: formatChatClock(),
+        partitionMountedTime: nextChatTime(
+          prologue.liveMessageTimes[prologue.liveMessageTimes.length - 1] ??
+            prologue.kenjiAuctionWonTime ??
+            prologue.kenjiAuctionNudgeTime,
+        ),
+        chatRecency: { ...prologue.chatRecency, kenji: Date.now() },
       },
     },
     { label: COPY.prologue.rebootPrompt, key: 'rebootPromptActive', patch: { rebootPromptActive: true } },
@@ -591,6 +672,115 @@ function UpgradesSection() {
   )
 }
 
+function EconomySimTab() {
+  const [result, setResult] = useState<EconomySimResult | null>(null)
+  const copy = COPY.economySim
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">
+      <div className="flex flex-col gap-2">
+        <h2 className="text-[10px] font-bold tracking-[0.18em] text-[#ffd166] uppercase">
+          {copy.title}
+        </h2>
+        <p className="text-[11px] text-[#8a90a0]">
+          {copy.clicks
+            .replace('{clicks}', String(CLICKS_PER_SECOND))
+            .replace('{fragments}', String(FRAGMENTS_PER_CLICK))}
+        </p>
+        <p className="text-[11px] leading-snug text-[#8a90a0]">{ECONOMY_SIM_STRATEGY}</p>
+        <div>
+          <DevButton onClick={() => setResult(runEconomySim())} variant="primary">
+            {result ? copy.runAgain : copy.start}
+          </DevButton>
+        </div>
+        {result?.stoppedEarly ? (
+          <p className="text-[11px] text-[#ffb3b3]">{result.stoppedEarly}</p>
+        ) : null}
+        {result ? (
+          <p className="text-[11px] leading-snug text-white">{summarizeEconomySim(result.state)}</p>
+        ) : null}
+      </div>
+      {result ? (
+        <>
+
+      <SimTable title={copy.milestones}>
+        <thead>
+          <tr>
+            <th>{copy.milestone}</th>
+            <th>{copy.time}</th>
+            <th>{copy.seconds}</th>
+            <th>{copy.wallet}</th>
+            <th>{copy.lifetime}</th>
+            <th>{copy.passive}</th>
+            <th>{copy.basicScan}</th>
+            <th>{copy.background}</th>
+            <th>{copy.botnet}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {result.milestones.map((row) => (
+            <tr key={row.milestone}>
+              <td>{row.milestone}</td>
+              <td>{row.time}</td>
+              <td>{row.seconds}</td>
+              <td>{row.wallet}</td>
+              <td>{row.lifetime}</td>
+              <td>{row.passivePerSec}</td>
+              <td>{row.basicSectorScan}</td>
+              <td>{row.backgroundProcess}</td>
+              <td>{row.botnetNode}</td>
+            </tr>
+          ))}
+        </tbody>
+      </SimTable>
+
+      <SimTable title={copy.purchases}>
+        <thead>
+          <tr>
+            <th>{copy.time}</th>
+            <th>{copy.seconds}</th>
+            <th>{copy.upgrade}</th>
+            <th>{copy.level}</th>
+            <th>{copy.cost}</th>
+            <th>{copy.wallet}</th>
+            <th>{copy.lifetime}</th>
+            <th>{copy.passive}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {result.purchases.map((row, index) => (
+            <tr key={`${row.upgrade}-${row.level}-${index}`}>
+              <td>{row.time}</td>
+              <td>{row.seconds}</td>
+              <td>{row.upgrade}</td>
+              <td>{row.level}</td>
+              <td>{row.cost}</td>
+              <td>{row.wallet}</td>
+              <td>{row.lifetime}</td>
+              <td>{row.passivePerSec}</td>
+            </tr>
+          ))}
+        </tbody>
+      </SimTable>
+        </>
+      ) : null}
+    </div>
+  )
+}
+
+function SimTable({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <h3 className="text-[10px] font-bold tracking-[0.18em] text-[#ffd166] uppercase">{title}</h3>
+      <div className="overflow-x-auto rounded-sm border border-white/10">
+        <table className="w-full border-collapse text-left text-[10px] whitespace-nowrap [&_td]:border-t [&_td]:border-white/10 [&_td]:px-2 [&_td]:py-1 [&_th]:bg-black/40 [&_th]:px-2 [&_th]:py-1.5 [&_th]:font-semibold [&_th]:text-[#8a90a0]">
+          {children}
+        </table>
+      </div>
+    </div>
+  )
+}
+
 function ToolsSection() {
   const devCloseOtherWindows = useGameStore((state) => state.devCloseOtherWindows)
   const notifications = useGameStore((state) => state.notifications)
@@ -659,6 +849,31 @@ function ToolsSection() {
 /* Primitives                                                          */
 /* ------------------------------------------------------------------ */
 
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean
+  onClick: () => void
+  children: ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'border-b-2 px-3 py-2 text-[11px] font-semibold tracking-wide uppercase',
+        active
+          ? 'border-[#ffd166] text-[#ffe6a3]'
+          : 'border-transparent text-[#8a90a0] hover:text-white',
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
@@ -721,6 +936,7 @@ function DevButton({
   type = 'button',
   variant = 'default',
   size = 'md',
+  title,
 }: {
   children: ReactNode
   onClick?: () => void
@@ -728,12 +944,14 @@ function DevButton({
   type?: 'button' | 'submit'
   variant?: 'default' | 'primary' | 'danger'
   size?: 'sm' | 'md'
+  title?: string
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={cn(
         'rounded-sm border font-semibold transition active:scale-[0.97]',
         size === 'sm' ? 'h-6 px-2 text-[10px]' : 'h-8 px-3 text-[11px]',

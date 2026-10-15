@@ -1,4 +1,4 @@
-import type { RecoveredFile, RecoveredFileType } from '../types/game'
+import type { RecoveredFile, RecoveredFileType, VirtualFile } from '../types/game'
 
 export type LootTemplate = {
   name: string
@@ -39,6 +39,7 @@ export interface ScanResult {
   fragments: number
   item: RecoveredFile | null
   isNew: boolean
+  unlockedFiles: VirtualFile[]
 }
 
 interface FragmentsEntry {

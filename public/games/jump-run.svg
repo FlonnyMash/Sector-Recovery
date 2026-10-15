@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Den-Den Dash">
+  <rect width="960" height="540" fill="#140c1e"/>
+  <text x="36" y="48" fill="#f7e6c8" font-family="Tahoma, Segoe UI, sans-serif" font-size="28" font-weight="700">Den-Den Dash</text>
+  <text x="924" y="48" text-anchor="end" fill="#f7e6c8" font-family="Consolas, monospace" font-size="16">High score: 1840 · Distance: 326</text>
+  <rect x="28" y="76" width="904" height="432" rx="2" fill="#1a1028" stroke="#5a3a70"/>
+  <rect x="28" y="430" width="904" height="78" fill="#3a2048"/>
+  <rect x="28" y="427" width="904" height="6" fill="#f0c14a"/>
+  <rect x="148" y="338" width="48" height="62" fill="#7CFF9A"/>
+  <rect x="430" y="368" width="38" height="62" fill="#e56b8c"/>
+  <rect x="620" y="348" width="38" height="82" fill="#e56b8c"/>
+  <rect x="800" y="378" width="44" height="52" fill="#e56b8c"/>
+  <text x="52" y="112" fill="#f7e6c8" font-family="Tahoma, Segoe UI, sans-serif" font-size="18">Distance: 326</text>
+</svg>

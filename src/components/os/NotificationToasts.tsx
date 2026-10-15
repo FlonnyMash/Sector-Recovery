@@ -39,6 +39,7 @@ function ToastCard({
   const holdNotification = useGameStore((state) => state.holdNotification)
   const releaseNotification = useGameStore((state) => state.releaseNotification)
   const openWindow = useGameStore((state) => state.openWindow)
+  const focusChat = useGameStore((state) => state.focusChat)
   const cardRef = useRef<HTMLButtonElement>(null)
   const boundsRef = useRef<{ left: number; top: number; width: number; height: number } | null>(null)
   const shiftX = useMotionValue(0)
@@ -87,7 +88,10 @@ function ToastCard({
         releaseNotification(notification.id)
       }}
       onClick={() => {
-        if (notification.kind === 'chat') openWindow('friend-chat')
+        if (notification.kind === 'chat') {
+          if (notification.conversationId) focusChat(notification.conversationId)
+          else openWindow('friend-chat')
+        }
         dismissNotification(notification.id)
       }}
       className="pointer-events-auto text-left"
@@ -111,7 +115,7 @@ function ToastCard({
         <div className="mt-1 text-[17px] font-semibold leading-snug">{notification.title}</div>
         <div
           className={cn(
-            'mt-1.5 text-[14px] leading-snug',
+            'mt-1.5 line-clamp-2 text-[14px] leading-snug',
             modern ? 'text-neutral-600' : 'text-white/80',
           )}
         >

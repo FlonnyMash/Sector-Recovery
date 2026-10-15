@@ -15,6 +15,8 @@ export type AppType =
   | 'net-explorer'
   | 'sector-recover'
   | 'operator-notes'
+  | 'photo-viewer'
+  | 'messenger'
   | 'news-browser'
   | 'friend-chat'
   | 'arcade'
@@ -26,6 +28,8 @@ export const APP_OS: Record<AppType, OsEnvironment> = {
   'net-explorer': 'target_os',
   'sector-recover': 'target_os',
   'operator-notes': 'target_os',
+  'photo-viewer': 'target_os',
+  messenger: 'target_os',
   'news-browser': 'host_os',
   'friend-chat': 'host_os',
   'arcade': 'host_os',
@@ -46,6 +50,8 @@ export interface WindowState {
 export type ChatConversationId = 'kenji' | 'mom' | 'study-group' | 'yujiro' | 'rin'
 
 export type AuctionLotId = 'lot-404' | 'lot-401' | 'lot-402' | 'lot-403' | 'lot-405'
+
+export type WahooTab = 'home' | 'news' | 'auctions' | 'gaming'
 
 export interface ChatLinkPreview {
   url: string
@@ -68,6 +74,7 @@ export interface PrologueState {
   rebootPromptActive: boolean
   liveMessagesRevealed: number
   momNudgeReceived: boolean
+  momNudgeRevealed: number
   momChatNotificationPending: boolean
   auctionCountdownStartedAt: number | null
   auctionLot404Sold: boolean
@@ -78,6 +85,8 @@ export interface PrologueState {
   liveMessageTimes: string[]
   partitionMountedTime: string | null
   momNudgeTime: string | null
+  momNudgeTimes: string[]
+  chatRecency: Partial<Record<ChatConversationId, number>>
 }
 
 export const initialPrologueState: PrologueState = {
@@ -90,6 +99,7 @@ export const initialPrologueState: PrologueState = {
   rebootPromptActive: false,
   liveMessagesRevealed: 0,
   momNudgeReceived: false,
+  momNudgeRevealed: 0,
   momChatNotificationPending: false,
   auctionCountdownStartedAt: null,
   auctionLot404Sold: false,
@@ -100,6 +110,8 @@ export const initialPrologueState: PrologueState = {
   liveMessageTimes: [],
   partitionMountedTime: null,
   momNudgeTime: null,
+  momNudgeTimes: [],
+  chatRecency: {},
 }
 
 export type NotificationKind = 'chat' | 'system'
@@ -109,16 +121,22 @@ export interface OsNotification {
   title: string
   body: string
   kind: NotificationKind
+  conversationId?: ChatConversationId
 }
 
 export const LIVE_MESSAGE_COUNT = 4
+/** Two mom texts plus the article card. */
+export const MOM_NUDGE_COUNT = 3
 export const COLD_CASE_PUBLISH_MS = 180_000
 export const MOM_NUDGE_MS = 300_000
 export const AUCTION_COUNTDOWN_MS = 5000
 export const AUCTION_SOLD_TO_DELAY_MS = 1000
 export const KENJI_WON_DELAY_MS = 4000
 export const KENJI_AUCTION_NUDGE_MS = 180_000
+/** Delay before Kenji's HDD follow-up when the article is read after the auction resolves. */
 export const HDD_MESSAGE_DELAY_MS = 25_000
+/** Shorter delay when the player already read the article before the auction was won. */
+export const HDD_MESSAGE_DELAY_ARTICLE_FIRST_MS = 10_000
 
 export type RecoveredFileType = 'image' | 'audio' | 'text' | 'system'
 
@@ -128,4 +146,20 @@ export interface RecoveredFile {
   type: RecoveredFileType
   size: string
   content?: string
+}
+
+export type VirtualFileType = RecoveredFileType
+
+export interface VirtualFile {
+  id: string
+  name: string
+  path: string
+  type: VirtualFileType
+  content: string
+  /** Served URL for pictures the Photo Viewer can open. */
+  imageSrc?: string
+  /** Tiny preview used by file icons. Inlined so it paints with the folder. */
+  imageThumb?: string
+  isUnlocked: boolean
+  requiredSector: number
 }

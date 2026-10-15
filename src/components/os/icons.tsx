@@ -177,6 +177,49 @@ export function ChatIcon({ size = 48, className, badge }: IconProps & { badge?: 
   )
 }
 
+export function MessengerIcon({ size = 48, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="messengerAeroFill" x1="10" y1="6" x2="36" y2="40">
+          <stop offset="0%" stopColor="#d7ebfb" />
+          <stop offset="45%" stopColor="#5aa4e0" />
+          <stop offset="100%" stopColor="#1f6fbf" />
+        </linearGradient>
+      </defs>
+      <rect
+        x="5"
+        y="7"
+        width="38"
+        height="26"
+        rx="8"
+        fill="url(#messengerAeroFill)"
+        stroke="#1a5a96"
+        strokeWidth="2"
+      />
+      <ellipse cx="16" cy="14" rx="8" ry="4" fill="white" fillOpacity="0.35" />
+      <path
+        d="M18 33 L14 41 L28 33"
+        fill="url(#messengerAeroFill)"
+        stroke="#1a5a96"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <circle cx="17" cy="20" r="2" fill="#0b3d66" />
+      <circle cx="24" cy="20" r="2" fill="#0b3d66" />
+      <circle cx="31" cy="20" r="2" fill="#0b3d66" />
+      <circle cx="38" cy="36" r="7" fill="#3ea74a" stroke="white" strokeWidth="2" />
+    </svg>
+  )
+}
+
 export function ComputerIcon({ size = 48, className }: IconProps) {
   return (
     <svg
@@ -196,6 +239,31 @@ export function ComputerIcon({ size = 48, className }: IconProps) {
       <circle cx="38" cy="22" r="1.4" fill="#3ea74a" />
       <rect x="35" y="26" width="6" height="2" fill="#8a96a4" />
       <rect x="35" y="29" width="6" height="2" fill="#8a96a4" />
+    </svg>
+  )
+}
+
+export function PhotoIcon({ size = 48, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="photoViewerSky" x1="12" y1="10" x2="12" y2="34">
+          <stop offset="0%" stopColor="#8ec8f5" />
+          <stop offset="100%" stopColor="#d7ecfb" />
+        </linearGradient>
+      </defs>
+      <rect x="8" y="12" width="30" height="24" rx="2" fill="#e8eef4" stroke="#8aa0b4" strokeWidth="2" />
+      <rect x="11" y="8" width="30" height="26" rx="2" fill="url(#photoViewerSky)" stroke="#2f5f90" strokeWidth="2" />
+      <circle cx="18" cy="15" r="2.4" fill="#f6d365" />
+      <path d="M11 28 L18 20 L24 26 L29 21 L41 32 V34 H11 Z" fill="#3ea74a" />
+      <path d="M11 30 L20 24 L27 29 L33 25 L41 33 V34 H11 Z" fill="#2f8a3a" />
     </svg>
   )
 }

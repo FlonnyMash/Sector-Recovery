@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Nipponbashi Blackjack">
+  <rect width="960" height="540" fill="#14261c"/>
+  <text x="36" y="48" fill="#e8f6ea" font-family="Tahoma, Segoe UI, sans-serif" font-size="28" font-weight="700">Nipponbashi Blackjack</text>
+  <text x="924" y="48" text-anchor="end" fill="#e8f6ea" font-family="Consolas, monospace" font-size="16">Chips: 420 · High score: 740</text>
+
+  <text x="36" y="108" fill="#aad4b4" font-family="Tahoma, Segoe UI, sans-serif" font-size="16" letter-spacing="1.4">DEALER</text>
+  <g font-family="Tahoma, Segoe UI, sans-serif" font-size="22" font-weight="700" text-anchor="middle">
+    <rect x="36" y="124" width="72" height="102" rx="4" fill="#f7f1e4" stroke="#d9d2c5"/>
+    <text x="72" y="184" fill="#1a1a1a">A♠</text>
+    <rect x="120" y="124" width="72" height="102" rx="4" fill="#3a2060" stroke="#3a2060"/>
+    <text x="156" y="184" fill="#ffffff">◆</text>
+  </g>
+
+  <text x="36" y="278" fill="#aad4b4" font-family="Tahoma, Segoe UI, sans-serif" font-size="16" letter-spacing="1.4">YOU · 18</text>
+  <g font-family="Tahoma, Segoe UI, sans-serif" font-size="22" font-weight="700" text-anchor="middle">
+    <rect x="36" y="294" width="72" height="102" rx="4" fill="#f7f1e4" stroke="#d9d2c5"/>
+    <text x="72" y="354" fill="#c42b3a">8♥</text>
+    <rect x="120" y="294" width="72" height="102" rx="4" fill="#f7f1e4" stroke="#d9d2c5"/>
+    <text x="156" y="354" fill="#1a1a1a">K♣</text>
+  </g>
+
+  <g font-family="Tahoma, Segoe UI, sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+    <rect x="300" y="456" width="88" height="36" rx="2" fill="#2f5a38" stroke="#9ad4a6"/>
+    <text x="344" y="480" fill="#e8f6ea">Hit</text>
+    <rect x="404" y="456" width="88" height="36" rx="2" fill="#2f5a38" stroke="#9ad4a6"/>
+    <text x="448" y="480" fill="#e8f6ea">Stand</text>
+    <rect x="508" y="456" width="88" height="36" rx="2" fill="#2f5a38" stroke="#9ad4a6"/>
+    <text x="552" y="480" fill="#e8f6ea">Double</text>
+  </g>
+</svg>

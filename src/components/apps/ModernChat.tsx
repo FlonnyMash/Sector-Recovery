@@ -9,22 +9,42 @@ import {
   type ReactNode,
 } from 'react'
 import { strings } from '../../i18n'
-import { useGameStore } from '../../store/useGameStore'
+import { selectActiveWindowId, selectCurrentOs, useGameStore } from '../../store/useGameStore'
 import {
   LIVE_MESSAGE_COUNT,
+  MOM_NUDGE_COUNT,
   type ChatConversationId,
   type ChatLinkPreview,
 } from '../../types/game'
 import { cn } from '../../utils/cn'
-import { formatChatClock } from '../../utils/format'
+import { nextChatTime } from '../../utils/format'
+import { playMessageSound } from '../../utils/sounds'
 
-const TYPING_MS = 1400
+const TYPING_MS_PER_CHAR = 42
+const TYPING_MIN_MS = 2000
+const TYPING_MAX_MS = 11000
+const TYPING_GAP_MS = 320
 const PANE_TRANSITION = { duration: 0.18, ease: 'easeOut' as const }
 const SCROLL_BOTTOM_PX = 48
+
+function typingDurationMs(text: string): number {
+  return Math.min(TYPING_MAX_MS, Math.max(TYPING_MIN_MS, Math.round(text.length * TYPING_MS_PER_CHAR)))
+}
 
 type ConversationId = ChatConversationId
 
 const COLD_CASE_ARTICLE = strings.news.articles.find((article) => article.id === 'cold-case-article')!
+
+function nextKenjiLiveText(revealed: number): string {
+  return strings.chat.live[revealed] ?? ''
+}
+
+function nextMomNudgeText(revealed: number): string {
+  if (revealed < strings.chat.momNudge.length) {
+    return strings.chat.momNudge[revealed]?.text ?? ''
+  }
+  return `${COLD_CASE_ARTICLE.title} ${COLD_CASE_ARTICLE.excerpt}`
+}
 
 const MOM_LINK_PREVIEW: ChatLinkPreview = {
   url: `${strings.news.addressArticle}/${COLD_CASE_ARTICLE.id}`,
@@ -55,6 +75,7 @@ interface LocalMessage {
 export function ModernChat() {
   const prologue = useGameStore((state) => state.prologue)
   const revealNextLiveMessage = useGameStore((state) => state.revealNextLiveMessage)
+  const revealNextMomNudge = useGameStore((state) => state.revealNextMomNudge)
   const startPartitionDownload = useGameStore((state) => state.startPartitionDownload)
   const clearChatNotification = useGameStore((state) => state.clearChatNotification)
   const clearMomChatNotification = useGameStore((state) => state.clearMomChatNotification)
@@ -82,6 +103,16 @@ export function ModernChat() {
   activeIdRef.current = activeId
 
   const kenjiActive = activeId === 'kenji'
+  const momActive = activeId === 'mom'
+  const chatVisible = useGameStore((state) =>
+    state.windows.some((window) => window.type === 'friend-chat' && window.isOpen && !window.isMinimized),
+  )
+  const chatFocused = useGameStore((state) => {
+    const activeId = selectActiveWindowId(state.windows)
+    if (!activeId) return false
+    return state.windows.find((window) => window.id === activeId)?.type === 'friend-chat'
+  })
+  const soundOs = useGameStore((state) => selectCurrentOs(state.systemStage, state.bootTarget))
 
   const contentKeys = useMemo(
     () => ({
@@ -94,13 +125,19 @@ export function ModernChat() {
         typing && kenjiActive ? 1 : 0,
         sent.kenji.length,
       ].join(':'),
-      mom: [prologue.momNudgeReceived ? 1 : 0, sent.mom.length].join(':'),
+      mom: [
+        prologue.momNudgeReceived ? 1 : 0,
+        prologue.momNudgeRevealed,
+        typing && momActive ? 1 : 0,
+        sent.mom.length,
+      ].join(':'),
       'study-group': String(sent['study-group'].length),
       yujiro: String(sent.yujiro.length),
       rin: String(sent.rin.length),
     }),
     [
       kenjiActive,
+      momActive,
       typing,
       sent,
       prologue.kenjiAuctionNudgeSent,
@@ -108,6 +145,7 @@ export function ModernChat() {
       prologue.liveMessagesRevealed,
       prologue.isPartitionDownloaded,
       prologue.momNudgeReceived,
+      prologue.momNudgeRevealed,
     ],
   )
 
@@ -144,6 +182,7 @@ export function ModernChat() {
   const selectConversation = useCallback(
     (id: ConversationId) => {
       rememberScroll()
+      setTyping(false)
       setActiveId(id)
       setDraft('')
     },
@@ -156,6 +195,7 @@ export function ModernChat() {
       return
     }
     rememberScroll()
+    setTyping(false)
     setActiveId(pendingChatFocus)
     consumePendingChatFocus()
   }, [pendingChatFocus, activeId, consumePendingChatFocus, rememberScroll])
@@ -172,24 +212,73 @@ export function ModernChat() {
     clearMomChatNotification,
   ])
 
-  const waitingForNext =
-    kenjiActive && prologue.friendMessageReceived && prologue.liveMessagesRevealed < LIVE_MESSAGE_COUNT
+  const waitingForKenji =
+    chatVisible &&
+    kenjiActive &&
+    prologue.friendMessageReceived &&
+    prologue.liveMessagesRevealed >= 1 &&
+    prologue.liveMessagesRevealed < LIVE_MESSAGE_COUNT
+
+  const waitingForMom =
+    chatVisible &&
+    momActive &&
+    prologue.momNudgeReceived &&
+    prologue.momNudgeRevealed >= 1 &&
+    prologue.momNudgeRevealed < MOM_NUDGE_COUNT
+
+  const kenjiIncomingCount =
+    (prologue.kenjiAuctionNudgeSent ? 1 : 0) +
+    (prologue.kenjiAuctionWonSent ? 1 : 0) +
+    prologue.liveMessagesRevealed +
+    (prologue.isPartitionDownloaded ? 1 : 0)
+  const kenjiIncomingRef = useRef(kenjiIncomingCount)
+  const momIncomingRef = useRef(prologue.momNudgeRevealed)
 
   useEffect(() => {
-    if (!waitingForNext) return
+    const previous = kenjiIncomingRef.current
+    kenjiIncomingRef.current = kenjiIncomingCount
+    if (!chatFocused || !kenjiActive) return
+    if (kenjiIncomingCount > previous) playMessageSound(soundOs)
+  }, [kenjiIncomingCount, chatFocused, kenjiActive, soundOs])
 
-    const start = window.setTimeout(() => setTyping(true), 40)
+  useEffect(() => {
+    const previous = momIncomingRef.current
+    momIncomingRef.current = prologue.momNudgeRevealed
+    if (!chatFocused || !momActive) return
+    if (prologue.momNudgeRevealed > previous) playMessageSound(soundOs)
+  }, [prologue.momNudgeRevealed, chatFocused, momActive, soundOs])
+
+  useEffect(() => {
+    if (!waitingForKenji) return
+    const duration = typingDurationMs(nextKenjiLiveText(prologue.liveMessagesRevealed))
+    const start = window.setTimeout(() => setTyping(true), TYPING_GAP_MS)
     const id = window.setTimeout(() => {
       setTyping(false)
       revealNextLiveMessage()
-    }, TYPING_MS)
+    }, TYPING_GAP_MS + duration)
 
     return () => {
       window.clearTimeout(start)
       window.clearTimeout(id)
       setTyping(false)
     }
-  }, [waitingForNext, prologue.liveMessagesRevealed, revealNextLiveMessage])
+  }, [waitingForKenji, prologue.liveMessagesRevealed, revealNextLiveMessage])
+
+  useEffect(() => {
+    if (!waitingForMom) return
+    const duration = typingDurationMs(nextMomNudgeText(prologue.momNudgeRevealed))
+    const start = window.setTimeout(() => setTyping(true), TYPING_GAP_MS)
+    const id = window.setTimeout(() => {
+      setTyping(false)
+      revealNextMomNudge()
+    }, TYPING_GAP_MS + duration)
+
+    return () => {
+      window.clearTimeout(start)
+      window.clearTimeout(id)
+      setTyping(false)
+    }
+  }, [waitingForMom, prologue.momNudgeRevealed, revealNextMomNudge])
 
   useLayoutEffect(() => {
     for (const id of Object.keys(contentKeys) as ConversationId[]) {
@@ -207,10 +296,12 @@ export function ModernChat() {
 
   const conversations = useMemo(() => {
     const needle = query.trim().toLowerCase()
-    return strings.chat.conversations.filter((conversation) =>
-      needle ? conversation.name.toLowerCase().includes(needle) : true,
-    )
-  }, [query])
+    const recency = prologue.chatRecency
+    return strings.chat.conversations
+      .filter((conversation) => (needle ? conversation.name.toLowerCase().includes(needle) : true))
+      .slice()
+      .sort((a, b) => (recency[b.id] ?? 0) - (recency[a.id] ?? 0))
+  }, [query, prologue.chatRecency])
 
   const active = strings.chat.conversations.find((conversation) => conversation.id === activeId)
   const liveMessages = strings.chat.live.slice(0, prologue.liveMessagesRevealed)
@@ -219,7 +310,7 @@ export function ModernChat() {
   function sendDraft() {
     const text = draft.trim()
     if (!text) return
-    const time = formatChatClock()
+    const time = nextChatTime(sidebarPreview(activeId, prologue, sent[activeId]).time)
     setSent((current) => ({
       ...current,
       [activeId]: [...current[activeId], { from: 'player', time, text }],
@@ -248,6 +339,10 @@ export function ModernChat() {
               (conversation.id === 'kenji' && prologue.chatNotificationPending) ||
               (conversation.id === 'mom' && prologue.momChatNotificationPending)
             const selected = conversation.id === activeId
+            const isTypingHere =
+              typing &&
+              ((conversation.id === 'kenji' && kenjiActive) ||
+                (conversation.id === 'mom' && momActive))
             const preview = sidebarPreview(conversation.id, prologue, sent[conversation.id])
             return (
               <button
@@ -276,10 +371,16 @@ export function ModernChat() {
                     <span
                       className={cn(
                         'truncate text-[12px]',
-                        selected ? 'text-white/80' : 'text-neutral-500',
+                        isTypingHere
+                          ? selected
+                            ? 'italic text-white'
+                            : 'italic text-[#0a84ff]'
+                          : selected
+                            ? 'text-white/80'
+                            : 'text-neutral-500',
                       )}
                     >
-                      {preview.text}
+                      {isTypingHere ? strings.chat.sidebarTyping : preview.text}
                     </span>
                     {unread ? (
                       <span className="ml-auto h-2 w-2 shrink-0 rounded-full bg-[#0a84ff] ring-2 ring-white" />
@@ -307,7 +408,13 @@ export function ModernChat() {
                 <Avatar name={active.name} color={active.color} />
                 <div className="min-w-0">
                   <div className="truncate text-[14px] font-semibold">{active.name}</div>
-                  <div className="text-[11px] text-neutral-500">{active.status}</div>
+                  <div className={cn('text-[11px]', typing ? 'text-[#0a84ff]' : 'text-neutral-500')}>
+                    {typing && active.id === 'mom'
+                      ? strings.chat.momTyping
+                      : typing && active.id === 'kenji'
+                        ? strings.chat.typing
+                        : active.status}
+                  </div>
                 </div>
               </header>
 
@@ -411,7 +518,13 @@ export function ModernChat() {
                   </>
                 ) : (
                   <>
-                    {threadMessages(active.id, prologue.momNudgeReceived, prologue.momNudgeTime).map((message, index) => (
+                    {threadMessages(
+                      active.id,
+                      prologue.momNudgeReceived,
+                      prologue.momNudgeRevealed,
+                      prologue.momNudgeTimes,
+                      prologue.momNudgeTime,
+                    ).map((message, index) => (
                       <Bubble
                         key={`${message.time ?? 'nudge'}-${message.text}-${index}`}
                         from={message.from === 'player' ? 'player' : 'them'}
@@ -432,12 +545,30 @@ export function ModernChat() {
                         from="player"
                         time={message.time}
                         index={
-                          threadMessages(active.id, prologue.momNudgeReceived, prologue.momNudgeTime).length + index
+                          threadMessages(
+                            active.id,
+                            prologue.momNudgeReceived,
+                            prologue.momNudgeRevealed,
+                            prologue.momNudgeTimes,
+                            prologue.momNudgeTime,
+                          ).length + index
                         }
                       >
                         {message.text}
                       </Bubble>
                     ))}
+                    <AnimatePresence>
+                      {typing ? (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          className="flex justify-start"
+                        >
+                          <TypingDots />
+                        </motion.div>
+                      ) : null}
+                    </AnimatePresence>
                   </>
                 )}
               </div>
@@ -482,6 +613,8 @@ interface ThreadMessage {
 function threadMessages(
   id: ConversationId,
   momNudgeReceived: boolean,
+  momNudgeRevealed: number,
+  momNudgeTimes: string[],
   momNudgeTime: string | null,
 ): ThreadMessage[] {
   if (id === 'study-group') return [...strings.chat.studyGroup]
@@ -489,11 +622,23 @@ function threadMessages(
   if (id === 'rin') return [...strings.chat.rin]
   const messages: ThreadMessage[] = [...strings.chat.mom]
   if (!momNudgeReceived) return messages
-  const time = momNudgeTime ?? undefined
-  for (const message of strings.chat.momNudge) {
-    messages.push({ from: message.from, text: message.text, time })
+  const count = Math.max(0, momNudgeRevealed)
+  for (let index = 0; index < Math.min(count, strings.chat.momNudge.length); index += 1) {
+    const message = strings.chat.momNudge[index]
+    messages.push({
+      from: message.from,
+      text: message.text,
+      time: momNudgeTimes[index] ?? momNudgeTime ?? undefined,
+    })
   }
-  messages.push({ from: 'them', text: '', time, linkPreview: MOM_LINK_PREVIEW })
+  if (count >= MOM_NUDGE_COUNT) {
+    messages.push({
+      from: 'them',
+      text: '',
+      time: momNudgeTimes[MOM_NUDGE_COUNT - 1] ?? momNudgeTime ?? undefined,
+      linkPreview: MOM_LINK_PREVIEW,
+    })
+  }
   return messages
 }
 
@@ -542,10 +687,13 @@ function sidebarPreview(
       return { text: strings.chat.auctionNudge, time: prologue.kenjiAuctionNudgeTime ?? fallbackTime }
     }
   }
-  if (id === 'mom' && prologue.momNudgeReceived) {
+  if (id === 'mom' && prologue.momNudgeReceived && prologue.momNudgeRevealed > 0) {
+    const revealed = prologue.momNudgeRevealed
+    const textIndex = Math.min(revealed, strings.chat.momNudge.length) - 1
+    const timeIndex = Math.min(revealed, MOM_NUDGE_COUNT) - 1
     return {
-      text: strings.chat.momNudge[1].text,
-      time: prologue.momNudgeTime ?? fallbackTime,
+      text: strings.chat.momNudge[textIndex]?.text ?? fallback?.preview ?? '',
+      time: prologue.momNudgeTimes[timeIndex] ?? prologue.momNudgeTime ?? fallbackTime,
     }
   }
   return { text: fallback?.preview ?? '', time: fallbackTime }

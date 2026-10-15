@@ -1,3 +1,4 @@
+import { ARCADE_CATALOG } from '../../../game/arcadeCatalog'
 import { AUCTION_LOTS, resolveLot } from '../../../game/wahooAuctions'
 import { strings } from '../../../i18n'
 import { useGameStore } from '../../../store/useGameStore'
@@ -7,24 +8,6 @@ import type { NewsArticle } from './WahooNews'
 const COPY = strings.wahoo
 const ARTICLES = strings.news.articles
 const AUCTION_PREVIEWS = AUCTION_LOTS.slice(0, 3)
-
-const GAME_PREVIEWS = [
-  {
-    title: strings.arcade.sweeper.title,
-    version: COPY.gaming.sweeper.version,
-    rating: COPY.gaming.sweeper.rating,
-  },
-  {
-    title: strings.arcade.blackjack.title,
-    version: COPY.gaming.blackjack.version,
-    rating: COPY.gaming.blackjack.rating,
-  },
-  {
-    title: strings.arcade.jumpRun.title,
-    version: COPY.gaming.jumpRun.version,
-    rating: COPY.gaming.jumpRun.rating,
-  },
-]
 
 function articleById(id: string): NewsArticle | undefined {
   return ARTICLES.find((article) => article.id === id)
@@ -100,8 +83,8 @@ export function WahooHome({
             </div>
             <p className="mt-1 text-[12px] text-[#5a5e66]">{COPY.gaming.subheading}</p>
             <ul className="mt-3 space-y-2">
-              {GAME_PREVIEWS.map((game) => (
-                <li key={game.title} className="flex items-baseline justify-between gap-3">
+              {ARCADE_CATALOG.map((game) => (
+                <li key={game.id} className="flex items-baseline justify-between gap-3">
                   <span className="text-[13px] font-semibold text-[#1a1a1a]">{game.title}</span>
                   <span className="shrink-0 font-mono text-[11px] text-[#8a6a5e]">
                     {game.version} · {game.rating}

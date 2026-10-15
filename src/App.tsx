@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { BiosScreen } from './components/os/BiosScreen'
 import { BootScreen } from './components/os/BootScreen'
 import { Desktop } from './components/os/Desktop'
@@ -8,9 +8,31 @@ import { LoginScreen } from './components/os/LoginScreen'
 import { MotherboardSplash } from './components/os/MotherboardSplash'
 import { ShuttingDownScreen } from './components/os/ShuttingDownScreen'
 import { useGameStore } from './store/useGameStore'
-import type { SystemStage } from './types/game'
+import type { OsEnvironment, SystemStage } from './types/game'
+import {
+  isClickFeedbackTarget,
+  playClickSound,
+  playPowerOnSound,
+  playStartupSound,
+} from './utils/sounds'
 
-const BLACK_SCREEN_MS = 1500
+const BLACK_SCREEN_MS = 3500
+/** POST beep lands partway through the black screen, like a real board. */
+const POST_BEEP_DELAY_MS = 1400
+
+/** Stages where UI clicks should give audible feedback. */
+function isClickFeedbackStage(stage: SystemStage) {
+  return (
+    stage === 'host_os' ||
+    stage === 'host_login' ||
+    stage === 'target_os' ||
+    stage === 'legacy_login'
+  )
+}
+
+function isDesktopStage(stage: SystemStage): stage is OsEnvironment {
+  return stage === 'host_os' || stage === 'target_os'
+}
 
 const FADE = { duration: 0.28 }
 const CUT = { duration: 0 }
@@ -63,12 +85,42 @@ function App() {
     return () => window.clearInterval(id)
   }, [fragmentsPerSecond, tick])
 
+  // Stage-transition sounds. Only real transitions play (not the initial
+  // mount, and not StrictMode's duplicate effect run for the same stage).
+  const previousStageRef = useRef<SystemStage | null>(null)
+  useEffect(() => {
+    const previous = previousStageRef.current
+    previousStageRef.current = systemStage
+    if (previous === null || previous === systemStage) return
+
+    if (isDesktopStage(systemStage) && !isDesktopStage(previous)) {
+      playStartupSound(systemStage)
+    }
+  }, [systemStage])
+
+  // Global click feedback. Read the stage at event time so the listener
+  // binds once.
+  useEffect(() => {
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.button !== 0) return
+      if (!isClickFeedbackStage(useGameStore.getState().systemStage)) return
+      if (!isClickFeedbackTarget(event.target)) return
+      playClickSound()
+    }
+    document.addEventListener('pointerdown', onPointerDown, true)
+    return () => document.removeEventListener('pointerdown', onPointerDown, true)
+  }, [])
+
   useEffect(() => {
     if (systemStage !== 'black_screen') return
+    const beep = window.setTimeout(() => playPowerOnSound(), POST_BEEP_DELAY_MS)
     const id = window.setTimeout(() => {
       setSystemStage('motherboard_splash')
     }, BLACK_SCREEN_MS)
-    return () => window.clearTimeout(id)
+    return () => {
+      window.clearTimeout(beep)
+      window.clearTimeout(id)
+    }
   }, [systemStage, setSystemStage])
 
   useEffect(() => {

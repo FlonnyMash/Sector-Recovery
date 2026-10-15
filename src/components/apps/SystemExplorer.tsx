@@ -1,25 +1,82 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { selectVisibleApps } from '../../game/apps'
+import {
+  EXPLORER_PATH,
+  dynamicChildFolders,
+  filesInDirectory,
+  joinPath,
+} from '../../game/virtualFiles'
 import { strings } from '../../i18n'
 import { useGameStore } from '../../store/useGameStore'
 import type { AppType, RecoveredFileType } from '../../types/game'
 import { cn } from '../../utils/cn'
 
-type PageId = 'computer' | 'drive' | 'sys-user' | 'toro' | 'desktop' | 'recovered'
-
 const COPY = strings.systemExplorer
 
-const DRIVE_PAGES: PageId[] = ['drive', 'sys-user', 'toro', 'desktop', 'recovered']
-const SYS_USER_PAGES: PageId[] = ['sys-user', 'toro', 'desktop']
-const TORO_PAGES: PageId[] = ['toro', 'desktop']
+function folderLabel(path: string): string {
+  if (path === EXPLORER_PATH.computer) return COPY.computer
+  if (path === EXPLORER_PATH.drive) return COPY.drive
+  if (path === EXPLORER_PATH.recovered) return COPY.recoveredFolder
+  if (path === EXPLORER_PATH.user) return COPY.sysUser
+  if (path === EXPLORER_PATH.toro) return COPY.userFolder
+  if (path === EXPLORER_PATH.desktop) return COPY.desktop
+  if (path === EXPLORER_PATH.pictures) return COPY.pictures
+  const slash = path.lastIndexOf('/')
+  return slash === -1 ? path : path.slice(slash + 1)
+}
+
+function staticChildFolders(
+  path: string,
+  hasRecoveryTool: boolean,
+): { path: string; label: string }[] {
+  if (path === EXPLORER_PATH.computer) {
+    return [{ path: EXPLORER_PATH.drive, label: COPY.drive }]
+  }
+  if (path === EXPLORER_PATH.drive) {
+    const folders: { path: string; label: string }[] = [
+      { path: EXPLORER_PATH.user, label: COPY.sysUser },
+    ]
+    if (hasRecoveryTool) {
+      folders.push({ path: EXPLORER_PATH.recovered, label: COPY.recoveredFolder })
+    }
+    return folders
+  }
+  if (path === EXPLORER_PATH.user) {
+    return [{ path: EXPLORER_PATH.toro, label: COPY.userFolder }]
+  }
+  if (path === EXPLORER_PATH.toro) {
+    return [
+      { path: EXPLORER_PATH.desktop, label: COPY.desktop },
+      { path: EXPLORER_PATH.pictures, label: COPY.pictures },
+    ]
+  }
+  return []
+}
+
+function ancestorPaths(path: string): string[] {
+  if (path === EXPLORER_PATH.computer) return [EXPLORER_PATH.computer]
+  const parts: string[] = [EXPLORER_PATH.computer]
+  const segs = path === EXPLORER_PATH.drive ? [EXPLORER_PATH.drive] : path.split('/')
+  let acc = segs[0] ?? EXPLORER_PATH.drive
+  parts.push(acc)
+  for (let index = 1; index < segs.length; index++) {
+    acc = `${acc}/${segs[index]}`
+    parts.push(acc)
+  }
+  return parts
+}
 
 export function SystemExplorer() {
   const inventory = useGameStore((state) => state.inventory)
+  const files = useGameStore((state) => state.files)
   const hasRecoveryTool = useGameStore((state) => state.hasRecoveryTool)
+  const explorerRevealRequest = useGameStore((state) => state.explorerRevealRequest)
+  const clearExplorerRevealRequest = useGameStore((state) => state.clearExplorerRevealRequest)
   const openWindow = useGameStore((state) => state.openWindow)
+  const openFile = useGameStore((state) => state.openFile)
   const desktopApps = selectVisibleApps('target_os', hasRecoveryTool)
 
-  const [history, setHistory] = useState<PageId[]>(['computer'])
+  const [history, setHistory] = useState<string[]>([EXPLORER_PATH.computer])
   const [historyIndex, setHistoryIndex] = useState(0)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [driveExpanded, setDriveExpanded] = useState(false)
@@ -27,19 +84,40 @@ export function SystemExplorer() {
   const [toroExpanded, setToroExpanded] = useState(false)
   const [selectedDesktopApp, setSelectedDesktopApp] = useState<AppType | null>(null)
 
-  const page = history[historyIndex] ?? 'computer'
+  const page = history[historyIndex] ?? EXPLORER_PATH.computer
   const canBack = historyIndex > 0
   const canForward = historyIndex < history.length - 1
-  const selectedFile = inventory.find((file) => file.id === selectedId) ?? null
 
-  const expandAncestors = (next: PageId) => {
-    if (DRIVE_PAGES.includes(next)) setDriveExpanded(true)
-    if (SYS_USER_PAGES.includes(next)) setSysUserExpanded(true)
-    if (TORO_PAGES.includes(next)) setToroExpanded(true)
+  const folderTiles = useMemo(() => {
+    const staticFolders = staticChildFolders(page, hasRecoveryTool)
+    const known = new Set(staticFolders.map((folder) => folder.path))
+    const dynamic = dynamicChildFolders(files, page)
+      .map((segment) => ({ path: joinPath(page, segment), label: segment }))
+      .filter((folder) => !known.has(folder.path))
+    return [...staticFolders, ...dynamic]
+  }, [files, hasRecoveryTool, page])
+
+  const visibleFiles = useMemo(
+    () => (page === EXPLORER_PATH.recovered ? [] : filesInDirectory(files, page)),
+    [files, page],
+  )
+
+  const selectedVirtualFile = visibleFiles.find((file) => file.id === selectedId) ?? null
+  const selectedLootFile = inventory.find((file) => file.id === selectedId) ?? null
+
+  const expandAncestors = (next: string) => {
+    if (next === EXPLORER_PATH.computer) return
+    setDriveExpanded(true)
+    if (next === EXPLORER_PATH.user || next.startsWith(`${EXPLORER_PATH.user}/`)) {
+      setSysUserExpanded(true)
+    }
+    if (next === EXPLORER_PATH.toro || next.startsWith(`${EXPLORER_PATH.toro}/`)) {
+      setToroExpanded(true)
+    }
   }
 
-  const goTo = (next: PageId) => {
-    if (next === 'recovered' && !hasRecoveryTool) return
+  const goTo = (next: string) => {
+    if (next === EXPLORER_PATH.recovered && !hasRecoveryTool) return
     if (history[historyIndex] === next) return
     setSelectedId(null)
     setSelectedDesktopApp(null)
@@ -49,38 +127,54 @@ export function SystemExplorer() {
   }
 
   useEffect(() => {
-    if (hasRecoveryTool || page !== 'recovered') return
+    if (hasRecoveryTool || page !== EXPLORER_PATH.recovered) return
     setSelectedId(null)
-    setHistory(['computer', 'drive'])
+    setHistory([EXPLORER_PATH.computer, EXPLORER_PATH.drive])
     setHistoryIndex(1)
   }, [hasRecoveryTool, page])
 
-  const driveFolderCount = 1 + (hasRecoveryTool ? 1 : 0)
+  useEffect(() => {
+    if (!explorerRevealRequest) return
+    const trail = ancestorPaths(explorerRevealRequest.path)
+    expandAncestors(explorerRevealRequest.path)
+    setHistory(trail)
+    setHistoryIndex(trail.length - 1)
+    setSelectedId(explorerRevealRequest.fileId)
+    setSelectedDesktopApp(null)
+    clearExplorerRevealRequest()
+  }, [explorerRevealRequest, clearExplorerRevealRequest])
+
+  const isDesktop = page === EXPLORER_PATH.desktop
+  const isRecovered = page === EXPLORER_PATH.recovered
+
   const statusCount =
-    page === 'recovered'
-      ? inventory.length
-      : page === 'desktop'
-        ? desktopApps.length
-        : page === 'drive'
-          ? driveFolderCount
-          : page === 'sys-user' || page === 'toro'
-            ? 1
-            : 1
+    folderTiles.length +
+    visibleFiles.length +
+    (isDesktop ? desktopApps.length : 0) +
+    (isRecovered ? inventory.length : 0)
 
   const statusDetail =
-    page === 'recovered' && selectedFile
-      ? COPY.itemSelected.replace('{name}', selectedFile.name).replace('{size}', selectedFile.size)
-      : page === 'desktop' && selectedDesktopApp
-        ? desktopApps.find((app) => app.type === selectedDesktopApp)?.title ?? ''
-        : ''
+    selectedLootFile
+      ? COPY.itemSelected.replace('{name}', selectedLootFile.name).replace('{size}', selectedLootFile.size)
+      : selectedVirtualFile
+        ? selectedVirtualFile.name
+        : isDesktop && selectedDesktopApp
+          ? desktopApps.find((app) => app.type === selectedDesktopApp)?.title ?? ''
+          : ''
 
   const openDesktopApp = (type: AppType) => {
     if (type === 'system-explorer') {
-      goTo('computer')
+      goTo(EXPLORER_PATH.computer)
       return
     }
     openWindow(type)
   }
+
+  const isEmpty =
+    folderTiles.length === 0 &&
+    visibleFiles.length === 0 &&
+    (!isDesktop || desktopApps.length === 0) &&
+    (!isRecovered || inventory.length === 0)
 
   return (
     <div className="flex h-full flex-col bg-[#f0f0f0] font-[Tahoma,'Segoe_UI',sans-serif] text-[12px] text-[#222]">
@@ -92,7 +186,7 @@ export function SystemExplorer() {
           {COPY.forward} →
         </ChromeButton>
         <div className="win7-inset ml-1 flex min-w-0 flex-1 items-center gap-1 bg-white px-2 py-0.5 text-[11px]">
-          <AddressCrumbs page={page} onGo={goTo} hasRecoveryTool={hasRecoveryTool} />
+          <AddressCrumbs path={page} onGo={goTo} />
         </div>
       </div>
 
@@ -101,18 +195,23 @@ export function SystemExplorer() {
           <NavGroup title={COPY.favorites}>
             <NavItem
               label={COPY.desktop}
-              active={page === 'desktop'}
-              onClick={() => goTo('desktop')}
+              active={page === EXPLORER_PATH.desktop}
+              onClick={() => goTo(EXPLORER_PATH.desktop)}
+            />
+            <NavItem
+              label={COPY.pictures}
+              active={page === EXPLORER_PATH.pictures}
+              onClick={() => goTo(EXPLORER_PATH.pictures)}
             />
           </NavGroup>
           <NavGroup title={COPY.computer}>
             <NavItem
               label={COPY.drive}
-              active={page === 'drive'}
+              active={page === EXPLORER_PATH.drive}
               expanded={driveExpanded}
               expandable
               onToggle={() => setDriveExpanded((open) => !open)}
-              onClick={() => goTo('drive')}
+              onClick={() => goTo(EXPLORER_PATH.drive)}
             />
             {driveExpanded ? (
               <>
@@ -120,37 +219,45 @@ export function SystemExplorer() {
                   <NavItem
                     label={COPY.recoveredFolder}
                     depth={1}
-                    active={page === 'recovered'}
-                    onClick={() => goTo('recovered')}
+                    active={page === EXPLORER_PATH.recovered}
+                    onClick={() => goTo(EXPLORER_PATH.recovered)}
                   />
                 ) : null}
                 <NavItem
                   label={COPY.sysUser}
                   depth={1}
-                  active={page === 'sys-user'}
+                  active={page === EXPLORER_PATH.user}
                   expanded={sysUserExpanded}
                   expandable
                   onToggle={() => setSysUserExpanded((open) => !open)}
-                  onClick={() => goTo('sys-user')}
+                  onClick={() => goTo(EXPLORER_PATH.user)}
                 />
                 {sysUserExpanded ? (
                   <>
                     <NavItem
                       label={COPY.userFolder}
                       depth={2}
-                      active={page === 'toro'}
+                      active={page === EXPLORER_PATH.toro}
                       expanded={toroExpanded}
                       expandable
                       onToggle={() => setToroExpanded((open) => !open)}
-                      onClick={() => goTo('toro')}
+                      onClick={() => goTo(EXPLORER_PATH.toro)}
                     />
                     {toroExpanded ? (
-                      <NavItem
-                        label={COPY.desktop}
-                        depth={3}
-                        active={page === 'desktop'}
-                        onClick={() => goTo('desktop')}
-                      />
+                      <>
+                        <NavItem
+                          label={COPY.desktop}
+                          depth={3}
+                          active={page === EXPLORER_PATH.desktop}
+                          onClick={() => goTo(EXPLORER_PATH.desktop)}
+                        />
+                        <NavItem
+                          label={COPY.pictures}
+                          depth={3}
+                          active={page === EXPLORER_PATH.pictures}
+                          onClick={() => goTo(EXPLORER_PATH.pictures)}
+                        />
+                      </>
                     ) : null}
                   </>
                 ) : null}
@@ -169,95 +276,72 @@ export function SystemExplorer() {
             setSelectedDesktopApp(null)
           }}
         >
-          {page === 'computer' ? (
+          {isEmpty ? (
+            <p className="px-4 py-6 text-[12px] text-[#666]">
+              {isRecovered ? COPY.empty : COPY.emptyDrive}
+            </p>
+          ) : (
             <IconGrid>
-              <ExplorerTile
-                label={COPY.drive}
-                selected={selectedId === 'drive'}
-                onSelect={() => setSelectedId('drive')}
-                onOpen={() => goTo('drive')}
-                icon={<DriveGlyph />}
-              />
-            </IconGrid>
-          ) : null}
-
-          {page === 'drive' ? (
-            <IconGrid>
-              <ExplorerTile
-                label={COPY.sysUser}
-                selected={selectedId === 'sys-user'}
-                onSelect={() => setSelectedId('sys-user')}
-                onOpen={() => goTo('sys-user')}
-                icon={<FolderGlyph />}
-              />
-              {hasRecoveryTool ? (
+              {folderTiles.map((folder) => (
                 <ExplorerTile
-                  label={COPY.recoveredFolder}
-                  selected={selectedId === 'recovered-folder'}
-                  onSelect={() => setSelectedId('recovered-folder')}
-                  onOpen={() => goTo('recovered')}
-                  icon={<FolderGlyph />}
+                  key={folder.path}
+                  label={folder.label}
+                  selected={selectedId === folder.path}
+                  onSelect={() => setSelectedId(folder.path)}
+                  onOpen={() => goTo(folder.path)}
+                  icon={folder.path === EXPLORER_PATH.drive ? <DriveGlyph /> : <FolderGlyph />}
                 />
-              ) : null}
-            </IconGrid>
-          ) : null}
-
-          {page === 'sys-user' ? (
-            <IconGrid>
-              <ExplorerTile
-                label={COPY.userFolder}
-                selected={selectedId === 'toro'}
-                onSelect={() => setSelectedId('toro')}
-                onOpen={() => goTo('toro')}
-                icon={<FolderGlyph />}
-              />
-            </IconGrid>
-          ) : null}
-
-          {page === 'toro' ? (
-            <IconGrid>
-              <ExplorerTile
-                label={COPY.desktop}
-                selected={selectedId === 'desktop-folder'}
-                onSelect={() => setSelectedId('desktop-folder')}
-                onOpen={() => goTo('desktop')}
-                icon={<FolderGlyph />}
-              />
-            </IconGrid>
-          ) : null}
-
-          {page === 'recovered' ? (
-            inventory.length === 0 ? (
-              <p className="px-4 py-6 text-[12px] text-[#666]">{COPY.empty}</p>
-            ) : (
-              <IconGrid>
-                {inventory.map((file) => (
-                  <ExplorerTile
-                    key={file.id}
-                    label={file.name}
-                    selected={selectedId === file.id}
-                    onSelect={() => setSelectedId(file.id)}
-                    icon={<FileTypeGlyph type={file.type} />}
-                  />
-                ))}
-              </IconGrid>
-            )
-          ) : null}
-
-          {page === 'desktop' ? (
-            <IconGrid>
-              {desktopApps.map((app) => (
+              ))}
+              {isRecovered
+                ? inventory.map((file) => (
+                    <ExplorerTile
+                      key={file.id}
+                      label={file.name}
+                      selected={selectedId === file.id}
+                      onSelect={() => setSelectedId(file.id)}
+                      icon={<FileTypeGlyph type={file.type} />}
+                    />
+                  ))
+                : null}
+              {isDesktop
+                ? desktopApps.map((app) => (
+                    <ExplorerTile
+                      key={app.type}
+                      label={app.title}
+                      selected={selectedDesktopApp === app.type}
+                      onSelect={() => setSelectedDesktopApp(app.type)}
+                      onOpen={() => openDesktopApp(app.type)}
+                      icon={app.icon({ size: 40 })}
+                    />
+                  ))
+                : null}
+              {visibleFiles.map((file) => (
                 <ExplorerTile
-                  key={app.type}
-                  label={app.title}
-                  selected={selectedDesktopApp === app.type}
-                  onSelect={() => setSelectedDesktopApp(app.type)}
-                  onOpen={() => openDesktopApp(app.type)}
-                  icon={app.icon({ size: 40 })}
+                  key={file.id}
+                  label={file.name}
+                  selected={selectedId === file.id}
+                  onSelect={() => setSelectedId(file.id)}
+                  onOpen={() => openFile(file.id)}
+                  icon={
+                    file.type === 'image' && (file.imageThumb ?? file.imageSrc) ? (
+                      <img
+                        src={file.imageThumb ?? file.imageSrc}
+                        alt=""
+                        width={40}
+                        height={40}
+                        draggable={false}
+                        decoding="sync"
+                        loading="eager"
+                        className="h-10 w-10 border border-[#3a6ea5] bg-white object-contain"
+                      />
+                    ) : (
+                      <FileTypeGlyph type={file.type} />
+                    )
+                  }
                 />
               ))}
             </IconGrid>
-          ) : null}
+          )}
         </div>
       </div>
 
@@ -269,44 +353,20 @@ export function SystemExplorer() {
   )
 }
 
-function AddressCrumbs({
-  page,
-  onGo,
-  hasRecoveryTool,
-}: {
-  page: PageId
-  onGo: (page: PageId) => void
-  hasRecoveryTool: boolean
-}) {
-  const parts: { id: PageId; label: string }[] = [{ id: 'computer', label: COPY.computer }]
-
-  if (page !== 'computer') {
-    parts.push({ id: 'drive', label: COPY.drive })
-  }
-  if (page === 'recovered' && hasRecoveryTool) {
-    parts.push({ id: 'recovered', label: COPY.recoveredFolder })
-  }
-  if (SYS_USER_PAGES.includes(page)) {
-    parts.push({ id: 'sys-user', label: COPY.sysUser })
-  }
-  if (TORO_PAGES.includes(page)) {
-    parts.push({ id: 'toro', label: COPY.userFolder })
-  }
-  if (page === 'desktop') {
-    parts.push({ id: 'desktop', label: COPY.desktop })
-  }
+function AddressCrumbs({ path, onGo }: { path: string; onGo: (path: string) => void }) {
+  const parts = ancestorPaths(path)
 
   return (
     <>
       {parts.map((part, index) => {
         const last = index === parts.length - 1
         return (
-          <span key={part.id} className="flex min-w-0 items-center gap-1">
+          <span key={part} className="flex min-w-0 items-center gap-1">
             {index > 0 ? <span className="text-[#888]">›</span> : null}
             {last ? (
-              <span className="truncate font-semibold text-[#1a1a1a]">{part.label}</span>
+              <span className="truncate font-semibold text-[#1a1a1a]">{folderLabel(part)}</span>
             ) : (
-              <Crumb label={part.label} active={false} onClick={() => onGo(part.id)} />
+              <Crumb label={folderLabel(part)} active={false} onClick={() => onGo(part)} />
             )}
           </span>
         )

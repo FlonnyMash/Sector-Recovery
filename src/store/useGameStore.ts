@@ -1,16 +1,26 @@
 import { create } from 'zustand'
 import { strings } from '../i18n'
+import type { ArcadeGameId } from '../game/arcadeCatalog'
 import { instantiateLootByName, rollLoot, type ScanResult } from '../game/loot'
 import { computeFragmentsPerSecond, getUpgradeCost, initialUpgradeCounts } from '../game/upgrades'
 import type { UpgradeId } from '../game/upgrades'
 import {
+  createInitialFiles,
+  newlyUnlockedFiles,
+  unlockFilesForSector as markFilesUnlockedForSector,
+  viewerAppForFile,
+  withLifetimeGain,
+} from '../game/virtualFiles'
+import {
   APP_OS,
   AUCTION_COUNTDOWN_MS,
   COLD_CASE_PUBLISH_MS,
+  HDD_MESSAGE_DELAY_ARTICLE_FIRST_MS,
   HDD_MESSAGE_DELAY_MS,
   KENJI_AUCTION_NUDGE_MS,
   KENJI_WON_DELAY_MS,
   LIVE_MESSAGE_COUNT,
+  MOM_NUDGE_COUNT,
   MOM_NUDGE_MS,
   initialPrologueState,
   type AppType,
@@ -22,19 +32,29 @@ import {
   type PrologueState,
   type RecoveredFile,
   type SystemStage,
+  type VirtualFile,
+  type WahooTab,
   type WindowState,
 } from '../types/game'
-import { formatChatClock } from '../utils/format'
-import { resetGameClock } from '../utils/gameClock'
+import { nextChatTime, sequentialChatTimes } from '../utils/format'
+import { getGameClockOrigin, resetGameClock, restoreGameClock } from '../utils/gameClock'
 import { playNotificationSound } from '../utils/sounds'
+import {
+  DEV_SESSION_KEY,
+  parseDevSession,
+  serializeDevSession,
+  type DevSessionState,
+} from './devSession'
 
-export type { RecoveredFile }
+export type { RecoveredFile, VirtualFile }
 
 const APP_TITLES: Record<AppType, string> = {
   'system-explorer': strings.apps.systemExplorer,
   'net-explorer': strings.apps.netExplorer,
   'sector-recover': strings.apps.sectorRecover,
   'operator-notes': strings.apps.operatorNotes,
+  'photo-viewer': strings.apps.photoViewer,
+  messenger: strings.apps.messenger,
   'news-browser': strings.apps.newsBrowser,
   'friend-chat': strings.apps.friendChat,
   arcade: strings.apps.arcade,
@@ -89,9 +109,132 @@ function clearAuctionTimers() {
   }
 }
 
+function clearDownloadTimer() {
+  if (downloadTimer === null) return
+  window.clearInterval(downloadTimer)
+  downloadTimer = null
+}
+
+function clearNotificationTimers() {
+  for (const timer of notificationTimers.values()) window.clearTimeout(timer)
+  notificationTimers.clear()
+}
+
+function lastKenjiStamp(prologue: PrologueState): string | null {
+  if (prologue.partitionMountedTime) return prologue.partitionMountedTime
+  if (prologue.liveMessageTimes.length > 0) {
+    return prologue.liveMessageTimes[prologue.liveMessageTimes.length - 1] ?? null
+  }
+  if (prologue.kenjiAuctionWonTime) return prologue.kenjiAuctionWonTime
+  if (prologue.kenjiAuctionNudgeTime) return prologue.kenjiAuctionNudgeTime
+  const earlier = strings.chat.earlier
+  return earlier[earlier.length - 1]?.time ?? null
+}
+
+function lastMomStamp(prologue: PrologueState): string | null {
+  if (prologue.momNudgeTimes.length > 0) {
+    return prologue.momNudgeTimes[prologue.momNudgeTimes.length - 1] ?? null
+  }
+  if (prologue.momNudgeTime) return prologue.momNudgeTime
+  const mom = strings.chat.mom
+  return mom[mom.length - 1]?.time ?? null
+}
+
+function bumpChatRecency(
+  prologue: PrologueState,
+  id: ChatConversationId,
+): Partial<Record<ChatConversationId, number>> {
+  return { ...prologue.chatRecency, [id]: Date.now() }
+}
+
+function isFriendChatFocused(windows: WindowState[]): boolean {
+  const activeId = selectActiveWindowId(windows)
+  if (!activeId) return false
+  const active = windows.find((window) => window.id === activeId)
+  return active?.type === 'friend-chat'
+}
+
+function scheduleKenjiWon(delayMs: number) {
+  if (kenjiWonTimer !== null) return
+  kenjiWonTimer = window.setTimeout(() => {
+    kenjiWonTimer = null
+    const afterSold = useGameStore.getState().prologue
+    if (afterSold.kenjiAuctionWonSent) return
+    const stamp = nextChatTime(lastKenjiStamp(afterSold))
+    useGameStore.setState({
+      prologue: patchPrologue(afterSold, {
+        kenjiAuctionWonSent: true,
+        kenjiAuctionWonTime: stamp,
+        chatNotificationPending: true,
+        chatRecency: bumpChatRecency(afterSold, 'kenji'),
+      }),
+      pendingChatFocus: 'kenji',
+    })
+    useGameStore.getState().pushNotification({
+      title: strings.notifications.kenjiTitle,
+      body: afterSold.kenjiAuctionNudgeSent
+        ? strings.chat.auctionWonAfterNudge
+        : strings.chat.auctionWonDirect,
+      kind: 'chat',
+      conversationId: 'kenji',
+    })
+    // Reaching here with the article already read means the player did the
+    // reading before the auction resolved, so Kenji can follow up sooner.
+    maybeScheduleHddMessages(
+      useGameStore.getState,
+      (partial) => {
+        useGameStore.setState(partial)
+      },
+      HDD_MESSAGE_DELAY_ARTICLE_FIRST_MS,
+    )
+  }, delayMs)
+}
+
+function scheduleAuctionSold(delayMs: number) {
+  if (auctionSoldTimer !== null) return
+  auctionSoldTimer = window.setTimeout(() => {
+    auctionSoldTimer = null
+    const afterCountdown = useGameStore.getState().prologue
+    if (afterCountdown.auctionLot404Sold) return
+    useGameStore.setState({
+      prologue: patchPrologue(afterCountdown, { auctionLot404Sold: true }),
+    })
+    scheduleKenjiWon(KENJI_WON_DELAY_MS)
+  }, delayMs)
+}
+
+function beginPartitionDownload(fromProgress: number) {
+  clearDownloadTimer()
+  const startProgress = Math.max(0, Math.min(99, fromProgress))
+  const remainingMs = Math.max(50, DOWNLOAD_DURATION_MS * ((100 - startProgress) / 100))
+  const startedAt = performance.now()
+  downloadTimer = window.setInterval(() => {
+    const elapsed = Math.min(1, (performance.now() - startedAt) / remainingMs)
+    const progress = Math.min(100, Math.round(startProgress + (100 - startProgress) * elapsed))
+    useGameStore.getState().setImageDownloadProgress(progress)
+    if (progress < 100 || downloadTimer === null) return
+    clearDownloadTimer()
+    useGameStore.setState((state) => ({
+      prologue: patchPrologue(state.prologue, {
+        imageDownloadProgress: 100,
+        isPartitionDownloaded: true,
+        partitionMountedTime: nextChatTime(lastKenjiStamp(state.prologue)),
+        chatRecency: bumpChatRecency(state.prologue, 'kenji'),
+        rebootPromptActive: true,
+      }),
+    }))
+    useGameStore.getState().pushNotification({
+      title: strings.notifications.rebootTitle,
+      body: strings.notifications.rebootBody,
+      kind: 'system',
+    })
+  }, 50)
+}
+
 function maybeScheduleHddMessages(
   get: () => GameState,
   set: (partial: { prologue: PrologueState; pendingChatFocus?: ChatConversationId | null }) => void,
+  delayMs: number = HDD_MESSAGE_DELAY_MS,
 ) {
   const { prologue } = get()
   if (!prologue.hasReadTargetArticle || !prologue.kenjiAuctionWonSent || prologue.friendMessageReceived) {
@@ -102,19 +245,25 @@ function maybeScheduleHddMessages(
     hddTimer = null
     const current = get().prologue
     if (current.friendMessageReceived) return
+    const stamp = nextChatTime(lastKenjiStamp(current))
     set({
       prologue: patchPrologue(current, {
         friendMessageReceived: true,
         chatNotificationPending: true,
+        liveMessagesRevealed: Math.max(1, current.liveMessagesRevealed),
+        liveMessageTimes:
+          current.liveMessageTimes.length > 0 ? current.liveMessageTimes : [stamp],
+        chatRecency: bumpChatRecency(current, 'kenji'),
       }),
       pendingChatFocus: 'kenji',
     })
     get().pushNotification({
       title: strings.notifications.kenjiTitle,
-      body: strings.notifications.kenjiBody,
+      body: strings.chat.live[0],
       kind: 'chat',
+      conversationId: 'kenji',
     })
-  }, HDD_MESSAGE_DELAY_MS)
+  }, delayMs)
 }
 
 export function selectActiveWindowId(windows: WindowState[]): string | null {
@@ -135,6 +284,10 @@ interface GameState {
   dataFragments: number
   fragmentsPerSecond: number
   inventory: RecoveredFile[]
+  files: VirtualFile[]
+  lifetimeFragments: number
+  recoveredSector: number
+  activeFileId: string | null
   hasRecoveryTool: boolean
   /** Dev-only multiplier applied to passive income. 1 = normal speed. */
   timeScale: number
@@ -143,7 +296,10 @@ interface GameState {
   narrativeElapsedMs: number
   pendingChatFocus: ChatConversationId | null
   newsArticleRequest: string | null
+  explorerRevealRequest: { path: string; fileId: string } | null
   auctionLotRequest: AuctionLotId | null
+  wahooTabRequest: WahooTab | null
+  installedArcadeGames: ArcadeGameId[]
   upgrades: Record<UpgradeId, number>
   windows: WindowState[]
   nextZIndex: number
@@ -153,10 +309,14 @@ interface GameState {
   prologue: PrologueState
   notifications: OsNotification[]
   scanSector: () => ScanResult
+  unlockFilesForSector: (sector: number) => void
+  openFile: (fileId: string) => void
+  openFileLocation: (fileId: string) => void
   downloadRecoveryTool: () => void
   tick: (deltaSeconds: number) => void
   purchaseUpgrade: (id: UpgradeId) => void
   openWindow: (type: AppType) => void
+  setWindowTitle: (type: AppType, title: string) => void
   closeWindow: (id: string) => void
   minimizeWindow: (id: string) => void
   toggleMaximize: (id: string) => void
@@ -165,6 +325,7 @@ interface GameState {
   showDesktop: () => void
   markTargetArticleRead: () => void
   revealNextLiveMessage: () => void
+  revealNextMomNudge: () => void
   clearChatNotification: () => void
   clearMomChatNotification: () => void
   startMomNudgeClock: () => void
@@ -173,13 +334,23 @@ interface GameState {
   watchAuction: () => void
   deliverKenjiAuctionNudge: () => void
   consumePendingChatFocus: () => void
+  focusChat: (id: ChatConversationId) => void
   requestNewsArticle: (articleId: string) => void
   clearNewsArticleRequest: () => void
+  clearExplorerRevealRequest: () => void
   requestAuctionLot: (id: AuctionLotId) => void
   clearAuctionLotRequest: () => void
+  requestWahooTab: (tab: WahooTab) => void
+  clearWahooTabRequest: () => void
+  installArcadeGame: (id: ArcadeGameId) => void
   startPartitionDownload: () => void
   setImageDownloadProgress: (progress: number) => void
-  pushNotification: (input: { title: string; body: string; kind: NotificationKind }) => void
+  pushNotification: (input: {
+    title: string
+    body: string
+    kind: NotificationKind
+    conversationId?: ChatConversationId
+  }) => void
   dismissNotification: (id: string) => void
   holdNotification: (id: string) => void
   releaseNotification: (id: string) => void
@@ -233,13 +404,20 @@ export const useGameStore = create<GameState>((set, get) => ({
   dataFragments: 0,
   fragmentsPerSecond: 0,
   inventory: [],
+  files: createInitialFiles(),
+  lifetimeFragments: 0,
+  recoveredSector: 0,
+  activeFileId: null,
   hasRecoveryTool: false,
   timeScale: 1,
   narrativeTimeScale: 1,
   narrativeElapsedMs: 0,
   pendingChatFocus: null,
   newsArticleRequest: null,
+  explorerRevealRequest: null,
   auctionLotRequest: null,
+  wahooTabRequest: null,
+  installedArcadeGames: [],
   upgrades: initialUpgradeCounts(),
   windows: [],
   nextZIndex: 100,
@@ -251,14 +429,53 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   scanSector: () => {
     const roll = rollLoot()
-    const { inventory } = get()
+    const { inventory, files } = get()
     const isNew =
       roll.item !== null && !inventory.some((file) => file.name === roll.item?.name)
+    set((state) => {
+      const lifetime = withLifetimeGain(
+        state.files,
+        state.recoveredSector,
+        state.lifetimeFragments,
+        roll.fragments,
+      )
+      return {
+        dataFragments: state.dataFragments + roll.fragments,
+        inventory: isNew && roll.item ? [...state.inventory, roll.item] : state.inventory,
+        ...lifetime,
+      }
+    })
+    return {
+      fragments: roll.fragments,
+      item: roll.item,
+      isNew,
+      unlockedFiles: newlyUnlockedFiles(files, get().files),
+    }
+  },
+
+  unlockFilesForSector: (sector) => {
+    if (!Number.isInteger(sector) || sector < 1) return
     set((state) => ({
-      dataFragments: state.dataFragments + roll.fragments,
-      inventory: isNew && roll.item ? [...state.inventory, roll.item] : state.inventory,
+      files: markFilesUnlockedForSector(state.files, sector),
     }))
-    return { fragments: roll.fragments, item: roll.item, isNew }
+  },
+
+  openFile: (fileId) => {
+    const file = get().files.find((entry) => entry.id === fileId)
+    if (!file || !file.isUnlocked) return
+    set({ activeFileId: fileId })
+    const viewer = viewerAppForFile(file)
+    if (viewer) get().openWindow(viewer)
+  },
+
+  openFileLocation: (fileId) => {
+    const file = get().files.find((entry) => entry.id === fileId)
+    if (!file || !file.isUnlocked) return
+    set({
+      activeFileId: fileId,
+      explorerRevealRequest: { path: file.path, fileId: file.id },
+    })
+    get().openWindow('system-explorer')
   },
 
   downloadRecoveryTool: () => {
@@ -274,10 +491,19 @@ export const useGameStore = create<GameState>((set, get) => ({
   tick: (deltaSeconds) => {
     const { fragmentsPerSecond } = get()
     if (fragmentsPerSecond <= 0 || deltaSeconds <= 0) return
-    set((state) => ({
-      dataFragments:
-        state.dataFragments + state.fragmentsPerSecond * deltaSeconds * state.timeScale,
-    }))
+    set((state) => {
+      const gained = state.fragmentsPerSecond * deltaSeconds * state.timeScale
+      const lifetime = withLifetimeGain(
+        state.files,
+        state.recoveredSector,
+        state.lifetimeFragments,
+        gained,
+      )
+      return {
+        dataFragments: state.dataFragments + gained,
+        ...lifetime,
+      }
+    })
   },
 
   purchaseUpgrade: (id) => {
@@ -323,6 +549,17 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({
       windows: [...windows, windowState],
       nextZIndex: nextZIndex + 1,
+    })
+  },
+
+  setWindowTitle: (type, title) => {
+    const { windows } = get()
+    const target = windows.find((window) => window.type === type && window.isOpen)
+    if (!target || target.title === title) return
+    set({
+      windows: windows.map((window) =>
+        window.id === target.id ? { ...window, title } : window,
+      ),
     })
   },
 
@@ -433,7 +670,26 @@ export const useGameStore = create<GameState>((set, get) => ({
       return {
         prologue: patchPrologue(state.prologue, {
           liveMessagesRevealed: state.prologue.liveMessagesRevealed + 1,
-          liveMessageTimes: [...state.prologue.liveMessageTimes, formatChatClock()],
+          liveMessageTimes: [
+            ...state.prologue.liveMessageTimes,
+            nextChatTime(lastKenjiStamp(state.prologue)),
+          ],
+          chatRecency: bumpChatRecency(state.prologue, 'kenji'),
+        }),
+      }
+    })
+  },
+
+  revealNextMomNudge: () => {
+    set((state) => {
+      if (state.prologue.momNudgeRevealed >= MOM_NUDGE_COUNT) return state
+      const stamp = nextChatTime(lastMomStamp(state.prologue))
+      return {
+        prologue: patchPrologue(state.prologue, {
+          momNudgeRevealed: state.prologue.momNudgeRevealed + 1,
+          momNudgeTimes: [...state.prologue.momNudgeTimes, stamp],
+          momNudgeTime: state.prologue.momNudgeTime ?? stamp,
+          chatRecency: bumpChatRecency(state.prologue, 'mom'),
         }),
       }
     })
@@ -490,18 +746,23 @@ export const useGameStore = create<GameState>((set, get) => ({
   deliverMomNudge: () => {
     const { prologue } = get()
     if (prologue.hasReadTargetArticle || prologue.momNudgeReceived) return
+    const stamp = nextChatTime(lastMomStamp(prologue))
     set({
       prologue: patchPrologue(prologue, {
         momNudgeReceived: true,
+        momNudgeRevealed: Math.max(1, prologue.momNudgeRevealed),
         momChatNotificationPending: true,
-        momNudgeTime: formatChatClock(),
+        momNudgeTime: stamp,
+        momNudgeTimes: prologue.momNudgeTimes.length > 0 ? prologue.momNudgeTimes : [stamp],
+        chatRecency: bumpChatRecency(prologue, 'mom'),
       }),
       pendingChatFocus: 'mom',
     })
     get().pushNotification({
       title: strings.notifications.momTitle,
-      body: strings.notifications.momBody,
+      body: strings.chat.momNudge[0].text,
       kind: 'chat',
+      conversationId: 'mom',
     })
     if (narrativeClockComplete(get().prologue)) {
       stopMomClockInterval()
@@ -519,54 +780,28 @@ export const useGameStore = create<GameState>((set, get) => ({
       stopMomClockInterval()
     }
 
-    if (auctionSoldTimer !== null) return
-    auctionSoldTimer = window.setTimeout(() => {
-      auctionSoldTimer = null
-      const afterCountdown = get().prologue
-      if (afterCountdown.auctionLot404Sold) return
-      set({
-        prologue: patchPrologue(afterCountdown, { auctionLot404Sold: true }),
-      })
-
-      if (kenjiWonTimer !== null) return
-      kenjiWonTimer = window.setTimeout(() => {
-        kenjiWonTimer = null
-        const afterSold = get().prologue
-        if (afterSold.kenjiAuctionWonSent) return
-        set({
-          prologue: patchPrologue(afterSold, {
-            kenjiAuctionWonSent: true,
-            kenjiAuctionWonTime: formatChatClock(),
-            chatNotificationPending: true,
-          }),
-          pendingChatFocus: 'kenji',
-        })
-        get().pushNotification({
-          title: strings.notifications.kenjiTitle,
-          body: strings.notifications.kenjiBody,
-          kind: 'chat',
-        })
-        maybeScheduleHddMessages(get, set)
-      }, KENJI_WON_DELAY_MS)
-    }, AUCTION_COUNTDOWN_MS)
+    scheduleAuctionSold(AUCTION_COUNTDOWN_MS)
   },
 
   deliverKenjiAuctionNudge: () => {
     const { prologue } = get()
     if (prologue.kenjiAuctionNudgeSent) return
     if (prologue.auctionCountdownStartedAt !== null || prologue.auctionLot404Sold) return
+    const stamp = nextChatTime(lastKenjiStamp(prologue))
     set({
       prologue: patchPrologue(prologue, {
         kenjiAuctionNudgeSent: true,
-        kenjiAuctionNudgeTime: formatChatClock(),
+        kenjiAuctionNudgeTime: stamp,
         chatNotificationPending: true,
+        chatRecency: bumpChatRecency(prologue, 'kenji'),
       }),
       pendingChatFocus: 'kenji',
     })
     get().pushNotification({
       title: strings.notifications.kenjiTitle,
-      body: strings.notifications.kenjiBody,
+      body: strings.chat.auctionNudge,
       kind: 'chat',
+      conversationId: 'kenji',
     })
     if (narrativeClockComplete(get().prologue)) {
       stopMomClockInterval()
@@ -577,12 +812,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ pendingChatFocus: null })
   },
 
+  focusChat: (id) => {
+    set({ pendingChatFocus: id })
+    get().openWindow('friend-chat')
+  },
+
   requestNewsArticle: (articleId) => {
     set({ newsArticleRequest: articleId })
   },
 
   clearNewsArticleRequest: () => {
     set({ newsArticleRequest: null })
+  },
+
+  clearExplorerRevealRequest: () => {
+    set({ explorerRevealRequest: null })
   },
 
   requestAuctionLot: (id) => {
@@ -593,45 +837,31 @@ export const useGameStore = create<GameState>((set, get) => ({
     set({ auctionLotRequest: null })
   },
 
+  requestWahooTab: (tab) => {
+    set({ wahooTabRequest: tab })
+  },
+
+  clearWahooTabRequest: () => {
+    set({ wahooTabRequest: null })
+  },
+
+  installArcadeGame: (id) => {
+    set((state) => {
+      if (state.installedArcadeGames.includes(id)) return state
+      return { installedArcadeGames: [...state.installedArcadeGames, id] }
+    })
+  },
+
   startPartitionDownload: () => {
     const { prologue } = get()
     if (prologue.isPartitionDownloaded) return
     if (prologue.imageDownloadProgress > 0 && prologue.imageDownloadProgress < 100) return
+    if (downloadTimer !== null) return
 
-    if (downloadTimer !== null) {
-      window.clearInterval(downloadTimer)
-      downloadTimer = null
-    }
-
-    const startedAt = performance.now()
     set({
       prologue: patchPrologue(prologue, { imageDownloadProgress: 1 }),
     })
-
-    downloadTimer = window.setInterval(() => {
-      const progress = Math.min(
-        100,
-        Math.round(((performance.now() - startedAt) / DOWNLOAD_DURATION_MS) * 100),
-      )
-      get().setImageDownloadProgress(progress)
-      if (progress >= 100 && downloadTimer !== null) {
-        window.clearInterval(downloadTimer)
-        downloadTimer = null
-        set((state) => ({
-          prologue: patchPrologue(state.prologue, {
-            imageDownloadProgress: 100,
-            isPartitionDownloaded: true,
-            partitionMountedTime: formatChatClock(),
-            rebootPromptActive: true,
-          }),
-        }))
-        get().pushNotification({
-          title: strings.notifications.rebootTitle,
-          body: strings.notifications.rebootBody,
-          kind: 'system',
-        })
-      }
-    }, 50)
+    beginPartitionDownload(1)
   },
 
   setImageDownloadProgress: (progress) => {
@@ -642,16 +872,21 @@ export const useGameStore = create<GameState>((set, get) => ({
     }))
   },
 
-  pushNotification: ({ title, body, kind }) => {
+  pushNotification: ({ title, body, kind, conversationId }) => {
     const id = `${Date.now()}-${Math.random().toString(16).slice(2)}`
-    const notification: OsNotification = { id, title, body, kind }
-    const { systemStage, bootTarget } = get()
+    const notification: OsNotification = { id, title, body, kind, conversationId }
+    const { systemStage, bootTarget, windows } = get()
     set((state) => ({ notifications: [...state.notifications, notification] }))
     const timer = window.setTimeout(() => {
       get().dismissNotification(id)
     }, NOTIFICATION_TTL_MS)
     notificationTimers.set(id, timer)
-    playNotificationSound(selectCurrentOs(systemStage, bootTarget))
+    const os = selectCurrentOs(systemStage, bootTarget)
+    if (kind === 'chat' && isFriendChatFocused(windows)) {
+      // In-chat pops play from ModernChat as each line lands.
+      return
+    }
+    playNotificationSound(os)
   },
 
   dismissNotification: (id) => {
@@ -746,12 +981,26 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   devAddFragments: (amount) => {
     if (!Number.isFinite(amount) || amount === 0) return
-    set((state) => ({ dataFragments: Math.max(0, state.dataFragments + amount) }))
+    set((state) => {
+      const dataFragments = Math.max(0, state.dataFragments + amount)
+      if (amount <= 0) return { dataFragments }
+      return {
+        dataFragments,
+        ...withLifetimeGain(state.files, state.recoveredSector, state.lifetimeFragments, amount),
+      }
+    })
   },
 
   devSetFragments: (amount) => {
     if (!Number.isFinite(amount)) return
-    set({ dataFragments: Math.max(0, amount) })
+    const next = Math.max(0, amount)
+    set((state) => {
+      const gained = Math.max(0, next - state.lifetimeFragments)
+      return {
+        dataFragments: next,
+        ...withLifetimeGain(state.files, state.recoveredSector, state.lifetimeFragments, gained),
+      }
+    })
   },
 
   devSetRecoveryTool: (installed) => {
@@ -778,34 +1027,41 @@ export const useGameStore = create<GameState>((set, get) => ({
   devCompletePrologue: () => {
     clearHddTimer()
     clearAuctionTimers()
-    if (downloadTimer !== null) {
-      window.clearInterval(downloadTimer)
-      downloadTimer = null
-    }
+    clearDownloadTimer()
     stopMomClockInterval()
-    set((state) => ({
-      prologue: patchPrologue(state.prologue, {
-        hasReadTargetArticle: true,
-        isColdCasePublished: true,
-        friendMessageReceived: true,
-        chatNotificationPending: false,
-        liveMessagesRevealed: LIVE_MESSAGE_COUNT,
-        imageDownloadProgress: 100,
-        isPartitionDownloaded: true,
-        rebootPromptActive: true,
-        auctionCountdownStartedAt: state.prologue.auctionCountdownStartedAt ?? Date.now(),
-        auctionLot404Sold: true,
-        kenjiAuctionNudgeSent: true,
-        kenjiAuctionWonSent: true,
-        kenjiAuctionNudgeTime: state.prologue.kenjiAuctionNudgeTime ?? formatChatClock(),
-        kenjiAuctionWonTime: state.prologue.kenjiAuctionWonTime ?? formatChatClock(),
-        liveMessageTimes:
-          state.prologue.liveMessageTimes.length >= LIVE_MESSAGE_COUNT
-            ? state.prologue.liveMessageTimes
-            : Array.from({ length: LIVE_MESSAGE_COUNT }, () => formatChatClock()),
-        partitionMountedTime: state.prologue.partitionMountedTime ?? formatChatClock(),
-      }),
-    }))
+    set((state) => {
+      const earlierLast = strings.chat.earlier[strings.chat.earlier.length - 1]?.time
+      const kenjiAuctionNudgeTime =
+        state.prologue.kenjiAuctionNudgeTime ?? nextChatTime(earlierLast)
+      const kenjiAuctionWonTime =
+        state.prologue.kenjiAuctionWonTime ?? nextChatTime(kenjiAuctionNudgeTime)
+      const liveMessageTimes =
+        state.prologue.liveMessageTimes.length >= LIVE_MESSAGE_COUNT
+          ? state.prologue.liveMessageTimes
+          : sequentialChatTimes(LIVE_MESSAGE_COUNT, kenjiAuctionWonTime)
+      const liveLast = liveMessageTimes[liveMessageTimes.length - 1] ?? kenjiAuctionWonTime
+      return {
+        prologue: patchPrologue(state.prologue, {
+          hasReadTargetArticle: true,
+          isColdCasePublished: true,
+          friendMessageReceived: true,
+          chatNotificationPending: false,
+          liveMessagesRevealed: LIVE_MESSAGE_COUNT,
+          imageDownloadProgress: 100,
+          isPartitionDownloaded: true,
+          rebootPromptActive: true,
+          auctionCountdownStartedAt: state.prologue.auctionCountdownStartedAt ?? Date.now(),
+          auctionLot404Sold: true,
+          kenjiAuctionNudgeSent: true,
+          kenjiAuctionWonSent: true,
+          kenjiAuctionNudgeTime,
+          kenjiAuctionWonTime,
+          liveMessageTimes,
+          partitionMountedTime: state.prologue.partitionMountedTime ?? nextChatTime(liveLast),
+          chatRecency: bumpChatRecency(state.prologue, 'kenji'),
+        }),
+      }
+    })
   },
 
   devGrantUpgrade: (id, count) => {
@@ -857,26 +1113,29 @@ export const useGameStore = create<GameState>((set, get) => ({
   devResetGame: () => {
     clearHddTimer()
     clearAuctionTimers()
-    if (downloadTimer !== null) {
-      window.clearInterval(downloadTimer)
-      downloadTimer = null
-    }
+    clearDownloadTimer()
     stopMomClockInterval()
     momClockElapsedMs = 0
     resetGameClock()
-    for (const timer of notificationTimers.values()) window.clearTimeout(timer)
-    notificationTimers.clear()
+    clearNotificationTimers()
     set({
       dataFragments: 0,
       fragmentsPerSecond: 0,
       inventory: [],
+      files: createInitialFiles(),
+      lifetimeFragments: 0,
+      recoveredSector: 0,
+      activeFileId: null,
       hasRecoveryTool: false,
       timeScale: 1,
       narrativeTimeScale: 1,
       narrativeElapsedMs: 0,
       pendingChatFocus: null,
       newsArticleRequest: null,
+      explorerRevealRequest: null,
       auctionLotRequest: null,
+      wahooTabRequest: null,
+      installedArcadeGames: [],
       upgrades: initialUpgradeCounts(),
       windows: [],
       nextZIndex: 100,
@@ -887,5 +1146,188 @@ export const useGameStore = create<GameState>((set, get) => ({
       notifications: [],
     })
     get().startMomNudgeClock()
+    flushDevSession()
   },
 }))
+
+function captureDevSession() {
+  const state = useGameStore.getState()
+  const sessionState: DevSessionState = {
+    dataFragments: state.dataFragments,
+    fragmentsPerSecond: state.fragmentsPerSecond,
+    inventory: state.inventory,
+    fileUnlocks: state.files.map((file) => ({ id: file.id, isUnlocked: file.isUnlocked })),
+    lifetimeFragments: state.lifetimeFragments,
+    recoveredSector: state.recoveredSector,
+    activeFileId: state.activeFileId,
+    hasRecoveryTool: state.hasRecoveryTool,
+    timeScale: state.timeScale,
+    narrativeTimeScale: state.narrativeTimeScale,
+    narrativeElapsedMs: state.narrativeElapsedMs,
+    pendingChatFocus: state.pendingChatFocus,
+    newsArticleRequest: state.newsArticleRequest,
+    explorerRevealRequest: state.explorerRevealRequest,
+    auctionLotRequest: state.auctionLotRequest,
+    wahooTabRequest: state.wahooTabRequest,
+    installedArcadeGames: state.installedArcadeGames,
+    upgrades: state.upgrades,
+    windows: state.windows,
+    nextZIndex: state.nextZIndex,
+    systemStage: state.systemStage,
+    bootTarget: state.bootTarget,
+    isLegacyOSUnlocked: state.isLegacyOSUnlocked,
+    prologue: state.prologue,
+    notifications: state.notifications,
+  }
+  return {
+    version: 1 as const,
+    momClockElapsedMs,
+    clockOrigin: getGameClockOrigin(),
+    state: sessionState,
+  }
+}
+
+function applySavedFiles(unlocks: DevSessionState['fileUnlocks']) {
+  const unlocked = new Set(unlocks.filter((file) => file.isUnlocked).map((file) => file.id))
+  return createInitialFiles().map((file) =>
+    unlocked.has(file.id) ? { ...file, isUnlocked: true } : file,
+  )
+}
+
+const DEV_SAVE_DELAY_MS = 400
+let devSaveTimer: number | null = null
+let devSessionDiscarded = false
+
+/** Drop the dev-tab save so the next load starts a new game. */
+export function discardDevSession() {
+  devSessionDiscarded = true
+  if (devSaveTimer !== null) {
+    window.clearTimeout(devSaveTimer)
+    devSaveTimer = null
+  }
+  try {
+    sessionStorage.removeItem(DEV_SESSION_KEY)
+  } catch {
+    // sessionStorage can throw when it is disabled.
+  }
+}
+
+function flushDevSession() {
+  if (!import.meta.env.DEV || devSessionDiscarded) return
+  if (devSaveTimer !== null) {
+    window.clearTimeout(devSaveTimer)
+    devSaveTimer = null
+  }
+  try {
+    sessionStorage.setItem(DEV_SESSION_KEY, serializeDevSession(captureDevSession()))
+  } catch {
+    // sessionStorage can throw when it is disabled or full.
+  }
+}
+
+function scheduleDevSessionSave() {
+  if (!import.meta.env.DEV || devSaveTimer !== null) return
+  devSaveTimer = window.setTimeout(() => {
+    devSaveTimer = null
+    flushDevSession()
+  }, DEV_SAVE_DELAY_MS)
+}
+
+function resumeInFlightWork() {
+  const { prologue, notifications } = useGameStore.getState()
+
+  if (prologue.auctionCountdownStartedAt !== null && !prologue.auctionLot404Sold) {
+    const elapsed = Date.now() - prologue.auctionCountdownStartedAt
+    const soldIn = AUCTION_COUNTDOWN_MS - elapsed
+    if (soldIn > 0) {
+      scheduleAuctionSold(soldIn)
+    } else {
+      const sold = patchPrologue(prologue, { auctionLot404Sold: true })
+      useGameStore.setState({ prologue: sold })
+      const wonIn = Math.max(0, KENJI_WON_DELAY_MS - (elapsed - AUCTION_COUNTDOWN_MS))
+      scheduleKenjiWon(wonIn)
+    }
+  } else if (prologue.auctionLot404Sold && !prologue.kenjiAuctionWonSent) {
+    scheduleKenjiWon(KENJI_WON_DELAY_MS)
+  }
+
+  if (
+    prologue.hasReadTargetArticle &&
+    prologue.kenjiAuctionWonSent &&
+    !prologue.friendMessageReceived
+  ) {
+    maybeScheduleHddMessages(useGameStore.getState, (partial) => {
+      useGameStore.setState(partial)
+    })
+  }
+
+  if (
+    !prologue.isPartitionDownloaded &&
+    prologue.imageDownloadProgress > 0 &&
+    prologue.imageDownloadProgress < 100
+  ) {
+    beginPartitionDownload(prologue.imageDownloadProgress)
+  }
+
+  for (const note of notifications) {
+    if (notificationTimers.has(note.id)) continue
+    const timer = window.setTimeout(() => {
+      useGameStore.getState().dismissNotification(note.id)
+    }, NOTIFICATION_TTL_MS)
+    notificationTimers.set(note.id, timer)
+  }
+}
+
+function restoreDevSession() {
+  let raw: string | null = null
+  try {
+    raw = sessionStorage.getItem(DEV_SESSION_KEY)
+  } catch {
+    return
+  }
+  if (!raw) return
+  const snapshot = parseDevSession(raw)
+  if (!snapshot) return
+  momClockElapsedMs = snapshot.momClockElapsedMs
+  if (snapshot.clockOrigin > 0) restoreGameClock(snapshot.clockOrigin)
+  const { fileUnlocks, ...rest } = snapshot.state
+  useGameStore.setState({
+    ...rest,
+    files: applySavedFiles(fileUnlocks),
+    narrativeElapsedMs: Math.max(rest.narrativeElapsedMs, snapshot.momClockElapsedMs),
+  })
+}
+
+if (import.meta.env.DEV) {
+  restoreDevSession()
+
+  let lastStage = useGameStore.getState().systemStage
+  let lastPrologue = useGameStore.getState().prologue
+  useGameStore.subscribe((state) => {
+    if (state.systemStage !== lastStage || state.prologue !== lastPrologue) {
+      lastStage = state.systemStage
+      lastPrologue = state.prologue
+      flushDevSession()
+      return
+    }
+    scheduleDevSessionSave()
+  })
+
+  resumeInFlightWork()
+  flushDevSession()
+
+  window.addEventListener('pagehide', flushDevSession)
+
+  if (import.meta.hot) {
+    import.meta.hot.dispose(() => {
+      useGameStore.getState().pauseMomNudgeClock()
+      flushDevSession()
+      window.removeEventListener('pagehide', flushDevSession)
+      stopMomClockInterval()
+      clearHddTimer()
+      clearAuctionTimers()
+      clearDownloadTimer()
+      clearNotificationTimers()
+    })
+  }
+}

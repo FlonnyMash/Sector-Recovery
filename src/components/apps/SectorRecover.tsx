@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import type { MouseEvent } from 'react'
-import { LOOT_NAMES } from '../../game/loot'
+import { VIRTUAL_FILE_COUNT } from '../../game/virtualFiles'
 import type { RecoveredFileType } from '../../types/game'
 import { strings } from '../../i18n'
 import { useGameStore } from '../../store/useGameStore'
@@ -43,8 +43,10 @@ function fileGlyph(type: RecoveredFileType): string {
 export function SectorRecover() {
   const fragments = useGameStore((state) => state.dataFragments)
   const rate = useGameStore((state) => state.fragmentsPerSecond)
-  const inventory = useGameStore((state) => state.inventory)
+  const files = useGameStore((state) => state.files)
   const scanSector = useGameStore((state) => state.scanSector)
+  const openFileLocation = useGameStore((state) => state.openFileLocation)
+  const recoveredFiles = files.filter((file) => file.isUnlocked)
 
   const [status, setStatus] = useState<string>(COPY.statusIdle)
   const [progress, setProgress] = useState(0)
@@ -55,12 +57,34 @@ export function SectorRecover() {
   ])
   const logRef = useRef<HTMLDivElement>(null)
   const manualScanRef = useRef(false)
+  const seenUnlockedRef = useRef<Set<string> | null>(null)
 
   useEffect(() => {
     const node = logRef.current
     if (!node) return
     node.scrollTop = node.scrollHeight
   }, [logs])
+
+  useEffect(() => {
+    const unlocked = files.filter((file) => file.isUnlocked)
+    if (seenUnlockedRef.current === null) {
+      seenUnlockedRef.current = new Set(unlocked.map((file) => file.id))
+      return
+    }
+    const fresh = unlocked.filter((file) => !seenUnlockedRef.current?.has(file.id))
+    seenUnlockedRef.current = new Set(unlocked.map((file) => file.id))
+    if (fresh.length === 0) return
+    setLogs((current) =>
+      [
+        ...current,
+        ...fresh.map((file) => ({
+          id: Date.now() + Math.random(),
+          text: fillTemplate(COPY.logFound, { item: file.name }),
+          kind: 'found' as const,
+        })),
+      ].slice(-MAX_LOG_LINES),
+    )
+  }, [files])
 
   useEffect(() => {
     if (rate <= 0) return
@@ -100,7 +124,8 @@ export function SectorRecover() {
     setPulse((value) => value + 1)
 
     const rect = event.currentTarget.getBoundingClientRect()
-    const label = result.item ? result.item.name : `+${result.fragments} KB`
+    const found = result.unlockedFiles[0]
+    const label = found ? found.name : `+${result.fragments} KB`
     const pop: Pop = {
       id: Date.now() + Math.random(),
       x: event.clientX - rect.left,
@@ -123,21 +148,11 @@ export function SectorRecover() {
         kind: 'normal',
       })
     }
-    if (result.item) {
-      nextLines.push({
-        id: Date.now() + Math.random() + 0.2,
-        text: fillTemplate(result.isNew ? COPY.logFound : COPY.logDuplicate, {
-          item: result.item.name,
-        }),
-        kind: result.isNew ? 'found' : 'skip',
-      })
-    } else {
-      nextLines.push({
-        id: Date.now() + Math.random() + 0.2,
-        text: fillTemplate(COPY.logRecovered, { size: formatDataSize(result.fragments) }),
-        kind: 'normal',
-      })
-    }
+    nextLines.push({
+      id: Date.now() + Math.random() + 0.2,
+      text: fillTemplate(COPY.logRecovered, { size: formatDataSize(result.fragments) }),
+      kind: 'normal',
+    })
     setLogs((current) => [...current, ...nextLines].slice(-MAX_LOG_LINES))
 
     window.setTimeout(() => {
@@ -243,22 +258,27 @@ export function SectorRecover() {
 
         <fieldset className="flex min-h-0 flex-col rounded-sm bg-[#e9e9e9] px-3 pb-3 pt-2 win7-inset">
           <legend className="px-1 text-[11px] font-bold text-[#003399]">
-            {COPY.recoveredFiles} · {inventory.length} / {LOOT_NAMES.length}
+            {COPY.recoveredFiles} · {recoveredFiles.length} / {VIRTUAL_FILE_COUNT}
           </legend>
           <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-auto pr-1">
-            {inventory.length === 0 ? (
+            {recoveredFiles.length === 0 ? (
               <p className="text-[11px] leading-snug text-[#666]">{COPY.emptyInventory}</p>
             ) : (
-              inventory.map((file) => (
-                <div
+              recoveredFiles.map((file) => (
+                <button
                   key={file.id}
-                  className="flex items-center gap-2 rounded-sm border border-[#c3c3c3] bg-[#f7f7f7] px-2 py-1.5"
+                  type="button"
+                  onClick={() => openFileLocation(file.id)}
+                  className="flex items-center gap-2 rounded-sm border border-[#c3c3c3] bg-[#f7f7f7] px-2 py-1.5 text-left hover:border-[#7eb6e0] hover:bg-[#f0f6fb]"
                 >
                   <span className="text-[14px]" aria-hidden="true">
                     {fileGlyph(file.type)}
                   </span>
-                  <span className="font-mono text-[11px] text-[#1a1a1a]">{file.name}</span>
-                </div>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-mono text-[11px] text-[#1a1a1a]">{file.name}</span>
+                    <span className="block truncate font-mono text-[10px] text-[#666]">{file.path}</span>
+                  </span>
+                </button>
               ))
             )}
           </div>
