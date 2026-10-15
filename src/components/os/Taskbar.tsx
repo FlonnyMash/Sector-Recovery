@@ -4,6 +4,8 @@ import { strings } from '../../i18n'
 import { selectActiveWindowId, selectWindowsForOs, useGameStore } from '../../store/useGameStore'
 import type { OsEnvironment } from '../../types/game'
 import { cn } from '../../utils/cn'
+import { formatChatClock } from '../../utils/format'
+import { getGameNow } from '../../utils/gameClock'
 import { StartFlag } from './icons'
 import { ModernDock } from './ModernDock'
 import { StartMenu } from './StartMenu'
@@ -45,10 +47,10 @@ function AeroTaskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: Taskbar
   const showDesktop = useGameStore((state) => state.showDesktop)
   const chatBadge = useGameStore((state) => state.prologue.chatNotificationPending)
   const activeId = selectActiveWindowId(osWindows)
-  const [now, setNow] = useState(() => new Date())
+  const [now, setNow] = useState(() => getGameNow())
 
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000)
+    const id = window.setInterval(() => setNow(getGameNow()), 1000)
     return () => window.clearInterval(id)
   }, [])
 
@@ -114,7 +116,7 @@ function AeroTaskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: Taskbar
           title={now.toLocaleDateString()}
         >
           <span>
-            {now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+            {formatChatClock(now)}
           </span>
         </div>
 

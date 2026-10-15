@@ -67,16 +67,17 @@ export function playSound(theme: SoundTheme, event: SoundEvent) {
 function playGeneratedAlert(theme: SoundTheme) {
   const ctx = getAudioContext()
   if (!ctx) return
+  const audio = ctx
 
   const start = () => {
-    const now = ctx.currentTime
-    const master = ctx.createGain()
+    const now = audio.currentTime
+    const master = audio.createGain()
     master.gain.setValueAtTime(theme === 'modern' ? 0.22 : 0.28, now)
-    master.connect(ctx.destination)
+    master.connect(audio.destination)
 
     function tone(frequency: number, at: number, duration: number, type: OscillatorType) {
-      const osc = ctx.createOscillator()
-      const gain = ctx.createGain()
+      const osc = audio.createOscillator()
+      const gain = audio.createGain()
       osc.type = type
       osc.frequency.setValueAtTime(frequency, at)
       gain.gain.setValueAtTime(0.0001, at)

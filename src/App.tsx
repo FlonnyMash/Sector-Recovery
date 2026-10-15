@@ -3,6 +3,8 @@ import { useEffect } from 'react'
 import { BiosScreen } from './components/os/BiosScreen'
 import { BootScreen } from './components/os/BootScreen'
 import { Desktop } from './components/os/Desktop'
+import { HostLoginScreen } from './components/os/HostLoginScreen'
+import { LoginScreen } from './components/os/LoginScreen'
 import { MotherboardSplash } from './components/os/MotherboardSplash'
 import { ShuttingDownScreen } from './components/os/ShuttingDownScreen'
 import { useGameStore } from './store/useGameStore'
@@ -31,6 +33,10 @@ function StageView({ stage }: { stage: SystemStage }) {
       return <BiosScreen />
     case 'booting':
       return <BootScreen />
+    case 'legacy_login':
+      return <LoginScreen />
+    case 'host_login':
+      return <HostLoginScreen />
     default:
       return <Desktop />
   }
@@ -39,21 +45,23 @@ function StageView({ stage }: { stage: SystemStage }) {
 function App() {
   const systemStage = useGameStore((state) => state.systemStage)
   const setSystemStage = useGameStore((state) => state.setSystemStage)
+  const tick = useGameStore((state) => state.tick)
+  const fragmentsPerSecond = useGameStore((state) => state.fragmentsPerSecond)
+  const startMomNudgeClock = useGameStore((state) => state.startMomNudgeClock)
+  const pauseMomNudgeClock = useGameStore((state) => state.pauseMomNudgeClock)
 
   useEffect(() => {
+    if (fragmentsPerSecond <= 0) return
     let last = performance.now()
     const id = window.setInterval(() => {
       const now = performance.now()
       const delta = (now - last) / 1000
       last = now
-      const { fragmentsPerSecond, tick } = useGameStore.getState()
-      if (fragmentsPerSecond > 0) {
-        tick(delta)
-      }
+      tick(delta)
     }, 100)
 
     return () => window.clearInterval(id)
-  }, [])
+  }, [fragmentsPerSecond, tick])
 
   useEffect(() => {
     if (systemStage !== 'black_screen') return
@@ -64,11 +72,23 @@ function App() {
   }, [systemStage, setSystemStage])
 
   useEffect(() => {
-    document.body.classList.toggle('cursor-modern', systemStage === 'host_os')
+    document.body.classList.toggle(
+      'cursor-modern',
+      systemStage === 'host_os' || systemStage === 'host_login',
+    )
     return () => {
       document.body.classList.remove('cursor-modern')
     }
   }, [systemStage])
+
+  useEffect(() => {
+    if (systemStage !== 'host_os') {
+      pauseMomNudgeClock()
+      return
+    }
+    startMomNudgeClock()
+    return () => pauseMomNudgeClock()
+  }, [systemStage, startMomNudgeClock, pauseMomNudgeClock])
 
   const transition = stageTransition(systemStage)
 

@@ -5,6 +5,8 @@ import { strings } from '../../i18n'
 import { selectActiveWindowId, selectWindowsForOs, useGameStore } from '../../store/useGameStore'
 import type { OsEnvironment } from '../../types/game'
 import { cn } from '../../utils/cn'
+import { formatChatClock } from '../../utils/format'
+import { getGameNow } from '../../utils/gameClock'
 import { StartMenu } from './StartMenu'
 
 interface ModernDockProps {
@@ -23,10 +25,10 @@ export function ModernDock({ os, startMenuOpen, onToggleStart, onCloseStart }: M
   const chatBadge = useGameStore((state) => state.prologue.chatNotificationPending)
   const activeId = selectActiveWindowId(osWindows)
   const apps = APP_LIST_FOR_OS(os)
-  const [now, setNow] = useState(() => new Date())
+  const [now, setNow] = useState(() => getGameNow())
 
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000)
+    const id = window.setInterval(() => setNow(getGameNow()), 1000)
     return () => window.clearInterval(id)
   }, [])
 
@@ -89,7 +91,7 @@ export function ModernDock({ os, startMenuOpen, onToggleStart, onCloseStart }: M
           title={now.toLocaleDateString()}
         >
           <span className="font-medium">
-            {now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+            {formatChatClock(now)}
           </span>
         </div>
 

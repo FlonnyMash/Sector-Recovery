@@ -3,7 +3,7 @@ interface IconProps {
   className?: string
 }
 
-export function TerminalIcon({ size = 48, className }: IconProps) {
+export function IeIcon({ size = 48, className }: IconProps) {
   return (
     <svg
       width={size}
@@ -13,12 +13,81 @@ export function TerminalIcon({ size = 48, className }: IconProps) {
       className={className}
       aria-hidden="true"
     >
-      <rect x="3" y="5" width="42" height="38" rx="3" fill="#1b3a4a" stroke="#8ec8e8" strokeWidth="2" />
-      <rect x="6" y="8" width="36" height="24" fill="#062016" />
-      <path d="M10 14 L16 18 L10 22" stroke="#7CFF9A" strokeWidth="2" strokeLinecap="square" fill="none" />
-      <path d="M18 22 H28" stroke="#7CFF9A" strokeWidth="2" />
-      <rect x="8" y="35" width="32" height="4" fill="#2f6f8a" />
-      <rect x="8" y="35" width="18" height="4" fill="#5ad4ff" />
+      <defs>
+        <linearGradient id="wahoo2011Glass" x1="12" y1="6" x2="36" y2="42">
+          <stop offset="0%" stopColor="#d4a4ff" />
+          <stop offset="45%" stopColor="#6a1b9a" />
+          <stop offset="100%" stopColor="#3d1466" />
+        </linearGradient>
+      </defs>
+      <circle cx="24" cy="24" r="18" fill="url(#wahoo2011Glass)" stroke="#ffcc00" strokeWidth="2.4" />
+      <ellipse cx="18" cy="16" rx="8" ry="4" fill="white" fillOpacity="0.28" />
+      <text
+        x="24"
+        y="30"
+        textAnchor="middle"
+        fill="#ffcc00"
+        fontFamily="Georgia, Times, serif"
+        fontSize="18"
+        fontWeight="700"
+        fontStyle="italic"
+      >
+        W!
+      </text>
+    </svg>
+  )
+}
+
+export function RecoverToolIcon({ size = 48, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="6" y="12" width="28" height="24" rx="3" fill="#6b7380" stroke="#2f3540" strokeWidth="2" />
+      <rect x="9" y="15" width="22" height="10" fill="#1c2430" />
+      <rect x="11" y="18" width="8" height="4" fill="#3ea74a" />
+      <rect x="10" y="28" width="6" height="4" rx="1" fill="#c9d0d8" />
+      <rect x="18" y="28" width="6" height="4" rx="1" fill="#c9d0d8" />
+      <circle cx="34" cy="32" r="8" fill="#dce6f2" stroke="#2f5f90" strokeWidth="2.4" />
+      <circle cx="34" cy="32" r="4" fill="none" stroke="#2f5f90" strokeWidth="1.6" />
+      <path d="M39.5 37.5 L44 44" stroke="#2f5f90" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function DevSwitchIcon({ size = 48, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="4" y="8" width="18" height="14" rx="2" fill="#3d1d6b" stroke="#c9a6ff" strokeWidth="2" />
+      <rect x="26" y="26" width="18" height="14" rx="2" fill="#0b3d66" stroke="#7ec8f0" strokeWidth="2" />
+      <path d="M24 12 H40 V22" stroke="#ffd166" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M36 18 L40 22 L44 18" stroke="#ffd166" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M24 36 H8 V26" stroke="#ffd166" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M4 30 L8 26 L12 30" stroke="#ffd166" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="2" y="2" width="14" height="8" rx="2" fill="#e23d3d" />
+      <text
+        x="9"
+        y="8.4"
+        textAnchor="middle"
+        fill="white"
+        fontFamily="monospace"
+        fontSize="6.5"
+        fontWeight="700"
+      >
+        DEV
+      </text>
     </svg>
   )
 }
@@ -61,15 +130,25 @@ export function BrowserIcon({ size = 48, className }: IconProps) {
       className={className}
       aria-hidden="true"
     >
-      <rect x="4" y="6" width="40" height="36" rx="4" fill="#fff5f8" stroke="#d46a8a" strokeWidth="2" />
-      <rect x="4" y="6" width="40" height="10" rx="4" fill="#f4a4b8" />
-      <rect x="4" y="12" width="40" height="4" fill="#f4a4b8" />
-      <circle cx="10" cy="11" r="1.6" fill="#ff6b81" />
-      <circle cx="15" cy="11" r="1.6" fill="#ffd166" />
-      <circle cx="20" cy="11" r="1.6" fill="#7CFF9A" />
+      <rect x="4" y="6" width="40" height="36" rx="4" fill="#faf7ff" stroke="#7b1fa2" strokeWidth="2" />
+      <rect x="4" y="6" width="40" height="10" rx="4" fill="#7b1fa2" />
+      <rect x="4" y="12" width="40" height="4" fill="#7b1fa2" />
+      <circle cx="10" cy="11" r="1.6" fill="#ffcc00" />
+      <circle cx="15" cy="11" r="1.6" fill="#ffffff" />
+      <circle cx="20" cy="11" r="1.6" fill="#ce93d8" />
       <rect x="24" y="9" width="16" height="4" rx="2" fill="white" fillOpacity="0.85" />
-      <path d="M18 22 C18 18 30 18 30 24 C30 30 18 28 18 34 C24 30 32 32 32 26" stroke="#e56b8c" strokeWidth="2" fill="none" />
-      <circle cx="24" cy="26" r="7" stroke="#7eb6e0" strokeWidth="1.5" fill="none" />
+      <text
+        x="24"
+        y="34"
+        textAnchor="middle"
+        fill="#7b1fa2"
+        fontFamily="Georgia, Times, serif"
+        fontSize="16"
+        fontWeight="700"
+        fontStyle="italic"
+      >
+        W!
+      </text>
     </svg>
   )
 }
@@ -95,6 +174,29 @@ export function ChatIcon({ size = 48, className, badge }: IconProps & { badge?: 
         <span className="absolute top-0 right-0 h-[11px] w-[11px] rounded-full border-2 border-white bg-[#e23d3d] shadow-[0_0_6px_rgba(226,61,61,0.9)]" />
       ) : null}
     </span>
+  )
+}
+
+export function ComputerIcon({ size = 48, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="4" y="6" width="26" height="20" rx="2" fill="#dce6f0" stroke="#3a4a58" strokeWidth="2" />
+      <rect x="7" y="9" width="20" height="13" fill="#1a4a78" />
+      <rect x="10" y="26" width="14" height="3" fill="#8a96a4" />
+      <rect x="7" y="29" width="20" height="2" rx="1" fill="#c5ced6" />
+      <rect x="32" y="10" width="12" height="24" rx="1.5" fill="#b8c2cc" stroke="#3a4a58" strokeWidth="2" />
+      <rect x="35" y="14" width="6" height="4" fill="#2a2a32" />
+      <circle cx="38" cy="22" r="1.4" fill="#3ea74a" />
+      <rect x="35" y="26" width="6" height="2" fill="#8a96a4" />
+      <rect x="35" y="29" width="6" height="2" fill="#8a96a4" />
+    </svg>
   )
 }
 

@@ -1,4 +1,4 @@
-import { APP_LIST_FOR_OS } from '../../game/apps'
+import { selectVisibleApps } from '../../game/apps'
 import { strings } from '../../i18n'
 import { useGameStore } from '../../store/useGameStore'
 import type { AppType, OsEnvironment } from '../../types/game'
@@ -13,7 +13,8 @@ interface StartMenuProps {
 export function StartMenu({ os, onOpenApp, onRestart }: StartMenuProps) {
   const startRebootSequence = useGameStore((state) => state.startRebootSequence)
   const ready = useGameStore((state) => state.prologue.isPartitionDownloaded)
-  const apps = APP_LIST_FOR_OS(os)
+  const hasRecoveryTool = useGameStore((state) => state.hasRecoveryTool)
+  const apps = selectVisibleApps(os, hasRecoveryTool)
   const header = os === 'host_os' ? strings.os.hostPcName : strings.os.targetPcName
   const modern = os === 'host_os'
 

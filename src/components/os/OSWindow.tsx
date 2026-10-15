@@ -31,7 +31,7 @@ export function OSWindow({
   const minimizeWindow = useGameStore((state) => state.minimizeWindow)
   const toggleMaximize = useGameStore((state) => state.toggleMaximize)
   const systemStage = useGameStore((state) => state.systemStage)
-  const modern = systemStage === 'host_os'
+  const modern = systemStage === 'host_os' || systemStage === 'host_login'
 
   const dragControls = useDragControls()
   const app = APPS[windowState.type]

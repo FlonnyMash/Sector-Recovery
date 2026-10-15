@@ -1,14 +1,50 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
 import { strings } from '../../i18n'
 import { useGameStore } from '../../store/useGameStore'
-import { LIVE_MESSAGE_COUNT } from '../../types/game'
+import {
+  LIVE_MESSAGE_COUNT,
+  type ChatConversationId,
+  type ChatLinkPreview,
+} from '../../types/game'
 import { cn } from '../../utils/cn'
+import { formatChatClock } from '../../utils/format'
 
 const TYPING_MS = 1400
 const PANE_TRANSITION = { duration: 0.18, ease: 'easeOut' as const }
+const SCROLL_BOTTOM_PX = 48
 
-type ConversationId = (typeof strings.chat.conversations)[number]['id']
+type ConversationId = ChatConversationId
+
+const COLD_CASE_ARTICLE = strings.news.articles.find((article) => article.id === 'cold-case-article')!
+
+const MOM_LINK_PREVIEW: ChatLinkPreview = {
+  url: `${strings.news.addressArticle}/${COLD_CASE_ARTICLE.id}`,
+  siteName: strings.news.portalName,
+  kicker: COLD_CASE_ARTICLE.kicker,
+  title: COLD_CASE_ARTICLE.title,
+  excerpt: COLD_CASE_ARTICLE.excerpt,
+  targetAppId: 'news-browser',
+  targetArticleId: COLD_CASE_ARTICLE.id,
+}
+
+const AUCTION_LINK_PREVIEW: ChatLinkPreview = {
+  url: `${strings.wahoo.addresses.auctions}/lot-404`,
+  siteName: strings.wahoo.bookmarks.auctions,
+  kicker: strings.chat.auctionLink.kicker,
+  title: strings.chat.auctionLink.title,
+  excerpt: strings.chat.auctionLink.excerpt,
+  targetAppId: 'news-browser',
+  targetAuctionLotId: 'lot-404',
+}
 
 interface LocalMessage {
   from: 'player'
@@ -21,23 +57,120 @@ export function ModernChat() {
   const revealNextLiveMessage = useGameStore((state) => state.revealNextLiveMessage)
   const startPartitionDownload = useGameStore((state) => state.startPartitionDownload)
   const clearChatNotification = useGameStore((state) => state.clearChatNotification)
+  const clearMomChatNotification = useGameStore((state) => state.clearMomChatNotification)
+  const pendingChatFocus = useGameStore((state) => state.pendingChatFocus)
+  const consumePendingChatFocus = useGameStore((state) => state.consumePendingChatFocus)
 
-  const [activeId, setActiveId] = useState<ConversationId>('kenji')
+  const [activeId, setActiveId] = useState<ConversationId>(
+    () => useGameStore.getState().pendingChatFocus ?? 'kenji',
+  )
   const [query, setQuery] = useState('')
   const [draft, setDraft] = useState('')
   const [sent, setSent] = useState<Record<ConversationId, LocalMessage[]>>({
     kenji: [],
     mom: [],
     'study-group': [],
+    yujiro: [],
+    rin: [],
   })
   const [typing, setTyping] = useState(false)
   const scrollerRef = useRef<HTMLDivElement>(null)
+  const activeIdRef = useRef(activeId)
+  const scrollMemoryRef = useRef<Partial<Record<ConversationId, number>>>({})
+  const contentKeysRef = useRef<Partial<Record<ConversationId, string>>>({})
+  const ignoreScrollRef = useRef(false)
+  activeIdRef.current = activeId
 
   const kenjiActive = activeId === 'kenji'
 
+  const contentKeys = useMemo(
+    () => ({
+      kenji: [
+        strings.chat.earlier.length,
+        prologue.kenjiAuctionNudgeSent ? 1 : 0,
+        prologue.kenjiAuctionWonSent ? 1 : 0,
+        prologue.liveMessagesRevealed,
+        prologue.isPartitionDownloaded ? 1 : 0,
+        typing && kenjiActive ? 1 : 0,
+        sent.kenji.length,
+      ].join(':'),
+      mom: [prologue.momNudgeReceived ? 1 : 0, sent.mom.length].join(':'),
+      'study-group': String(sent['study-group'].length),
+      yujiro: String(sent.yujiro.length),
+      rin: String(sent.rin.length),
+    }),
+    [
+      kenjiActive,
+      typing,
+      sent,
+      prologue.kenjiAuctionNudgeSent,
+      prologue.kenjiAuctionWonSent,
+      prologue.liveMessagesRevealed,
+      prologue.isPartitionDownloaded,
+      prologue.momNudgeReceived,
+    ],
+  )
+
+  const applyScrollPosition = useCallback((node: HTMLDivElement, id: ConversationId) => {
+    const remembered = scrollMemoryRef.current[id]
+    ignoreScrollRef.current = true
+    node.scrollTop = remembered === undefined ? node.scrollHeight : remembered
+    requestAnimationFrame(() => {
+      ignoreScrollRef.current = false
+    })
+  }, [])
+
+  const setScrollerRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      scrollerRef.current = node
+      if (node) applyScrollPosition(node, activeIdRef.current)
+    },
+    [applyScrollPosition],
+  )
+
+  const rememberScroll = useCallback(() => {
+    if (ignoreScrollRef.current) return
+    const node = scrollerRef.current
+    if (!node) return
+    const id = activeIdRef.current
+    const distanceFromBottom = node.scrollHeight - node.scrollTop - node.clientHeight
+    if (distanceFromBottom <= SCROLL_BOTTOM_PX) {
+      delete scrollMemoryRef.current[id]
+    } else {
+      scrollMemoryRef.current[id] = node.scrollTop
+    }
+  }, [])
+
+  const selectConversation = useCallback(
+    (id: ConversationId) => {
+      rememberScroll()
+      setActiveId(id)
+      setDraft('')
+    },
+    [rememberScroll],
+  )
+
+  useEffect(() => {
+    if (!pendingChatFocus || pendingChatFocus === activeId) {
+      if (pendingChatFocus) consumePendingChatFocus()
+      return
+    }
+    rememberScroll()
+    setActiveId(pendingChatFocus)
+    consumePendingChatFocus()
+  }, [pendingChatFocus, activeId, consumePendingChatFocus, rememberScroll])
+
   useEffect(() => {
     if (kenjiActive) clearChatNotification()
-  }, [kenjiActive, clearChatNotification])
+    if (activeId === 'mom') clearMomChatNotification()
+  }, [
+    kenjiActive,
+    activeId,
+    prologue.chatNotificationPending,
+    prologue.momChatNotificationPending,
+    clearChatNotification,
+    clearMomChatNotification,
+  ])
 
   const waitingForNext =
     kenjiActive && prologue.friendMessageReceived && prologue.liveMessagesRevealed < LIVE_MESSAGE_COUNT
@@ -58,18 +191,19 @@ export function ModernChat() {
     }
   }, [waitingForNext, prologue.liveMessagesRevealed, revealNextLiveMessage])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    for (const id of Object.keys(contentKeys) as ConversationId[]) {
+      const next = contentKeys[id]
+      const prev = contentKeysRef.current[id]
+      if (prev !== undefined && prev !== next) {
+        delete scrollMemoryRef.current[id]
+      }
+      contentKeysRef.current[id] = next
+    }
+
     const node = scrollerRef.current
-    if (!node) return
-    node.scrollTop = node.scrollHeight
-  }, [
-    activeId,
-    sent,
-    typing,
-    prologue.liveMessagesRevealed,
-    prologue.isPartitionDownloaded,
-    prologue.imageDownloadProgress,
-  ])
+    if (node) applyScrollPosition(node, activeId)
+  }, [activeId, contentKeys, applyScrollPosition])
 
   const conversations = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -85,7 +219,7 @@ export function ModernChat() {
   function sendDraft() {
     const text = draft.trim()
     if (!text) return
-    const time = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+    const time = formatChatClock()
     setSent((current) => ({
       ...current,
       [activeId]: [...current[activeId], { from: 'player', time, text }],
@@ -110,17 +244,16 @@ export function ModernChat() {
         </div>
         <div className="min-h-0 flex-1 overflow-auto px-1.5 pb-2">
           {conversations.map((conversation) => {
-            const unread = conversation.id === 'kenji' && prologue.chatNotificationPending
+            const unread =
+              (conversation.id === 'kenji' && prologue.chatNotificationPending) ||
+              (conversation.id === 'mom' && prologue.momChatNotificationPending)
             const selected = conversation.id === activeId
             const preview = sidebarPreview(conversation.id, prologue, sent[conversation.id])
             return (
               <button
                 key={conversation.id}
                 type="button"
-                onClick={() => {
-                  setActiveId(conversation.id)
-                  setDraft('')
-                }}
+                onClick={() => selectConversation(conversation.id)}
                 className={cn(
                   'flex w-full items-center gap-2.5 rounded-xl px-2 py-2 text-left',
                   selected ? 'bg-[#0a84ff] text-white' : 'text-neutral-900 hover:bg-black/5',
@@ -136,7 +269,7 @@ export function ModernChat() {
                         selected ? 'text-white/70' : 'text-neutral-400',
                       )}
                     >
-                      {conversation.time}
+                      {preview.time}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -146,7 +279,7 @@ export function ModernChat() {
                         selected ? 'text-white/80' : 'text-neutral-500',
                       )}
                     >
-                      {preview}
+                      {preview.text}
                     </span>
                     {unread ? (
                       <span className="ml-auto h-2 w-2 shrink-0 rounded-full bg-[#0a84ff] ring-2 ring-white" />
@@ -178,9 +311,13 @@ export function ModernChat() {
                 </div>
               </header>
 
-              <div ref={scrollerRef} className="min-h-0 flex-1 space-y-1.5 overflow-auto px-4 py-4">
+              <div
+                ref={setScrollerRef}
+                onScroll={rememberScroll}
+                className="min-h-0 flex-1 space-y-1.5 overflow-auto px-4 py-4"
+              >
                 <div className="pb-2 text-center text-[11px] text-neutral-400">
-                  {strings.chat.today}
+                  {active.id === 'rin' ? strings.chat.yesterday : strings.chat.today}
                 </div>
 
                 {active.id === 'kenji' ? (
@@ -195,8 +332,36 @@ export function ModernChat() {
                         {message.text}
                       </Bubble>
                     ))}
+                    {prologue.kenjiAuctionNudgeSent ? (
+                      <Bubble
+                        from="them"
+                        time={prologue.kenjiAuctionNudgeTime ?? undefined}
+                        linkPreview={AUCTION_LINK_PREVIEW}
+                        index={strings.chat.earlier.length}
+                      >
+                        {strings.chat.auctionNudge}
+                      </Bubble>
+                    ) : null}
+                    {prologue.kenjiAuctionWonSent ? (
+                      <Bubble
+                        from="them"
+                        time={prologue.kenjiAuctionWonTime ?? undefined}
+                        index={
+                          strings.chat.earlier.length + (prologue.kenjiAuctionNudgeSent ? 1 : 0)
+                        }
+                      >
+                        {prologue.kenjiAuctionNudgeSent
+                          ? strings.chat.auctionWonAfterNudge
+                          : strings.chat.auctionWonDirect}
+                      </Bubble>
+                    ) : null}
                     {liveMessages.map((text, index) => (
-                      <Bubble key={`live-${index}`} from="them" index={strings.chat.earlier.length + index}>
+                      <Bubble
+                        key={`live-${index}`}
+                        from="them"
+                        time={prologue.liveMessageTimes[index]}
+                        index={kenjiLeadCount(prologue) + index}
+                      >
                         {text}
                       </Bubble>
                     ))}
@@ -208,7 +373,11 @@ export function ModernChat() {
                       />
                     ) : null}
                     {prologue.isPartitionDownloaded ? (
-                      <Bubble from="them" index={strings.chat.earlier.length + liveMessages.length}>
+                      <Bubble
+                        from="them"
+                        time={prologue.partitionMountedTime ?? undefined}
+                        index={kenjiLeadCount(prologue) + liveMessages.length}
+                      >
                         {strings.chat.final}
                       </Bubble>
                     ) : null}
@@ -218,7 +387,7 @@ export function ModernChat() {
                         from="player"
                         time={message.time}
                         index={
-                          strings.chat.earlier.length +
+                          kenjiLeadCount(prologue) +
                           liveMessages.length +
                           (prologue.isPartitionDownloaded ? 1 : 0) +
                           index
@@ -242,27 +411,28 @@ export function ModernChat() {
                   </>
                 ) : (
                   <>
-                    {(active.id === 'mom' ? strings.chat.mom : strings.chat.studyGroup).map(
-                      (message, index) => (
-                        <Bubble
-                          key={`${message.time}-${message.text}`}
-                          from={message.from === 'player' ? 'player' : 'them'}
-                          sender={'sender' in message ? message.sender : undefined}
-                          time={message.time}
-                          index={index}
-                        >
-                          {message.text}
-                        </Bubble>
-                      ),
-                    )}
+                    {threadMessages(active.id, prologue.momNudgeReceived, prologue.momNudgeTime).map((message, index) => (
+                      <Bubble
+                        key={`${message.time ?? 'nudge'}-${message.text}-${index}`}
+                        from={message.from === 'player' ? 'player' : 'them'}
+                        sender={message.sender}
+                        time={message.time}
+                        linkPreview={message.linkPreview}
+                        index={index}
+                      >
+                        {message.text}
+                      </Bubble>
+                    ))}
+                    {active.id === 'rin' && sent.rin.length === 0 ? (
+                      <ReadReceipt label={strings.chat.rinReadAt} />
+                    ) : null}
                     {sent[active.id].map((message, index) => (
                       <Bubble
                         key={`${message.time}-${message.text}`}
                         from="player"
                         time={message.time}
                         index={
-                          (active.id === 'mom' ? strings.chat.mom : strings.chat.studyGroup).length +
-                          index
+                          threadMessages(active.id, prologue.momNudgeReceived, prologue.momNudgeTime).length + index
                         }
                       >
                         {message.text}
@@ -301,19 +471,84 @@ export function ModernChat() {
   )
 }
 
+interface ThreadMessage {
+  from: 'player' | 'them'
+  time?: string
+  text: string
+  sender?: string
+  linkPreview?: ChatLinkPreview
+}
+
+function threadMessages(
+  id: ConversationId,
+  momNudgeReceived: boolean,
+  momNudgeTime: string | null,
+): ThreadMessage[] {
+  if (id === 'study-group') return [...strings.chat.studyGroup]
+  if (id === 'yujiro') return [...strings.chat.yujiro]
+  if (id === 'rin') return [...strings.chat.rin]
+  const messages: ThreadMessage[] = [...strings.chat.mom]
+  if (!momNudgeReceived) return messages
+  const time = momNudgeTime ?? undefined
+  for (const message of strings.chat.momNudge) {
+    messages.push({ from: message.from, text: message.text, time })
+  }
+  messages.push({ from: 'them', text: '', time, linkPreview: MOM_LINK_PREVIEW })
+  return messages
+}
+
+function kenjiLeadCount(
+  prologue: ReturnType<typeof useGameStore.getState>['prologue'],
+) {
+  return (
+    strings.chat.earlier.length +
+    (prologue.kenjiAuctionNudgeSent ? 1 : 0) +
+    (prologue.kenjiAuctionWonSent ? 1 : 0)
+  )
+}
+
 function sidebarPreview(
   id: ConversationId,
   prologue: ReturnType<typeof useGameStore.getState>['prologue'],
   extras: LocalMessage[],
-) {
-  if (extras.length > 0) return extras[extras.length - 1].text
+): { text: string; time: string } {
+  const fallback = strings.chat.conversations.find((conversation) => conversation.id === id)
+  const fallbackTime = fallback?.time ?? ''
+
+  if (extras.length > 0) {
+    const last = extras[extras.length - 1]
+    return { text: last.text, time: last.time }
+  }
   if (id === 'kenji') {
-    if (prologue.isPartitionDownloaded) return strings.chat.final
+    if (prologue.isPartitionDownloaded) {
+      return { text: strings.chat.final, time: prologue.partitionMountedTime ?? fallbackTime }
+    }
     if (prologue.liveMessagesRevealed > 0) {
-      return strings.chat.live[prologue.liveMessagesRevealed - 1]
+      const index = prologue.liveMessagesRevealed - 1
+      return {
+        text: strings.chat.live[index],
+        time: prologue.liveMessageTimes[index] ?? fallbackTime,
+      }
+    }
+    if (prologue.kenjiAuctionWonSent) {
+      return {
+        text: prologue.kenjiAuctionNudgeSent
+          ? strings.chat.auctionWonAfterNudge
+          : strings.chat.auctionWonDirect,
+        time: prologue.kenjiAuctionWonTime ?? fallbackTime,
+      }
+    }
+    if (prologue.kenjiAuctionNudgeSent) {
+      return { text: strings.chat.auctionNudge, time: prologue.kenjiAuctionNudgeTime ?? fallbackTime }
     }
   }
-  return strings.chat.conversations.find((conversation) => conversation.id === id)?.preview ?? ''
+  if (id === 'mom' && prologue.momNudgeReceived) {
+    return {
+      text: strings.chat.momNudge[1].text,
+      time: prologue.momNudgeTime ?? fallbackTime,
+    }
+  }
+  return { text: fallback?.preview ?? '', time: fallbackTime }
 }
 
 function Avatar({ name, color }: { name: string; color: string }) {
@@ -333,15 +568,18 @@ function Bubble({
   time,
   sender,
   index = 0,
+  linkPreview,
   children,
 }: {
   from: 'player' | 'them'
   time?: string
   sender?: string
   index?: number
-  children: string
+  linkPreview?: ChatLinkPreview
+  children: ReactNode
 }) {
   const mine = from === 'player'
+  const hasText = typeof children === 'string' ? children.length > 0 : children != null
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -360,13 +598,67 @@ function Bubble({
         {sender ? (
           <div className="mb-0.5 text-[10px] font-semibold text-neutral-500">{sender}</div>
         ) : null}
-        <div>{children}</div>
+        {hasText ? <div>{children}</div> : null}
+        {linkPreview ? <LinkPreviewCard preview={linkPreview} /> : null}
         {time ? (
           <div className={cn('mt-1 text-[10px]', mine ? 'text-white/70' : 'text-neutral-400')}>
             {time}
           </div>
         ) : null}
       </div>
+    </motion.div>
+  )
+}
+
+function LinkPreviewCard({ preview }: { preview: ChatLinkPreview }) {
+  const openWindow = useGameStore((state) => state.openWindow)
+  const requestNewsArticle = useGameStore((state) => state.requestNewsArticle)
+  const requestAuctionLot = useGameStore((state) => state.requestAuctionLot)
+
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        if (preview.targetAuctionLotId) {
+          requestAuctionLot(preview.targetAuctionLotId)
+          openWindow(preview.targetAppId)
+          return
+        }
+        if (preview.targetArticleId) {
+          requestNewsArticle(preview.targetArticleId)
+          openWindow(preview.targetAppId)
+        }
+      }}
+      className="mt-2 w-full overflow-hidden rounded-xl bg-white text-left shadow-sm ring-1 ring-black/8 hover:bg-[#f7f7f8]"
+    >
+      <div className="border-b border-black/6 bg-[#f4f4f6] px-3 py-1.5 text-[10px] font-semibold tracking-wide text-neutral-500 uppercase">
+        {preview.siteName}
+      </div>
+      <div className="px-3 py-2">
+        <div className="text-[10px] font-bold tracking-[0.14em] text-[#c45c78] uppercase">
+          {preview.kicker}
+        </div>
+        <div className="mt-0.5 text-[13px] leading-snug font-semibold text-neutral-900">
+          {preview.title}
+        </div>
+        <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-neutral-500">
+          {preview.excerpt}
+        </div>
+        <div className="mt-1.5 truncate text-[10px] text-[#0a84ff]">{preview.url}</div>
+      </div>
+    </button>
+  )
+}
+
+function ReadReceipt({ label }: { label: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18, delay: 0.2 }}
+      className="flex justify-end pr-1 text-[10px] text-neutral-400"
+    >
+      {label}
     </motion.div>
   )
 }

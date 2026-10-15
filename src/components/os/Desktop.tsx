@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react'
-import { APP_LIST_FOR_OS } from '../../game/apps'
+import { selectVisibleApps } from '../../game/apps'
 import { selectCurrentOs, useGameStore } from '../../store/useGameStore'
 import type { AppType } from '../../types/game'
 import { cn } from '../../utils/cn'
 import { DesktopIcon } from './DesktopIcon'
 import { NotificationToasts } from './NotificationToasts'
+import { OsWallpaper } from './OsWallpaper'
 import { Taskbar } from './Taskbar'
 import { WindowManager } from './WindowManager'
 
@@ -14,8 +15,9 @@ export function Desktop() {
   const systemStage = useGameStore((state) => state.systemStage)
   const bootTarget = useGameStore((state) => state.bootTarget)
   const chatBadge = useGameStore((state) => state.prologue.chatNotificationPending)
+  const hasRecoveryTool = useGameStore((state) => state.hasRecoveryTool)
   const os = selectCurrentOs(systemStage, bootTarget)
-  const apps = APP_LIST_FOR_OS(os)
+  const apps = selectVisibleApps(os, hasRecoveryTool)
   const host = os === 'host_os'
 
   const [selectedIcon, setSelectedIcon] = useState<AppType | null>(null)
@@ -24,24 +26,13 @@ export function Desktop() {
   return (
     <div className="os-chrome relative h-screen w-screen overflow-hidden">
       <div
-        className={
-          host
-            ? 'absolute inset-0 bg-gradient-to-br from-[#1a1440] via-[#3d1d6b] to-[#c45c78]'
-            : 'absolute inset-0 bg-gradient-to-br from-[#0b3d66] via-[#1a5f8a] to-[#0a7a7a]'
-        }
+        className="absolute inset-0"
         onMouseDown={() => {
           setSelectedIcon(null)
           setStartMenuOpen(false)
         }}
       >
-        {host ? (
-          <>
-            <div className="absolute -top-24 -left-16 h-[520px] w-[520px] rounded-full bg-[#7c5cff]/35 blur-3xl" />
-            <div className="absolute right-[-80px] bottom-[-40px] h-[480px] w-[480px] rounded-full bg-[#ff8a6a]/28 blur-3xl" />
-          </>
-        ) : (
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.18),transparent_42%)]" />
-        )}
+        <OsWallpaper host={host} />
       </div>
 
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
