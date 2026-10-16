@@ -57,7 +57,7 @@ export function ModernDock({ os, startMenuOpen, onToggleStart, onCloseStart }: M
           <LauncherGlyph />
         </DockTile>
 
-        <div className="mx-1 h-8 w-px self-center bg-white/20" />
+        <div className="mx-1 h-10 w-px self-center bg-white/20" />
 
         {apps.map((app) => {
           const running = osWindows.find((windowState) => windowState.type === app.type)
@@ -79,15 +79,15 @@ export function ModernDock({ os, startMenuOpen, onToggleStart, onCloseStart }: M
                 openWindow(app.type)
               }}
             >
-              {app.icon({ size: 28, badge: showBadge })}
+              {app.icon({ size: 36, badge: showBadge })}
             </DockTile>
           )
         })}
 
-        <div className="mx-1 h-8 w-px self-center bg-white/20" />
+        <div className="mx-1 h-10 w-px self-center bg-white/20" />
 
         <div
-          className="flex h-10 min-w-[64px] flex-col items-center justify-center rounded-xl px-2 text-[11px] leading-tight text-white/90"
+          className="flex h-12 min-w-[84px] flex-col items-center justify-center rounded-xl px-2 text-[14px] leading-tight text-white/90"
           title={now.toLocaleDateString()}
         >
           <span className="font-medium">
@@ -100,7 +100,7 @@ export function ModernDock({ os, startMenuOpen, onToggleStart, onCloseStart }: M
           aria-label={strings.os.showDesktop}
           title={strings.os.showDesktop}
           onClick={showDesktop}
-          className="ml-0.5 h-10 w-2.5 rounded-full border border-white/20 bg-white/10 hover:bg-white/25"
+          className="ml-0.5 h-12 w-2.5 rounded-full border border-white/20 bg-white/10 hover:bg-white/25"
         />
       </div>
     </>
@@ -131,7 +131,7 @@ function DockTile({
       whileHover={{ scale: 1.08, y: -2 }}
       transition={{ type: 'spring', stiffness: 520, damping: 28 }}
       className={cn(
-        'relative flex h-11 w-11 items-center justify-center rounded-xl',
+        'relative flex h-14 w-14 items-center justify-center rounded-xl',
         active ? 'bg-white/25' : 'bg-transparent hover:bg-white/10',
         badge && 'animate-pulse',
       )}
@@ -152,10 +152,10 @@ function DockTile({
 function LauncherGlyph() {
   return (
     <span className="grid grid-cols-2 gap-[3px]">
-      <span className="h-[7px] w-[7px] rounded-[2px] bg-white/90" />
-      <span className="h-[7px] w-[7px] rounded-[2px] bg-white/70" />
-      <span className="h-[7px] w-[7px] rounded-[2px] bg-white/70" />
-      <span className="h-[7px] w-[7px] rounded-[2px] bg-white/90" />
+      <span className="h-[9px] w-[9px] rounded-[2px] bg-white/90" />
+      <span className="h-[9px] w-[9px] rounded-[2px] bg-white/70" />
+      <span className="h-[9px] w-[9px] rounded-[2px] bg-white/70" />
+      <span className="h-[9px] w-[9px] rounded-[2px] bg-white/90" />
     </span>
   )
 }

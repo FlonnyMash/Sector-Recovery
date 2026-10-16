@@ -28,13 +28,13 @@ export function MotherboardSplash() {
   }, [bootFrom, setSystemStage])
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-black font-mono text-[15px] leading-relaxed text-[#c8c8c8]">
+    <div className="relative h-screen w-screen overflow-hidden bg-black font-mono text-[20px] leading-relaxed text-[#c8c8c8]">
       <div className="flex items-start justify-between px-10 pt-8">
         <div>
-          <div className="text-[28px] font-bold tracking-[0.18em] text-[#e8e8e8]">
+          <div className="text-[36px] font-bold tracking-[0.18em] text-[#e8e8e8]">
             {strings.splash.vendor}
           </div>
-          <div className="mt-1 text-[13px] tracking-[0.12em] text-[#8a8a8a] uppercase">
+          <div className="mt-1 text-[17px] tracking-[0.12em] text-[#8a8a8a] uppercase">
             {strings.splash.legal}
           </div>
         </div>
@@ -50,7 +50,7 @@ export function MotherboardSplash() {
         <div className="pt-4">{strings.splash.detecting}</div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-8 text-center text-[14px] tracking-wide text-[#dcdcdc]">
+      <div className="absolute inset-x-0 bottom-8 text-center text-[18px] tracking-wide text-[#dcdcdc]">
         <span className="cursor-blink">{strings.splash.pressSetup}</span>
       </div>
     </div>
@@ -60,7 +60,7 @@ export function MotherboardSplash() {
 function EnergyStarMark() {
   return (
     <div
-      className="flex w-[132px] flex-col items-center border-[3px] border-[#3d9b4a] bg-[#0b1a10] px-2 py-2 text-center"
+      className="flex w-[176px] flex-col items-center border-[3px] border-[#3d9b4a] bg-[#0b1a10] px-2 py-2 text-center"
       aria-hidden="true"
     >
       <svg width="72" height="48" viewBox="0 0 72 48" fill="none">
@@ -68,7 +68,7 @@ function EnergyStarMark() {
         <path d="M18 34 L28 10 L36 26 L44 10 L54 34" stroke="#7CFF9A" strokeWidth="3" fill="none" />
         <circle cx="36" cy="30" r="5" fill="#f0c14a" />
       </svg>
-      <div className="mt-1 text-[9px] font-bold tracking-[0.16em] text-[#7CFF9A]">
+      <div className="mt-1 text-[12px] font-bold tracking-[0.16em] text-[#7CFF9A]">
         {strings.splash.energyStar}
       </div>
     </div>

@@ -10,18 +10,8 @@ import { OperatorNotes } from '../components/apps/OperatorNotes'
 import { PhotoViewer } from '../components/apps/PhotoViewer'
 import { SectorRecover } from '../components/apps/SectorRecover'
 import { SystemExplorer } from '../components/apps/SystemExplorer'
-import {
-  ArcadeIcon,
-  BrowserIcon,
-  ChatIcon,
-  ComputerIcon,
-  DevSwitchIcon,
-  IeIcon,
-  MessengerIcon,
-  NotesIcon,
-  PhotoIcon,
-  RecoverToolIcon,
-} from '../components/os/icons'
+import { ArcadeIcon, BrowserIcon, ChatIcon, DevSwitchIcon } from '../components/os/icons'
+import { retroAppIcon } from '../components/os/retroIcons'
 import { strings } from '../i18n'
 import { APP_OS, type AppType, type OsEnvironment } from '../types/game'
 
@@ -39,8 +29,8 @@ export interface AppDefinition {
 }
 
 const DEV_TOOLS_SIZE = {
-  defaultSize: { width: 560, height: 640 },
-  minSize: { width: 460, height: 400 },
+  defaultSize: { width: 720, height: 830 },
+  minSize: { width: 600, height: 520 },
 }
 
 export const APPS: Record<AppType, AppDefinition> = {
@@ -50,8 +40,8 @@ export const APPS: Record<AppType, AppDefinition> = {
     os: APP_OS['news-browser'],
     icon: BrowserIcon,
     component: NewsBrowser,
-    defaultSize: { width: 880, height: 620 },
-    minSize: { width: 600, height: 440 },
+    defaultSize: { width: 1140, height: 810 },
+    minSize: { width: 780, height: 570 },
   },
   'friend-chat': {
     type: 'friend-chat',
@@ -59,8 +49,8 @@ export const APPS: Record<AppType, AppDefinition> = {
     os: APP_OS['friend-chat'],
     icon: ChatIcon,
     component: ModernChat,
-    defaultSize: { width: 860, height: 600 },
-    minSize: { width: 580, height: 400 },
+    defaultSize: { width: 1120, height: 780 },
+    minSize: { width: 760, height: 520 },
   },
   arcade: {
     type: 'arcade',
@@ -68,63 +58,63 @@ export const APPS: Record<AppType, AppDefinition> = {
     os: APP_OS.arcade,
     icon: ArcadeIcon,
     component: MiniGame,
-    defaultSize: { width: 900, height: 560 },
-    minSize: { width: 720, height: 480 },
+    defaultSize: { width: 1170, height: 730 },
+    minSize: { width: 940, height: 620 },
   },
   'system-explorer': {
     type: 'system-explorer',
     title: strings.apps.systemExplorer,
     os: APP_OS['system-explorer'],
-    icon: ComputerIcon,
+    icon: retroAppIcon('computer-pc'),
     component: SystemExplorer,
-    defaultSize: { width: 780, height: 520 },
-    minSize: { width: 560, height: 400 },
+    defaultSize: { width: 1010, height: 680 },
+    minSize: { width: 730, height: 520 },
   },
   'net-explorer': {
     type: 'net-explorer',
     title: strings.apps.netExplorer,
     os: APP_OS['net-explorer'],
-    icon: IeIcon,
+    icon: retroAppIcon('globe'),
     component: NetExplorer,
-    defaultSize: { width: 820, height: 740 },
-    minSize: { width: 560, height: 520 },
+    defaultSize: { width: 1100, height: 820 },
+    minSize: { width: 760, height: 600 },
   },
   'sector-recover': {
     type: 'sector-recover',
     title: strings.apps.sectorRecover,
     os: APP_OS['sector-recover'],
-    icon: RecoverToolIcon,
+    icon: retroAppIcon('computer-recovery'),
     component: SectorRecover,
-    defaultSize: { width: 720, height: 520 },
-    minSize: { width: 600, height: 440 },
+    defaultSize: { width: 940, height: 680 },
+    minSize: { width: 780, height: 570 },
     requiresRecoveryTool: true,
   },
   'operator-notes': {
     type: 'operator-notes',
     title: strings.apps.operatorNotes,
     os: APP_OS['operator-notes'],
-    icon: NotesIcon,
+    icon: retroAppIcon('notepad-pencil'),
     component: OperatorNotes,
-    defaultSize: { width: 420, height: 360 },
-    minSize: { width: 320, height: 260 },
+    defaultSize: { width: 540, height: 470 },
+    minSize: { width: 420, height: 340 },
   },
   'photo-viewer': {
     type: 'photo-viewer',
     title: strings.apps.photoViewer,
     os: APP_OS['photo-viewer'],
-    icon: PhotoIcon,
+    icon: retroAppIcon('document-image'),
     component: PhotoViewer,
-    defaultSize: { width: 760, height: 560 },
-    minSize: { width: 480, height: 380 },
+    defaultSize: { width: 980, height: 730 },
+    minSize: { width: 620, height: 500 },
   },
   messenger: {
     type: 'messenger',
     title: strings.apps.messenger,
     os: APP_OS.messenger,
-    icon: MessengerIcon,
+    icon: retroAppIcon('chat-bubble'),
     component: Messenger,
-    defaultSize: { width: 760, height: 540 },
-    minSize: { width: 560, height: 400 },
+    defaultSize: { width: 980, height: 700 },
+    minSize: { width: 730, height: 520 },
   },
   'dev-tools-host': {
     type: 'dev-tools-host',
@@ -139,7 +129,7 @@ export const APPS: Record<AppType, AppDefinition> = {
     type: 'dev-tools-target',
     title: strings.apps.devTools,
     os: APP_OS['dev-tools-target'],
-    icon: DevSwitchIcon,
+    icon: retroAppIcon('circuit-board'),
     component: DevTools,
     ...DEV_TOOLS_SIZE,
     devOnly: true,

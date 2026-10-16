@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><radialGradient id="ocean" cx=".38" cy=".32" r=".72"><stop offset="0" stop-color="#8fd4ff"/><stop offset="1" stop-color="#1360c4"/></radialGradient><linearGradient id="land" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8be08a"/><stop offset="1" stop-color="#2f9a48"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <circle cx="32" cy="32" r="22" fill="url(#ocean)"/>
+    <path d="M18 24c4-6 10-8 16-6 3 1 4 4 2 7-3 4 2 6 6 5 4-1 8 3 6 8-2 4-8 6-14 5-8-1-14-6-16-13z" fill="url(#land)"/>
+    <path d="M22 42c4 2 10 3 16 1 3-1 6 1 5 4-4 3-12 4-20 1z" fill="url(#land)" opacity=".9"/>
+    <ellipse cx="24" cy="22" rx="8" ry="5" fill="#fff" opacity=".22"/>
+    <circle cx="32" cy="32" r="22" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width="1.5"/></g>
+</svg>

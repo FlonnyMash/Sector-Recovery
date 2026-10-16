@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><radialGradient id="cd" cx=".32" cy=".28" r=".8"><stop offset="0" stop-color="#e8fbff"/><stop offset="1" stop-color="#6a4dff"/></radialGradient><linearGradient id="cdH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8ff"/><stop offset="1" stop-color="#9aa7b8"/></linearGradient><linearGradient id="warn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe066"/><stop offset="1" stop-color="#e09a00"/></linearGradient></defs>
+  <g filter="url(#sh)">
+  <circle cx="32" cy="32" r="22" fill="url(#cd)"/>
+  <circle cx="32" cy="32" r="15.84" fill="none" stroke="#7ee8c8" stroke-opacity=".35" stroke-width="3.2"/>
+  <circle cx="32" cy="32" r="11" fill="none" stroke="#c9a6ff" stroke-opacity=".28" stroke-width="2.2"/>
+  <path d="M20 21a18 18 0 0 1 24 6" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="5.72" fill="url(#cdH)"/>
+  <circle cx="32" cy="32" r="2.2" fill="#eef4fb"/>
+  <g transform="translate(34 33)"><path d="M13 3.2 23.6 22.2H2.4L13 3.2z" fill="url(#warn)" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M13 10v6.2" stroke="#7a4a00" stroke-width="2.3" stroke-linecap="round"/><circle cx="13" cy="19.3" r="1.25" fill="#7a4a00"/></g></g>
+</svg>

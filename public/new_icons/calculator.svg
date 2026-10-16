@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="calc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a4d8f"/><stop offset="1" stop-color="#132850"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="12" y="8" width="40" height="48" rx="10" fill="url(#calc)"/>
+    <rect x="12" y="8" width="40" height="16" rx="10" fill="url(#gloss)" opacity=".12"/>
+    <g fill="#fff" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">
+      <rect x="16" y="16" width="14" height="14" rx="3" fill="#1a73e8"/>
+      <text x="23" y="26" fill="#fff">+</text>
+      <rect x="34" y="16" width="14" height="14" rx="3" fill="#5aa2f0"/>
+      <text x="41" y="26" fill="#fff">−</text>
+      <rect x="16" y="34" width="14" height="14" rx="3" fill="#7ec8ff"/>
+      <text x="23" y="44" fill="#1a3a6e">×</text>
+      <rect x="34" y="34" width="14" height="14" rx="3" fill="#c5cedb"/>
+      <text x="41" y="44" fill="#1a3a6e">=</text>
+    </g></g>
+</svg>

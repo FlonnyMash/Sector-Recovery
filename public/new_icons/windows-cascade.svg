@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="wbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e3ebf4"/></linearGradient><linearGradient id="whd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5aa2f0"/><stop offset="1" stop-color="#2b78d4"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="16" y="8" width="36" height="34" rx="8" fill="url(#wbg)"/>
+    <path d="M16 16V16c0-4.4 3.6-8 8-8h20c4.4 0 8 3.6 8 8H16z" fill="url(#whd)"/>
+    <circle cx="23" cy="14.4" r="1.7" fill="#ff6b6b"/>
+    <rect x="10" y="18" width="36" height="34" rx="8" fill="url(#wbg)"/>
+    <path d="M10 26V26c0-4.4 3.6-8 8-8h20c4.4 0 8 3.6 8 8H10z" fill="#7b1fa2"/>
+    <circle cx="17" cy="24.4" r="1.7" fill="#ffd166"/>
+    <circle cx="22.2" cy="24.4" r="1.7" fill="#6bcf7a"/></g>
+</svg>

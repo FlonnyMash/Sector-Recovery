@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef3f9"/><stop offset="1" stop-color="#9aa7b8"/></linearGradient><linearGradient id="metalD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b7688"/><stop offset="1" stop-color="#2a3142"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="14" y="34" width="36" height="18" rx="6" fill="url(#metalD)"/>
+    <circle cx="24" cy="43" r="4.4" fill="#ff6b81"/>
+    <circle cx="34" cy="43" r="3.2" fill="#7eb6e0"/>
+    <circle cx="42" cy="43" r="3.2" fill="#ffd166"/>
+    <rect x="28" y="14" width="8" height="22" rx="3" fill="url(#metal)"/>
+    <circle cx="32" cy="14" r="7" fill="#3d9ee8"/>
+    <circle cx="32" cy="14" r="3.2" fill="#fff" opacity=".4"/></g>
+</svg>

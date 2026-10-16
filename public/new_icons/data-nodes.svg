@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter></defs>
+  <g filter="url(#sh)">
+    <circle cx="18" cy="20" r="8" fill="#5aa2f0"/>
+    <circle cx="46" cy="18" r="7" fill="#6bcf7a"/>
+    <circle cx="32" cy="40" r="10" fill="#c9a6ff"/>
+    <circle cx="16" cy="46" r="6" fill="#ffd166"/>
+    <path d="M24 24l6 10M40 22l-6 12M22 44h4" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".7"/>
+    <circle cx="18" cy="20" r="3" fill="#fff" opacity=".5"/>
+    <circle cx="46" cy="18" r="2.6" fill="#fff" opacity=".5"/>
+    <circle cx="32" cy="40" r="3.4" fill="#fff" opacity=".45"/></g>
+</svg>

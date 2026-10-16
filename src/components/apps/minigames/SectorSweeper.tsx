@@ -139,21 +139,21 @@ export function SectorSweeper() {
         : strings.arcade.sweeper.statusReady
 
   return (
-    <div className="flex h-full flex-col bg-[#1c2430] p-3 font-[Tahoma,'Segoe_UI',sans-serif] text-[12px] text-[#d6e6f0]">
+    <div className="flex h-full flex-col bg-[#1c2430] p-3 font-[Tahoma,'Segoe_UI',sans-serif] text-[16px] text-[#d6e6f0]">
       <div className="mb-2 flex items-center justify-between">
         <div>
-          <div className="text-[14px] font-bold">{strings.arcade.sweeper.title}</div>
-          <div className="text-[11px] text-[#8aa4b4]">{statusLabel}</div>
+          <div className="text-[18px] font-bold">{strings.arcade.sweeper.title}</div>
+          <div className="text-[14px] text-[#8aa4b4]">{statusLabel}</div>
         </div>
         <button
           type="button"
           onClick={reset}
-          className="rounded-sm border border-[#5a7a8a] bg-[#2b3b48] px-2 py-1 text-[11px] hover:bg-[#354858]"
+          className="rounded-sm border border-[#5a7a8a] bg-[#2b3b48] px-2 py-1 text-[14px] hover:bg-[#354858]"
         >
           {strings.arcade.sweeper.newGame}
         </button>
       </div>
-      <div className="mb-2 flex gap-4 font-mono text-[11px]">
+      <div className="mb-2 flex gap-4 font-mono text-[14px]">
         <span>
           {strings.arcade.sweeper.mines}: {MINES - flags}
         </span>
@@ -178,7 +178,7 @@ export function SectorSweeper() {
               toggleFlag(index)
             }}
             className={cn(
-              'h-[28px] w-[28px] text-[12px] font-bold',
+              'h-[36px] w-[36px] text-[16px] font-bold',
               cell.revealed
                 ? cell.mine
                   ? 'bg-[#8a2a32] text-white'

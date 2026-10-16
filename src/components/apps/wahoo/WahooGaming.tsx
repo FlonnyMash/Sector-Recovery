@@ -44,8 +44,8 @@ export function WahooGaming() {
 
   return (
     <div className="h-full overflow-auto bg-[#16121c] p-4 text-[#f7e6c8]">
-      <div className="font-[Georgia,Times,serif] text-[22px] font-bold text-[#ffcc00]">{COPY.heading}</div>
-      <div className="mb-4 text-[12px] text-[#c4b09a]">{COPY.subheading}</div>
+      <div className="font-[Georgia,Times,serif] text-[28px] font-bold text-[#ffcc00]">{COPY.heading}</div>
+      <div className="mb-4 text-[16px] text-[#c4b09a]">{COPY.subheading}</div>
       <div className="grid gap-3">
         {ARCADE_CATALOG.map((game) => {
           const isDownloading = downloading === game.id
@@ -57,14 +57,14 @@ export function WahooGaming() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-[15px] font-bold text-white">{game.title}</div>
-                  <div className="mt-1 text-[12px] text-[#d9cbb8]">{game.blurb}</div>
+                  <div className="text-[20px] font-bold text-white">{game.title}</div>
+                  <div className="mt-1 text-[16px] text-[#d9cbb8]">{game.blurb}</div>
                 </div>
-                <div className="shrink-0 text-right font-mono text-[10px] text-[#f0c14a]">
+                <div className="shrink-0 text-right font-mono text-[13px] text-[#f0c14a]">
                   {game.rating}
                 </div>
               </div>
-              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-0.5 font-mono text-[11px] text-[#c4b09a]">
+              <div className="mt-2 flex flex-wrap gap-x-4 gap-y-0.5 font-mono text-[14px] text-[#c4b09a]">
                 <span>
                   {COPY.version} {game.version}
                 </span>
@@ -75,7 +75,7 @@ export function WahooGaming() {
               </div>
               {isDownloading ? (
                 <div className="mt-3">
-                  <div className="mb-1 text-[11px] text-[#c4b09a]">{COPY.downloading}</div>
+                  <div className="mb-1 text-[14px] text-[#c4b09a]">{COPY.downloading}</div>
                   <div className="h-[14px] overflow-hidden border border-[#4a3a20] bg-[#0e0c12]">
                     <div
                       className="h-full bg-[repeating-linear-gradient(45deg,#f0c14a_0_8px,#ffe08a_8px_16px)] transition-[width] duration-100"
@@ -85,11 +85,11 @@ export function WahooGaming() {
                 </div>
               ) : isInstalled ? (
                 <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="text-[11px] font-semibold text-[#9dffb0]">{COPY.installed}</span>
+                  <span className="text-[14px] font-semibold text-[#9dffb0]">{COPY.installed}</span>
                   <button
                     type="button"
                     onClick={() => openWindow('arcade')}
-                    className="h-[26px] min-w-[110px] rounded-sm border border-[#5ad46a] bg-[#1e3a24] px-3 text-[12px] font-bold text-[#9dffb0] hover:bg-[#24482c]"
+                    className="h-[26px] min-w-[110px] rounded-sm border border-[#5ad46a] bg-[#1e3a24] px-3 text-[16px] font-bold text-[#9dffb0] hover:bg-[#24482c]"
                   >
                     {COPY.openLauncher}
                   </button>
@@ -103,7 +103,7 @@ export function WahooGaming() {
                     setDownloading(game.id)
                   }}
                   className={cn(
-                    'mt-3 h-[26px] min-w-[110px] rounded-sm border border-[#f0c14a] bg-[#3a2a08] px-3 text-[12px] font-bold text-[#ffe08a] hover:bg-[#4a360c]',
+                    'mt-3 h-[26px] min-w-[110px] rounded-sm border border-[#f0c14a] bg-[#3a2a08] px-3 text-[16px] font-bold text-[#ffe08a] hover:bg-[#4a360c]',
                     downloading !== null ? 'opacity-50' : '',
                   )}
                 >

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e4ecf5"/></linearGradient><linearGradient id="calR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff5a62"/><stop offset="1" stop-color="#c81e28"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="10" y="10" width="44" height="44" rx="10" fill="url(#paper)"/>
+    <path d="M10 24V20c0-5.5 4.5-10 10-10h24c5.5 0 10 4.5 10 10v4H10z" fill="url(#calR)"/>
+    <rect x="18" y="8" width="5" height="8" rx="2.4" fill="#c5cedb"/>
+    <rect x="41" y="8" width="5" height="8" rx="2.4" fill="#c5cedb"/>
+    <text x="32" y="46" text-anchor="middle" fill="#c81e28" font-family="ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="800">16</text></g>
+</svg>

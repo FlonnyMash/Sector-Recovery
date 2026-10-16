@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><radialGradient id="cd" cx=".32" cy=".28" r=".8"><stop offset="0" stop-color="#e8fbff"/><stop offset="1" stop-color="#6a4dff"/></radialGradient><linearGradient id="cdH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8ff"/><stop offset="1" stop-color="#9aa7b8"/></linearGradient><linearGradient id="metalD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b7688"/><stop offset="1" stop-color="#2a3142"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <circle cx="32" cy="20" r="16" fill="url(#cd)"/>
+    <circle cx="32" cy="20" r="11.5" fill="none" stroke="#7ee8c8" stroke-opacity=".35" stroke-width="2.4"/>
+    <circle cx="32" cy="20" r="4.2" fill="url(#cdH)"/>
+    <circle cx="32" cy="20" r="1.6" fill="#eef4fb"/>
+    <rect x="8" y="24" width="48" height="28" rx="6" fill="url(#metalD)"/>
+    <rect x="14" y="32" width="26" height="6" rx="1.6" fill="#1c2230"/>
+    <circle cx="48" cy="35" r="2.3" fill="#6bcf7a"/></g>
+</svg>

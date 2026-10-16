@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef3f9"/><stop offset="1" stop-color="#9aa7b8"/></linearGradient><linearGradient id="metalD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b7688"/><stop offset="1" stop-color="#2a3142"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e09b18"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <path d="M32 8c-9 0-16 7.2-16 16 0 5.4 2.8 10.2 7.2 13.2V42h17.6v-4.8C45.2 34.2 48 29.4 48 24c0-8.8-7-16-16-16z" fill="url(#gold)"/>
+    <rect x="24.4" y="41" width="15.2" height="6" rx="1.6" fill="url(#metal)"/>
+    <rect x="26.4" y="47" width="11.2" height="4.4" rx="1.4" fill="url(#metalD)"/>
+    <path d="M32 14v8" stroke="#7a4a00" stroke-width="2.4" stroke-linecap="round"/>
+    <circle cx="32" cy="26" r="2.2" fill="#7a4a00"/></g>
+</svg>

@@ -54,6 +54,26 @@ export function OSWindow({
   } | null>(null)
 
   useEffect(() => {
+    const desktop = desktopRef.current?.getBoundingClientRect()
+    const maxW = desktop?.width ?? window.innerWidth
+    const maxH = desktop?.height ?? window.innerHeight
+    const minW = Math.min(app.minSize?.width ?? FALLBACK_MIN_WIDTH, maxW)
+    const minH = Math.min(app.minSize?.height ?? FALLBACK_MIN_HEIGHT, maxH)
+    const nextW = Math.max(minW, Math.min(width.get(), maxW))
+    const nextH = Math.max(minH, Math.min(height.get(), maxH))
+    const nextX = Math.max(0, Math.min(x.get(), Math.max(0, maxW - nextW)))
+    const nextY = Math.max(0, Math.min(y.get(), Math.max(0, maxH - nextH)))
+    width.set(nextW)
+    height.set(nextH)
+    x.set(nextX)
+    y.set(nextY)
+    savedW.current = nextW
+    savedH.current = nextH
+    savedX.current = nextX
+    savedY.current = nextY
+  }, [app.minSize?.height, app.minSize?.width, desktopRef, height, width, x, y])
+
+  useEffect(() => {
     if (windowState.isMaximized) {
       savedX.current = x.get()
       savedY.current = y.get()
@@ -151,7 +171,7 @@ export function OSWindow({
   }
 
   const Icon = app.icon
-  const rounded = windowState.isMaximized ? 'rounded-none' : modern ? 'rounded-xl' : 'rounded-t-[6px]'
+  const rounded = windowState.isMaximized ? 'rounded-none' : modern ? 'rounded-xl' : 'rounded-none'
 
   return (
     <motion.div
@@ -181,7 +201,7 @@ export function OSWindow({
       className={cn(
         'pointer-events-auto absolute top-0 left-0 flex flex-col overflow-hidden',
         rounded,
-        modern ? 'shadow-2xl' : 'shadow-[0_12px_40px_rgba(0,0,0,0.55)]',
+        modern ? 'shadow-2xl' : 'shadow-[2px_2px_4px_rgba(0,0,0,0.35)]',
       )}
     >
       {modern ? (
@@ -203,24 +223,18 @@ export function OSWindow({
           <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
         </div>
       ) : (
-        <div
-          className={cn(
-            'flex h-full flex-col border backdrop-blur-md',
-            windowState.isMaximized ? 'rounded-none' : 'rounded-t-[6px]',
-            isActive ? 'border-white/60 bg-white/35' : 'border-white/30 bg-white/20',
-          )}
-        >
-          <AeroTitleBar
+        <div className="classic-raised flex h-full flex-col bg-[#c0c0c0] p-[2px]">
+          <ClassicTitleBar
             title={windowState.title}
             isActive={isActive}
             isMaximized={windowState.isMaximized}
             dragControls={dragControls}
-            icon={<Icon size={16} />}
+            icon={<Icon size={20} />}
             onMinimize={() => minimizeWindow(windowState.id)}
             onMaximize={() => toggleMaximize(windowState.id)}
             onClose={() => closeWindow(windowState.id)}
           />
-          <div className="min-h-0 flex-1 overflow-hidden border-[3px] border-white/25 bg-[#f0f0f0]">
+          <div className="classic-sunken mt-[2px] min-h-0 flex-1 overflow-hidden bg-[#f0f0f0]">
             {children}
           </div>
         </div>
@@ -296,7 +310,7 @@ function ModernTitleBar({
   return (
     <div
       className={cn(
-        'group flex h-10 shrink-0 items-center bg-white/80 px-3 backdrop-blur-md',
+        'group flex h-12 shrink-0 items-center bg-white/80 px-3 backdrop-blur-md',
         !isActive && 'opacity-80',
       )}
       onPointerDown={(event) => {
@@ -332,7 +346,7 @@ function ModernTitleBar({
       <div className="flex min-w-0 flex-1 items-center justify-center">
         <span
           className={cn(
-            'truncate text-[13px] font-medium',
+            'truncate text-[17px] font-medium',
             isActive ? 'text-neutral-700' : 'text-neutral-400',
           )}
         >
@@ -366,7 +380,7 @@ function TrafficLight({
       aria-label={label}
       onClick={onClick}
       className={cn(
-        'flex h-4 w-4 items-center justify-center rounded-full text-[#4a1c12]',
+        'flex h-[18px] w-[18px] items-center justify-center rounded-full text-[#4a1c12]',
         dimmed ? 'bg-neutral-300' : fill,
       )}
     >
@@ -409,7 +423,7 @@ function TrafficGlyph({ color }: { color: 'close' | 'minimize' | 'maximize' }) {
   )
 }
 
-function AeroTitleBar({
+function ClassicTitleBar({
   title,
   isActive,
   isMaximized,
@@ -431,70 +445,67 @@ function AeroTitleBar({
   return (
     <div
       className={cn(
-        'flex h-[31px] shrink-0 items-stretch',
+        'flex h-[28px] shrink-0 items-center gap-0.5 overflow-hidden px-[3px]',
         isActive
-          ? 'bg-gradient-to-b from-white/70 via-[#cfe6f8]/50 to-[#7eb6e0]/35'
-          : 'bg-gradient-to-b from-white/30 via-white/15 to-white/5',
+          ? 'bg-gradient-to-r from-[#000080] to-[#1084d0]'
+          : 'bg-gradient-to-r from-[#808080] to-[#b5b5b5]',
       )}
     >
       <div
-        className="flex min-w-0 flex-1 items-center gap-1.5 px-2"
+        className="flex min-w-0 flex-1 items-center gap-1"
         onPointerDown={(event) => {
           if (isMaximized) return
           dragControls.start(event)
         }}
         onDoubleClick={onMaximize}
       >
-        <span className="shrink-0">{icon}</span>
-        <span
-          className={cn(
-            'truncate text-[12px] font-semibold',
-            isActive
-              ? 'text-[#1a1a1a] drop-shadow-[0_1px_0_rgba(255,255,255,0.7)]'
-              : 'text-[#4a4a4a]',
-          )}
-        >
-          {title}
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden">
+          {icon}
         </span>
+        <span className="truncate text-[14px] font-bold text-white">{title}</span>
       </div>
 
       <div
-        className="flex shrink-0 items-start"
+        className="flex shrink-0 items-center gap-px"
         onPointerDown={(event) => event.stopPropagation()}
       >
-        <WindowButton label="Minimize" onClick={onMinimize}>
-          <span className="mt-[7px] block h-[2px] w-[10px] bg-white" />
-        </WindowButton>
-        <WindowButton label={isMaximized ? 'Restore' : 'Maximize'} onClick={onMaximize}>
+        <CaptionButton label="Minimize" onClick={onMinimize}>
+          <span className="mt-[8px] block h-[2px] w-[10px] bg-black" />
+        </CaptionButton>
+        <CaptionButton label={isMaximized ? 'Restore' : 'Maximize'} onClick={onMaximize}>
           {isMaximized ? (
-            <span className="relative block h-[9px] w-[10px]">
-              <span className="absolute top-0 right-0 h-[7px] w-[7px] border border-white" />
-              <span className="absolute bottom-0 left-0 h-[7px] w-[7px] border border-white bg-[#5a9fd6]" />
+            <span className="relative block h-[11px] w-[11px]">
+              <span className="absolute top-0 right-0 h-[8px] w-[8px] border border-black" />
+              <span className="absolute bottom-0 left-0 h-[8px] w-[8px] border border-black bg-[#c0c0c0]" />
             </span>
           ) : (
-            <span className="block h-[9px] w-[9px] border-2 border-white" />
+            <span className="block h-[10px] w-[10px] border-2 border-black" />
           )}
-        </WindowButton>
-        <WindowButton label="Close" wide danger onClick={onClose}>
-          <span className="text-[13px] leading-none font-bold text-white">×</span>
-        </WindowButton>
+        </CaptionButton>
+        <CaptionButton label="Close" onClick={onClose}>
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path
+              d="M1.5 1.5 L8.5 8.5 M8.5 1.5 L1.5 8.5"
+              fill="none"
+              stroke="black"
+              strokeWidth="1.8"
+              strokeLinecap="square"
+            />
+          </svg>
+        </CaptionButton>
       </div>
     </div>
   )
 }
 
-function WindowButton({
+function CaptionButton({
   children,
   onClick,
   label,
-  wide = false,
-  danger = false,
 }: {
   children: ReactNode
   onClick: () => void
   label: string
-  wide?: boolean
-  danger?: boolean
 }) {
   return (
     <button
@@ -502,13 +513,7 @@ function WindowButton({
       title={label}
       aria-label={label}
       onClick={onClick}
-      className={cn(
-        'flex h-[20px] items-center justify-center border border-white/50',
-        wide ? 'w-[45px]' : 'w-[26px]',
-        danger
-          ? 'bg-gradient-to-b from-[#e38a8a] via-[#d04545] to-[#9e1c1c] hover:from-[#f0a0a0] hover:via-[#e05252] hover:to-[#b42222]'
-          : 'bg-gradient-to-b from-white/50 via-[#8eb8dd]/70 to-[#3e7cb0]/80 hover:from-white/70 hover:via-[#a8ccea] hover:to-[#4d8fc4]',
-      )}
+      className="classic-raised flex h-[18px] w-[20px] items-center justify-center bg-[#c0c0c0] hover:brightness-105 active:classic-sunken"
     >
       {children}
     </button>

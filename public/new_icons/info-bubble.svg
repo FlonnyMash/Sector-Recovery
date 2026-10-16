@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter></defs>
+  <g filter="url(#sh)">
+    <rect x="8" y="10" width="48" height="36" rx="14" fill="#3d9ee8"/>
+    <path d="M22 46l-6 10 16-8" fill="#3d9ee8"/>
+    <circle cx="32" cy="22" r="2.4" fill="#fff"/>
+    <rect x="30" y="27" width="4.2" height="12" rx="2" fill="#fff"/></g>
+</svg>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e09b18"/></linearGradient><linearGradient id="chip" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4456"/><stop offset="1" stop-color="#171d28"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="16" y="16" width="32" height="32" rx="6" fill="url(#chip)"/>
+    <rect x="21" y="21" width="22" height="22" rx="3" fill="#1c2230"/>
+    <rect x="24" y="24" width="16" height="16" rx="2" fill="url(#gold)"/>
+    <rect x="22" y="10" width="3" height="7" rx=".6" fill="url(#gold)"/><rect x="22" y="47" width="3" height="7" rx=".6" fill="url(#gold)"/><rect x="10" y="22" width="7" height="3" rx=".6" fill="url(#gold)"/><rect x="47" y="22" width="7" height="3" rx=".6" fill="url(#gold)"/><rect x="28" y="10" width="3" height="7" rx=".6" fill="url(#gold)"/><rect x="28" y="47" width="3" height="7" rx=".6" fill="url(#gold)"/><rect x="10" y="28" width="7" height="3" rx=".6" fill="url(#gold)"/><rect x="47" y="28" width="7" height="3" rx=".6" fill="url(#gold)"/><rect x="34" y="10" width="3" height="7" rx=".6" fill="url(#gold)"/><rect x="34" y="47" width="3" height="7" rx=".6" fill="url(#gold)"/><rect x="10" y="34" width="7" height="3" rx=".6" fill="url(#gold)"/><rect x="47" y="34" width="7" height="3" rx=".6" fill="url(#gold)"/><rect x="40" y="10" width="3" height="7" rx=".6" fill="url(#gold)"/><rect x="40" y="47" width="3" height="7" rx=".6" fill="url(#gold)"/><rect x="10" y="40" width="7" height="3" rx=".6" fill="url(#gold)"/><rect x="47" y="40" width="7" height="3" rx=".6" fill="url(#gold)"/></g>
+</svg>

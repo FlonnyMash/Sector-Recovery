@@ -8,8 +8,9 @@ import {
 } from '../../game/virtualFiles'
 import { strings } from '../../i18n'
 import { useGameStore } from '../../store/useGameStore'
-import type { AppType, RecoveredFileType } from '../../types/game'
+import type { AppType } from '../../types/game'
 import { cn } from '../../utils/cn'
+import { RetroIcon, fileTypeIcon, type RetroIconName } from '../os/retroIcons'
 
 const COPY = strings.systemExplorer
 
@@ -177,7 +178,7 @@ export function SystemExplorer() {
     (!isRecovered || inventory.length === 0)
 
   return (
-    <div className="flex h-full flex-col bg-[#f0f0f0] font-[Tahoma,'Segoe_UI',sans-serif] text-[12px] text-[#222]">
+    <div className="flex h-full flex-col bg-[#f0f0f0] font-[Tahoma,'Segoe_UI',sans-serif] text-[16px] text-[#222]">
       <div className="flex items-center gap-1 border-b border-[#b8b8b8] bg-gradient-to-b from-[#f7f7f7] to-[#e4e4e4] px-1.5 py-1">
         <ChromeButton disabled={!canBack} onClick={() => setHistoryIndex((index) => index - 1)}>
           ← {COPY.back}
@@ -185,21 +186,23 @@ export function SystemExplorer() {
         <ChromeButton disabled={!canForward} onClick={() => setHistoryIndex((index) => index + 1)}>
           {COPY.forward} →
         </ChromeButton>
-        <div className="win7-inset ml-1 flex min-w-0 flex-1 items-center gap-1 bg-white px-2 py-0.5 text-[11px]">
+        <div className="win7-inset ml-1 flex min-w-0 flex-1 items-center gap-1 bg-white px-2 py-0.5 text-[14px]">
           <AddressCrumbs path={page} onGo={goTo} />
         </div>
       </div>
 
       <div className="flex min-h-0 flex-1">
-        <aside className="w-[176px] shrink-0 overflow-auto border-r border-[#c8c8c8] bg-gradient-to-b from-[#eef4fb] to-[#dce8f5] px-1.5 py-2">
+        <aside className="w-[230px] shrink-0 overflow-auto border-r border-[#c8c8c8] bg-gradient-to-b from-[#eef4fb] to-[#dce8f5] px-1.5 py-2">
           <NavGroup title={COPY.favorites}>
             <NavItem
               label={COPY.desktop}
+              icon="folder"
               active={page === EXPLORER_PATH.desktop}
               onClick={() => goTo(EXPLORER_PATH.desktop)}
             />
             <NavItem
               label={COPY.pictures}
+              icon="folder"
               active={page === EXPLORER_PATH.pictures}
               onClick={() => goTo(EXPLORER_PATH.pictures)}
             />
@@ -207,6 +210,7 @@ export function SystemExplorer() {
           <NavGroup title={COPY.computer}>
             <NavItem
               label={COPY.drive}
+              icon="hard-drive"
               active={page === EXPLORER_PATH.drive}
               expanded={driveExpanded}
               expandable
@@ -218,6 +222,7 @@ export function SystemExplorer() {
                 {hasRecoveryTool ? (
                   <NavItem
                     label={COPY.recoveredFolder}
+                    icon="folder"
                     depth={1}
                     active={page === EXPLORER_PATH.recovered}
                     onClick={() => goTo(EXPLORER_PATH.recovered)}
@@ -225,6 +230,7 @@ export function SystemExplorer() {
                 ) : null}
                 <NavItem
                   label={COPY.sysUser}
+                  icon="folder"
                   depth={1}
                   active={page === EXPLORER_PATH.user}
                   expanded={sysUserExpanded}
@@ -236,6 +242,7 @@ export function SystemExplorer() {
                   <>
                     <NavItem
                       label={COPY.userFolder}
+                      icon="folder-open-papers"
                       depth={2}
                       active={page === EXPLORER_PATH.toro}
                       expanded={toroExpanded}
@@ -247,12 +254,14 @@ export function SystemExplorer() {
                       <>
                         <NavItem
                           label={COPY.desktop}
+                          icon="folder"
                           depth={3}
                           active={page === EXPLORER_PATH.desktop}
                           onClick={() => goTo(EXPLORER_PATH.desktop)}
                         />
                         <NavItem
                           label={COPY.pictures}
+                          icon="folder"
                           depth={3}
                           active={page === EXPLORER_PATH.pictures}
                           onClick={() => goTo(EXPLORER_PATH.pictures)}
@@ -265,7 +274,7 @@ export function SystemExplorer() {
             ) : null}
           </NavGroup>
           <NavGroup title={COPY.network}>
-            <NavItem label={COPY.network} inert />
+            <NavItem label={COPY.network} icon="folder-network" inert />
           </NavGroup>
         </aside>
 
@@ -277,7 +286,7 @@ export function SystemExplorer() {
           }}
         >
           {isEmpty ? (
-            <p className="px-4 py-6 text-[12px] text-[#666]">
+            <p className="px-4 py-6 text-[16px] text-[#666]">
               {isRecovered ? COPY.empty : COPY.emptyDrive}
             </p>
           ) : (
@@ -289,7 +298,7 @@ export function SystemExplorer() {
                   selected={selectedId === folder.path}
                   onSelect={() => setSelectedId(folder.path)}
                   onOpen={() => goTo(folder.path)}
-                  icon={folder.path === EXPLORER_PATH.drive ? <DriveGlyph /> : <FolderGlyph />}
+                  icon={<RetroIcon name={folder.path === EXPLORER_PATH.drive ? 'hard-drive' : 'folder'} size={56} />}
                 />
               ))}
               {isRecovered
@@ -299,7 +308,7 @@ export function SystemExplorer() {
                       label={file.name}
                       selected={selectedId === file.id}
                       onSelect={() => setSelectedId(file.id)}
-                      icon={<FileTypeGlyph type={file.type} />}
+                      icon={<RetroIcon name={fileTypeIcon(file.type)} size={56} />}
                     />
                   ))
                 : null}
@@ -311,7 +320,7 @@ export function SystemExplorer() {
                       selected={selectedDesktopApp === app.type}
                       onSelect={() => setSelectedDesktopApp(app.type)}
                       onOpen={() => openDesktopApp(app.type)}
-                      icon={app.icon({ size: 40 })}
+                      icon={app.icon({ size: 56 })}
                     />
                   ))
                 : null}
@@ -327,15 +336,15 @@ export function SystemExplorer() {
                       <img
                         src={file.imageThumb ?? file.imageSrc}
                         alt=""
-                        width={40}
-                        height={40}
+                        width={56}
+                        height={56}
                         draggable={false}
                         decoding="sync"
                         loading="eager"
-                        className="h-10 w-10 border border-[#3a6ea5] bg-white object-contain"
+                        className="h-14 w-14 border border-[#3a6ea5] bg-white object-contain"
                       />
                     ) : (
-                      <FileTypeGlyph type={file.type} />
+                      <RetroIcon name={fileTypeIcon(file.type)} size={56} />
                     )
                   }
                 />
@@ -345,7 +354,7 @@ export function SystemExplorer() {
         </div>
       </div>
 
-      <div className="flex h-[22px] items-center justify-between border-t border-[#b8b8b8] bg-gradient-to-b from-[#e8e8e8] to-[#d4d4d4] px-2 text-[11px] text-[#333]">
+      <div className="flex h-[28px] items-center justify-between border-t border-[#b8b8b8] bg-gradient-to-b from-[#e8e8e8] to-[#d4d4d4] px-2 text-[14px] text-[#333]">
         <span>{COPY.items.replace('{count}', String(statusCount))}</span>
         <span className="truncate">{statusDetail}</span>
       </div>
@@ -377,7 +386,7 @@ function AddressCrumbs({ path, onGo }: { path: string; onGo: (path: string) => v
 
 function IconGrid({ children }: { children: ReactNode }) {
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-2 p-3">{children}</div>
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-2 p-3">{children}</div>
   )
 }
 
@@ -396,7 +405,7 @@ function ChromeButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'win7-raised h-[22px] shrink-0 rounded-sm border border-[#6f6f6f] bg-gradient-to-b from-[#f8f8f8] to-[#d0d0d0] px-2 text-[11px]',
+        'win7-raised h-[28px] shrink-0 rounded-sm border border-[#6f6f6f] bg-gradient-to-b from-[#f8f8f8] to-[#d0d0d0] px-2 text-[14px]',
         disabled ? 'cursor-not-allowed text-[#8a8a8a]' : 'text-[#222] hover:from-[#fcfcfc] hover:to-[#d8d8d8]',
       )}
     >
@@ -431,7 +440,7 @@ function Crumb({
 function NavGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="mb-3">
-      <div className="mb-1 px-0.5 text-[10px] font-bold tracking-wide text-[#3b6ea5] uppercase">
+      <div className="mb-1 px-0.5 text-[13px] font-bold tracking-wide text-[#3b6ea5] uppercase">
         {title}
       </div>
       <div className="flex flex-col gap-0.5">{children}</div>
@@ -441,6 +450,7 @@ function NavGroup({ title, children }: { title: string; children: ReactNode }) {
 
 function NavItem({
   label,
+  icon,
   active,
   depth = 0,
   inert,
@@ -450,6 +460,7 @@ function NavItem({
   onClick,
 }: {
   label: string
+  icon?: RetroIconName
   active?: boolean
   depth?: number
   inert?: boolean
@@ -468,25 +479,26 @@ function NavItem({
             event.stopPropagation()
             onToggle?.()
           }}
-          className="flex h-[16px] w-[16px] shrink-0 items-center justify-center text-[9px] text-[#3b6ea5]"
+          className="flex h-[20px] w-[20px] shrink-0 items-center justify-center text-[12px] text-[#3b6ea5]"
         >
           {expanded ? '▼' : '►'}
         </button>
       ) : (
-        <span className="w-[16px] shrink-0" />
+        <span className="w-[20px] shrink-0" />
       )}
       <button
         type="button"
         disabled={inert}
         onClick={onClick}
         className={cn(
-          'min-w-0 flex-1 truncate rounded-sm px-1.5 py-0.5 text-left text-[11px]',
+          'flex min-w-0 flex-1 items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-left text-[14px]',
           inert && 'cursor-default text-[#666]',
           active && 'bg-[#3399ff] font-semibold text-white',
           !active && !inert && 'text-[#1a1a1a] hover:bg-[#c4e0ff]',
         )}
       >
-        {label}
+        {icon ? <RetroIcon name={icon} size={20} /> : null}
+        <span className="truncate">{label}</span>
       </button>
     </div>
   )
@@ -514,70 +526,12 @@ function ExplorerTile({
       }}
       onDoubleClick={() => onOpen?.()}
       className={cn(
-        'flex w-[88px] flex-col items-center gap-1 rounded-sm px-1 py-1.5 text-center',
+        'flex w-[112px] flex-col items-center gap-1 rounded-sm px-1 py-1.5 text-center',
         selected ? 'bg-[#3399ff]/80 text-white' : 'text-[#1a1a1a] hover:bg-[#3399ff]/15',
       )}
     >
       {icon}
-      <span className="w-full break-all text-[11px] leading-tight">{label}</span>
+      <span className="w-full break-all text-[14px] leading-tight">{label}</span>
     </button>
-  )
-}
-
-function DriveGlyph() {
-  return (
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <rect x="4" y="10" width="32" height="20" rx="2" fill="#d0d8e0" stroke="#4a5a68" strokeWidth="1.6" />
-      <rect x="7" y="13" width="18" height="10" fill="#1a5f8a" />
-      <circle cx="30" cy="20" r="3" fill="#3ea74a" stroke="#2a4a30" />
-      <rect x="7" y="25" width="10" height="2" fill="#8a96a4" />
-    </svg>
-  )
-}
-
-function FolderGlyph() {
-  return (
-    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-      <path d="M5 11 H16 L19 14 H35 V31 H5 Z" fill="#f0c14a" stroke="#b08920" strokeWidth="1.6" />
-      <path d="M5 14 H35" stroke="#d4a82a" strokeWidth="1.2" />
-    </svg>
-  )
-}
-
-function FileTypeGlyph({ type }: { type: RecoveredFileType }) {
-  if (type === 'image') {
-    return (
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-        <rect x="5" y="6" width="26" height="24" rx="2" fill="#f4f7fb" stroke="#3a6ea5" strokeWidth="1.6" />
-        <path d="M5 24 L13 16 L19 22 L24 18 L31 26 V30 H5 Z" fill="#7eb6e0" />
-        <circle cx="13" cy="13" r="2.4" fill="#f0c14a" />
-      </svg>
-    )
-  }
-  if (type === 'audio') {
-    return (
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-        <rect x="6" y="5" width="24" height="26" rx="2" fill="#3d1d6b" stroke="#8a6ab5" strokeWidth="1.6" />
-        <circle cx="14" cy="24" r="4" fill="#f0c14a" />
-        <path d="M18 24 V10 L28 8 V22" stroke="#f0c14a" strokeWidth="2" fill="none" />
-      </svg>
-    )
-  }
-  if (type === 'system') {
-    return (
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-        <rect x="6" y="8" width="24" height="20" rx="1" fill="#6b7380" stroke="#2f3540" strokeWidth="1.6" />
-        <rect x="9" y="11" width="18" height="8" fill="#1c2430" />
-        <rect x="10" y="13" width="8" height="3" fill="#3ea74a" />
-        <rect x="9" y="22" width="5" height="3" fill="#c9d0d8" />
-      </svg>
-    )
-  }
-  return (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
-      <path d="M10 5 H22 L30 13 V31 H10 Z" fill="#f7f3e8" stroke="#8a7a4a" strokeWidth="1.6" />
-      <path d="M22 5 V13 H30" stroke="#8a7a4a" strokeWidth="1.6" />
-      <path d="M14 18 H26 M14 22 H26 M14 26 H22" stroke="#b89a3c" strokeWidth="1.4" />
-    </svg>
   )
 }

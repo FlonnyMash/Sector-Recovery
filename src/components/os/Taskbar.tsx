@@ -6,7 +6,7 @@ import type { OsEnvironment } from '../../types/game'
 import { cn } from '../../utils/cn'
 import { formatChatClock } from '../../utils/format'
 import { getGameNow } from '../../utils/gameClock'
-import { StartFlag } from './icons'
+import { SakuraMark } from './icons'
 import { ModernDock } from './ModernDock'
 import { StartMenu } from './StartMenu'
 
@@ -30,7 +30,7 @@ export function Taskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: Task
   }
 
   return (
-    <AeroTaskbar
+    <ClassicTaskbar
       os={os}
       startMenuOpen={startMenuOpen}
       onToggleStart={onToggleStart}
@@ -39,7 +39,7 @@ export function Taskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: Task
   )
 }
 
-function AeroTaskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: TaskbarProps) {
+function ClassicTaskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: TaskbarProps) {
   const windows = useGameStore((state) => state.windows)
   const osWindows = useMemo(() => selectWindowsForOs(windows, os), [windows, os])
   const toggleFromTaskbar = useGameStore((state) => state.toggleFromTaskbar)
@@ -67,7 +67,7 @@ function AeroTaskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: Taskbar
         />
       ) : null}
 
-      <div className="absolute inset-x-0 bottom-0 z-50 flex h-10 items-center border-t border-white/25 bg-black/40 px-1 shadow-[0_-8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <div className="absolute inset-x-0 bottom-0 z-50 flex h-[40px] items-stretch gap-1 border-t-2 border-white bg-[#c0c0c0] px-[3px] py-[2px]">
         <button
           type="button"
           aria-label={strings.os.start}
@@ -76,19 +76,18 @@ function AeroTaskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: Taskbar
             onToggleStart()
           }}
           className={cn(
-            'mr-2 flex h-[34px] w-[34px] items-center justify-center rounded-full border border-white/40',
-            'bg-[radial-gradient(circle_at_30%_30%,#b7f08a,transparent_45%),radial-gradient(circle_at_70%_70%,#1b6fd4,#0b3d1f)]',
-            'shadow-[inset_0_0_8px_rgba(255,255,255,0.5),0_0_10px_rgba(80,180,80,0.55)]',
-            startMenuOpen && 'brightness-110',
+            'flex h-full shrink-0 items-center gap-1 px-1.5 text-[16px] font-bold italic text-black',
+            startMenuOpen ? 'classic-sunken' : 'classic-raised',
           )}
         >
-          <StartFlag size={14} />
+          <SakuraMark size={20} />
+          {strings.os.start}
         </button>
 
-        <div className="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+        <div className="flex h-full min-w-0 flex-1 items-stretch gap-0.5 overflow-hidden">
           {osWindows.map((windowState) => {
             const app = APPS[windowState.type]
-            const isActive = windowState.id === activeId
+            const isActive = windowState.id === activeId && !windowState.isMinimized
             const showBadge = windowState.type === 'friend-chat' && chatBadge
             return (
               <button
@@ -96,15 +95,12 @@ function AeroTaskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: Taskbar
                 type="button"
                 onClick={() => toggleFromTaskbar(windowState.id)}
                 className={cn(
-                  'relative flex h-[30px] min-w-[120px] max-w-[180px] items-center gap-1.5 truncate rounded-sm border px-2 text-left text-[12px] text-white',
-                  isActive
-                    ? 'border-white/50 bg-white/25 shadow-[inset_0_0_8px_rgba(255,255,255,0.25)]'
-                    : 'border-white/20 bg-white/10',
-                  windowState.isMinimized && 'opacity-70',
+                  'relative flex h-full min-w-[160px] max-w-[240px] items-center gap-1 truncate px-1.5 text-left text-[14px] text-black',
+                  isActive ? 'classic-sunken font-bold' : 'classic-raised',
                   showBadge && 'animate-pulse',
                 )}
               >
-                {app.icon({ size: 16, badge: showBadge })}
+                {app.icon({ size: 20, badge: showBadge })}
                 <span className="truncate">{windowState.title}</span>
               </button>
             )
@@ -112,12 +108,10 @@ function AeroTaskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: Taskbar
         </div>
 
         <div
-          className="ml-2 flex h-[30px] min-w-[70px] flex-col items-center justify-center rounded-sm border border-white/10 bg-white/5 px-2 text-[11px] leading-tight text-white"
+          className="classic-sunken ml-auto flex h-full min-w-[84px] items-center justify-center px-2 text-[14px] leading-none text-black"
           title={now.toLocaleDateString()}
         >
-          <span>
-            {formatChatClock(now)}
-          </span>
+          {formatChatClock(now)}
         </div>
 
         <button
@@ -125,7 +119,7 @@ function AeroTaskbar({ os, startMenuOpen, onToggleStart, onCloseStart }: Taskbar
           aria-label={strings.os.showDesktop}
           title={strings.os.showDesktop}
           onClick={showDesktop}
-          className="ml-1 h-[30px] w-[12px] border-l border-white/30 bg-white/10 hover:bg-white/20"
+          className="classic-raised ml-0.5 h-full w-[10px] shrink-0"
         />
       </div>
     </>

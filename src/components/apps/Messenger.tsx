@@ -64,17 +64,17 @@ export function Messenger() {
   }, [messages, yukaTyping])
 
   return (
-    <div className="flex h-full bg-[#e8f2fb] font-[Tahoma,'Segoe_UI',sans-serif] text-[12px] text-[#1a1a1a]">
-      <aside className="flex w-[220px] shrink-0 flex-col border-r border-[#7ea6c8] bg-gradient-to-b from-[#f4f9fd] to-[#d7e8f6]">
+    <div className="flex h-full bg-[#e8f2fb] font-[Tahoma,'Segoe_UI',sans-serif] text-[16px] text-[#1a1a1a]">
+      <aside className="flex w-[290px] shrink-0 flex-col border-r border-[#7ea6c8] bg-gradient-to-b from-[#f4f9fd] to-[#d7e8f6]">
         <div className="bg-gradient-to-b from-[#d7ebfb] via-[#7eb6ea] to-[#1f6fbf] px-3 py-2.5 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]">
-          <div className="text-[13px] font-bold drop-shadow-[0_1px_0_rgba(0,0,0,0.25)]">
+          <div className="text-[17px] font-bold drop-shadow-[0_1px_0_rgba(0,0,0,0.25)]">
             {strings.apps.messenger}
           </div>
           <div className="mt-2 flex items-center gap-2">
             <Avatar contact={signedIn} size="sm" />
             <div className="min-w-0">
-              <div className="truncate text-[11px] font-semibold">{MESSENGER_UI.signedInAs}</div>
-              <div className="truncate text-[10px] text-white/85">
+              <div className="truncate text-[14px] font-semibold">{MESSENGER_UI.signedInAs}</div>
+              <div className="truncate text-[13px] text-white/85">
                 {MESSENGER_UI.available} · {MESSENGER_UI.recoveredSession}
               </div>
             </div>
@@ -109,10 +109,10 @@ export function Messenger() {
         <header className="flex items-center gap-3 border-b border-[#9dbdd8] bg-gradient-to-b from-[#f4f9ff] via-[#d6e9f8] to-[#b7d4ee] px-3 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
           <Avatar contact={active} size="lg" />
           <div className="min-w-0">
-            <div className="truncate text-[13px] font-bold" style={{ color: active.nameColor }}>
+            <div className="truncate text-[17px] font-bold" style={{ color: active.nameColor }}>
               {active.name} ({active.statusLine})
             </div>
-            <div className="truncate text-[11px] text-[#4a6a86]">
+            <div className="truncate text-[14px] text-[#4a6a86]">
               {active.personalMessage || active.statusLine}
             </div>
           </div>
@@ -122,7 +122,7 @@ export function Messenger() {
           ref={logRef}
           className="min-h-0 flex-1 overflow-auto bg-white px-3 py-3 shadow-[inset_0_2px_8px_rgba(30,70,110,0.12)]"
         >
-          <div className="mb-3 text-center text-[11px] text-[#7a8fa3]">{MESSENGER_UI.logDate}</div>
+          <div className="mb-3 text-center text-[14px] text-[#7a8fa3]">{MESSENGER_UI.logDate}</div>
           <div className="space-y-2.5">
             {messages.map((message) => (
               <MessageLine key={message.id} message={message} />
@@ -130,7 +130,7 @@ export function Messenger() {
           </div>
         </div>
 
-        <div className="border-t border-[#9dbdd8] bg-gradient-to-b from-[#eef6fc] to-[#d4e6f5] px-3 py-1.5 text-[11px] italic text-[#4a6a86]">
+        <div className="border-t border-[#9dbdd8] bg-gradient-to-b from-[#eef6fc] to-[#d4e6f5] px-3 py-1.5 text-[14px] italic text-[#4a6a86]">
           {yukaTyping ? (
             <span>
               {MESSENGER_UI.typing}
@@ -150,13 +150,13 @@ export function Messenger() {
               readOnly
               rows={2}
               placeholder={MESSENGER_UI.composePlaceholder}
-              className="h-[52px] w-full resize-none bg-transparent px-2 py-1.5 text-[12px] outline-none placeholder:text-[#8aa0b4]"
+              className="h-[68px] w-full resize-none bg-transparent px-2 py-1.5 text-[16px] outline-none placeholder:text-[#8aa0b4]"
             />
           </div>
           <button
             type="submit"
             disabled
-            className="h-8 rounded-sm border border-[#5a8ab8] bg-gradient-to-b from-[#f4f9ff] via-[#c5def4] to-[#7eb6ea] px-3 text-[12px] font-semibold text-[#16385c] opacity-55"
+            className="h-8 rounded-sm border border-[#5a8ab8] bg-gradient-to-b from-[#f4f9ff] via-[#c5def4] to-[#7eb6ea] px-3 text-[16px] font-semibold text-[#16385c] opacity-55"
           >
             {MESSENGER_UI.send}
           </button>
@@ -177,7 +177,7 @@ function ContactGroup({
 }) {
   return (
     <div className="mb-2">
-      <div className="px-1.5 py-1 text-[11px] font-bold tracking-wide text-[#1f6fbf]">
+      <div className="px-1.5 py-1 text-[14px] font-bold tracking-wide text-[#1f6fbf]">
         {title} ({count})
       </div>
       <div className="space-y-0.5">{children}</div>
@@ -207,11 +207,11 @@ function ContactRow({
     >
       <Avatar contact={contact} size="sm" inverted={selected} />
       <div className="min-w-0 flex-1">
-        <div className={cn('truncate text-[12px] font-semibold', !selected && 'text-[#1a1a1a]')}>
+        <div className={cn('truncate text-[16px] font-semibold', !selected && 'text-[#1a1a1a]')}>
           {contact.name} ({contact.statusLine})
         </div>
         {contact.personalMessage ? (
-          <div className={cn('truncate text-[10px]', selected ? 'text-white/80' : 'text-[#5a738c]')}>
+          <div className={cn('truncate text-[13px]', selected ? 'text-white/80' : 'text-[#5a738c]')}>
             {contact.personalMessage}
           </div>
         ) : null}
@@ -228,7 +228,7 @@ function MessageLine({ message }: { message: MessengerMessage }) {
         <span className="font-bold" style={{ color: contact?.nameColor ?? '#1a1a1a' }}>
           {contact?.name ?? message.from}
         </span>
-        <span className="text-[10px] text-[#8aa0b4]">{message.time}</span>
+        <span className="text-[13px] text-[#8aa0b4]">{message.time}</span>
       </div>
       <div className="pl-0.5 leading-snug text-[#222]">{message.text}</div>
     </div>
@@ -244,7 +244,7 @@ function Avatar({
   size: 'sm' | 'lg'
   inverted?: boolean
 }) {
-  const dimension = size === 'lg' ? 'h-11 w-11 text-[15px]' : 'h-8 w-8 text-[12px]'
+  const dimension = size === 'lg' ? 'h-11 w-11 text-[20px]' : 'h-8 w-8 text-[16px]'
   const initial = contact.name.charAt(0)
   return (
     <span className="relative shrink-0">

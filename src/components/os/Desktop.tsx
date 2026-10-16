@@ -44,7 +44,7 @@ export function Desktop() {
             selected={selectedIcon === app.type}
             variant={host ? 'modern' : 'retro'}
             icon={app.icon({
-              size: 48,
+              size: 64,
               badge: app.type === 'friend-chat' && chatBadge,
             })}
             onSelect={() => setSelectedIcon(app.type)}
@@ -64,7 +64,7 @@ export function Desktop() {
         ref={desktopRef}
         className={cn(
           'pointer-events-none absolute inset-x-0 top-0 z-20',
-          host ? 'bottom-20' : 'bottom-10',
+          host ? 'bottom-24' : 'bottom-[40px]',
         )}
       >
         <WindowManager desktopRef={desktopRef} os={os} />

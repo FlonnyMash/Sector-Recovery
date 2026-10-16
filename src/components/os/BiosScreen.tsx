@@ -100,9 +100,9 @@ export function BiosScreen() {
   }, [activate, options, resolvedId, selectedIndex])
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-black font-mono text-[14px] text-[#33ff66]">
+    <div className="relative h-screen w-screen overflow-hidden bg-black font-mono text-[18px] text-[#33ff66]">
       <div className="bios-scanline pointer-events-none absolute inset-0" />
-      <div className="relative mx-auto flex h-full max-w-[920px] flex-col px-8 py-6">
+      <div className="relative mx-auto flex h-full max-w-[1200px] flex-col px-8 py-6">
         <div className="text-[#c8ffd4]">{strings.bios.vendor}</div>
         <div className="mb-4 text-[#7aa884]">{strings.bios.copyright}</div>
         <div>{strings.bios.cpu}</div>

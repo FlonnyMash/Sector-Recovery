@@ -319,10 +319,10 @@ export function ModernChat() {
   }
 
   return (
-    <div className="flex h-full bg-white font-[ui-sans-serif,-apple-system,'Segoe_UI',sans-serif] text-[13px] text-neutral-900">
-      <aside className="flex w-[30%] min-w-[200px] flex-col border-r border-black/8 bg-[#f5f5f7]">
+    <div className="flex h-full bg-white font-[ui-sans-serif,-apple-system,'Segoe_UI',sans-serif] text-[17px] text-neutral-900">
+      <aside className="flex w-[30%] min-w-[260px] flex-col border-r border-black/8 bg-[#f5f5f7]">
         <div className="px-3 pt-3 pb-2">
-          <div className="mb-2 px-1 text-[17px] font-semibold tracking-tight">
+          <div className="mb-2 px-1 text-[22px] font-semibold tracking-tight">
             {strings.chat.appName}
           </div>
           <input
@@ -330,7 +330,7 @@ export function ModernChat() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={strings.chat.searchPlaceholder}
-            className="h-8 w-full rounded-full border-0 bg-black/6 px-3 text-[12px] outline-none placeholder:text-neutral-400"
+            className="h-8 w-full rounded-full border-0 bg-black/6 px-3 text-[16px] outline-none placeholder:text-neutral-400"
           />
         </div>
         <div className="min-h-0 flex-1 overflow-auto px-1.5 pb-2">
@@ -357,10 +357,10 @@ export function ModernChat() {
                 <Avatar name={conversation.name} color={conversation.color} />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="truncate text-[13px] font-semibold">{conversation.name}</span>
+                    <span className="truncate text-[17px] font-semibold">{conversation.name}</span>
                     <span
                       className={cn(
-                        'shrink-0 text-[10px]',
+                        'shrink-0 text-[13px]',
                         selected ? 'text-white/70' : 'text-neutral-400',
                       )}
                     >
@@ -370,7 +370,7 @@ export function ModernChat() {
                   <div className="flex items-center gap-1.5">
                     <span
                       className={cn(
-                        'truncate text-[12px]',
+                        'truncate text-[16px]',
                         isTypingHere
                           ? selected
                             ? 'italic text-white'
@@ -407,8 +407,8 @@ export function ModernChat() {
               <header className="flex items-center gap-3 border-b border-black/6 px-4 py-2.5">
                 <Avatar name={active.name} color={active.color} />
                 <div className="min-w-0">
-                  <div className="truncate text-[14px] font-semibold">{active.name}</div>
-                  <div className={cn('text-[11px]', typing ? 'text-[#0a84ff]' : 'text-neutral-500')}>
+                  <div className="truncate text-[18px] font-semibold">{active.name}</div>
+                  <div className={cn('text-[14px]', typing ? 'text-[#0a84ff]' : 'text-neutral-500')}>
                     {typing && active.id === 'mom'
                       ? strings.chat.momTyping
                       : typing && active.id === 'kenji'
@@ -423,7 +423,7 @@ export function ModernChat() {
                 onScroll={rememberScroll}
                 className="min-h-0 flex-1 space-y-1.5 overflow-auto px-4 py-4"
               >
-                <div className="pb-2 text-center text-[11px] text-neutral-400">
+                <div className="pb-2 text-center text-[14px] text-neutral-400">
                   {active.id === 'rin' ? strings.chat.yesterday : strings.chat.today}
                 </div>
 
@@ -584,12 +584,12 @@ export function ModernChat() {
                   value={draft}
                   onChange={(event) => setDraft(event.target.value)}
                   placeholder={strings.chat.inputPlaceholder}
-                  className="h-9 min-w-0 flex-1 rounded-full bg-[#f1f1f3] px-4 text-[13px] outline-none placeholder:text-neutral-400"
+                  className="h-9 min-w-0 flex-1 rounded-full bg-[#f1f1f3] px-4 text-[17px] outline-none placeholder:text-neutral-400"
                 />
                 <button
                   type="submit"
                   disabled={!draft.trim()}
-                  className="rounded-full bg-[#0a84ff] px-3.5 py-1.5 text-[13px] font-semibold text-white disabled:opacity-40"
+                  className="rounded-full bg-[#0a84ff] px-3.5 py-1.5 text-[17px] font-semibold text-white disabled:opacity-40"
                 >
                   {strings.chat.send}
                 </button>
@@ -703,7 +703,7 @@ function Avatar({ name, color }: { name: string; color: string }) {
   const initial = name.trim().charAt(0).toUpperCase()
   return (
     <span
-      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[13px] font-semibold text-white"
+      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[17px] font-semibold text-white"
       style={{ backgroundColor: color }}
     >
       {initial}
@@ -744,12 +744,12 @@ function Bubble({
         )}
       >
         {sender ? (
-          <div className="mb-0.5 text-[10px] font-semibold text-neutral-500">{sender}</div>
+          <div className="mb-0.5 text-[13px] font-semibold text-neutral-500">{sender}</div>
         ) : null}
         {hasText ? <div>{children}</div> : null}
         {linkPreview ? <LinkPreviewCard preview={linkPreview} /> : null}
         {time ? (
-          <div className={cn('mt-1 text-[10px]', mine ? 'text-white/70' : 'text-neutral-400')}>
+          <div className={cn('mt-1 text-[13px]', mine ? 'text-white/70' : 'text-neutral-400')}>
             {time}
           </div>
         ) : null}
@@ -779,20 +779,20 @@ function LinkPreviewCard({ preview }: { preview: ChatLinkPreview }) {
       }}
       className="mt-2 w-full overflow-hidden rounded-xl bg-white text-left shadow-sm ring-1 ring-black/8 hover:bg-[#f7f7f8]"
     >
-      <div className="border-b border-black/6 bg-[#f4f4f6] px-3 py-1.5 text-[10px] font-semibold tracking-wide text-neutral-500 uppercase">
+      <div className="border-b border-black/6 bg-[#f4f4f6] px-3 py-1.5 text-[13px] font-semibold tracking-wide text-neutral-500 uppercase">
         {preview.siteName}
       </div>
       <div className="px-3 py-2">
-        <div className="text-[10px] font-bold tracking-[0.14em] text-[#c45c78] uppercase">
+        <div className="text-[13px] font-bold tracking-[0.14em] text-[#c45c78] uppercase">
           {preview.kicker}
         </div>
-        <div className="mt-0.5 text-[13px] leading-snug font-semibold text-neutral-900">
+        <div className="mt-0.5 text-[17px] leading-snug font-semibold text-neutral-900">
           {preview.title}
         </div>
-        <div className="mt-1 line-clamp-2 text-[11px] leading-snug text-neutral-500">
+        <div className="mt-1 line-clamp-2 text-[14px] leading-snug text-neutral-500">
           {preview.excerpt}
         </div>
-        <div className="mt-1.5 truncate text-[10px] text-[#0a84ff]">{preview.url}</div>
+        <div className="mt-1.5 truncate text-[13px] text-[#0a84ff]">{preview.url}</div>
       </div>
     </button>
   )
@@ -804,7 +804,7 @@ function ReadReceipt({ label }: { label: string }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.18, delay: 0.2 }}
-      className="flex justify-end pr-1 text-[10px] text-neutral-400"
+      className="flex justify-end pr-1 text-[13px] text-neutral-400"
     >
       {label}
     </motion.div>
@@ -839,12 +839,12 @@ function AttachmentCard({
   return (
     <div className="max-w-[78%] rounded-2xl rounded-bl-md bg-[#e9e9eb] p-3">
       <div className="flex items-start gap-2.5">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[11px] font-bold text-[#0a84ff]">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[14px] font-bold text-[#0a84ff]">
           IMG
         </span>
         <div className="min-w-0">
-          <div className="truncate text-[13px] font-semibold">{strings.chat.attachmentName}</div>
-          <div className="text-[11px] text-neutral-500">
+          <div className="truncate text-[17px] font-semibold">{strings.chat.attachmentName}</div>
+          <div className="text-[14px] text-neutral-500">
             {strings.chat.attachmentSize} · {strings.chat.attachmentHint}
           </div>
         </div>
@@ -861,7 +861,7 @@ function AttachmentCard({
         disabled={downloading || downloaded}
         onClick={onDownload}
         className={cn(
-          'mt-2 h-8 w-full rounded-full text-[12px] font-semibold',
+          'mt-2 h-8 w-full rounded-full text-[16px] font-semibold',
           downloaded
             ? 'bg-white text-[#248a3d]'
             : downloading

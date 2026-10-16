@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><radialGradient id="smile" cx=".4" cy=".32" r=".7"><stop offset="0" stop-color="#ffe566"/><stop offset="1" stop-color="#f0a800"/></radialGradient></defs>
+  <g filter="url(#sh)">
+    <circle cx="32" cy="32" r="22" fill="url(#smile)"/>
+    <circle cx="24" cy="26" r="3.2" fill="#2a3142"/>
+    <circle cx="40" cy="26" r="3.2" fill="#2a3142"/>
+    <path d="M22 38c3.4 6 16.6 6 20 0" fill="none" stroke="#2a3142" stroke-width="2.8" stroke-linecap="round"/></g>
+</svg>

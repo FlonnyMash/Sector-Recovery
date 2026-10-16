@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><radialGradient id="ocean" cx=".38" cy=".32" r=".72"><stop offset="0" stop-color="#8fd4ff"/><stop offset="1" stop-color="#1360c4"/></radialGradient><linearGradient id="land" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8be08a"/><stop offset="1" stop-color="#2f9a48"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <circle cx="28" cy="28" r="18" fill="url(#ocean)"/>
+    <path d="M16 22c3-5 8-7 13-5 2 .8 3 3 1.6 5.6-2.4 3.2 1.6 5 5 4.2 3-.8 6.4 2.4 4.8 6.4-1.6 3.2-6.4 4.8-11.2 4-6.4-.8-11.2-4.8-13.2-10.4z" fill="url(#land)"/>
+    <ellipse cx="22" cy="20" rx="6" ry="4" fill="#fff" opacity=".22"/>
+    <g transform="translate(34 34)"><circle cx="10" cy="10" r="7.3" fill="#f4f8ff" fill-opacity=".55" stroke="#243044" stroke-width="2.7"/><path d="M15.6 15.6 22.2 22.2" stroke="#243044" stroke-width="3.2" stroke-linecap="round"/></g></g>
+</svg>

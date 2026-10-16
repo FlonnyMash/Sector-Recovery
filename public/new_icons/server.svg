@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="metalD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b7688"/><stop offset="1" stop-color="#2a3142"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="10" y="12" width="44" height="40" rx="6" fill="url(#metalD)"/>
+    <rect x="14" y="17" width="36" height="9" rx="2.2" fill="#2a3142"/>
+    <rect x="14" y="29" width="36" height="9" rx="2.2" fill="#2a3142"/>
+    <rect x="14" y="41" width="36" height="6" rx="2.2" fill="#2a3142"/>
+    <g fill="#6bcf7a"><circle cx="18.5" cy="21.5" r="1.6"/><circle cx="18.5" cy="33.5" r="1.6"/></g>
+    <g fill="#5aa2f0"><rect x="24" y="20" width="3.2" height="3.2" rx=".6"/><rect x="28.6" y="20" width="3.2" height="3.2" rx=".6"/><rect x="33.2" y="20" width="3.2" height="3.2" rx=".6"/><rect x="37.8" y="20" width="3.2" height="3.2" rx=".6"/><rect x="42.4" y="20" width="3.2" height="3.2" rx=".6"/></g>
+    <path d="M32 8v4" stroke="#3d9ee8" stroke-width="2.2" stroke-linecap="round"/></g>
+</svg>

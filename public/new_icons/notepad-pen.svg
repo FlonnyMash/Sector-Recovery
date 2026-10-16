@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e4ecf5"/></linearGradient><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e09b18"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="12" y="10" width="34" height="44" rx="5.5" fill="url(#paper)"/>
+    <g fill="#5aa2f0"><circle cx="12" cy="18" r="2.2"/><circle cx="12" cy="24.6" r="2.2"/><circle cx="12" cy="31.2" r="2.2"/><circle cx="12" cy="37.8" r="2.2"/><circle cx="12" cy="44.4" r="2.2"/></g>
+    <g stroke="#9aa7b8" stroke-width="1.5" stroke-linecap="round" opacity=".5">
+      <path d="M20 24h18"/><path d="M20 31h18"/><path d="M20 38h12"/>
+    </g>
+    <g transform="translate(44 14) rotate(-40)">
+    <rect x="1.4" y="0" width="4.4" height="28" rx="2" fill="url(#gold)"/>
+    <rect x="0" y="6" width="7.2" height="8" rx="1.6" fill="#2a3142"/>
+    <path d="M1.4 28h4.4L3.6 36z" fill="#c5cedb"/>
+    <path d="M2.6 33.2h2L3.6 36z" fill="#2a3142"/>
+  </g></g>
+</svg>

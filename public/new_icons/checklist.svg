@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e4ecf5"/></linearGradient><linearGradient id="ok" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ee0a0"/><stop offset="1" stop-color="#168a48"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="12" y="8" width="40" height="48" rx="6" fill="url(#paper)"/>
+    <g>
+      <rect x="18" y="18" width="8" height="8" rx="2" fill="url(#ok)"/>
+      <path d="M19.6 22.2l2.2 2.2 4.4-4.6" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M30 22h16" stroke="#9aa7b8" stroke-width="2" stroke-linecap="round"/>
+      <rect x="18" y="30" width="8" height="8" rx="2" fill="url(#ok)"/>
+      <path d="M19.6 34.2l2.2 2.2 4.4-4.6" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M30 34h16" stroke="#9aa7b8" stroke-width="2" stroke-linecap="round"/>
+      <rect x="18" y="42" width="8" height="8" rx="2" fill="#e4ecf5" stroke="#9aa7b8"/>
+      <path d="M30 46h12" stroke="#9aa7b8" stroke-width="2" stroke-linecap="round"/>
+    </g></g>
+</svg>

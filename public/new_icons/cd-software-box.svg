@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><radialGradient id="cd" cx=".32" cy=".28" r=".8"><stop offset="0" stop-color="#e8fbff"/><stop offset="1" stop-color="#6a4dff"/></radialGradient><linearGradient id="cdH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8ff"/><stop offset="1" stop-color="#9aa7b8"/></linearGradient><linearGradient id="purple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c9a6ff"/><stop offset="1" stop-color="#6b2fc4"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="14" y="10" width="30" height="38" rx="4" fill="url(#purple)"/>
+    <rect x="14" y="10" width="30" height="12" rx="4" fill="url(#gloss)" opacity=".25"/>
+    <rect x="18" y="16" width="22" height="8" rx="2" fill="#fff" opacity=".25"/>
+    
+  <circle cx="40" cy="42" r="14" fill="url(#cd)"/>
+  <circle cx="40" cy="42" r="10.08" fill="none" stroke="#7ee8c8" stroke-opacity=".35" stroke-width="3.2"/>
+  <circle cx="40" cy="42" r="7" fill="none" stroke="#c9a6ff" stroke-opacity=".28" stroke-width="2.2"/>
+  <path d="M28 31a18 18 0 0 1 24 6" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="40" cy="42" r="3.64" fill="url(#cdH)"/>
+  <circle cx="40" cy="42" r="1.4" fill="#eef4fb"/>
+  </g>
+</svg>

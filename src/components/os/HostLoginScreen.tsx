@@ -72,7 +72,7 @@ export function HostLoginScreen() {
             title={devApp.title}
             selected={devSelected}
             variant="modern"
-            icon={devApp.icon({ size: 48 })}
+            icon={devApp.icon({ size: 64 })}
             onSelect={() => setDevSelected(true)}
             onOpen={() => openWindow('dev-tools-host')}
           />
@@ -84,12 +84,12 @@ export function HostLoginScreen() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
-          className="flex w-[260px] flex-col items-center"
+          className="flex w-[340px] flex-col items-center"
         >
-          <h1 className="text-center text-[26px] font-semibold tracking-tight text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.35)]">
+          <h1 className="text-center text-[34px] font-semibold tracking-tight text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.35)]">
             {copy.welcome}
           </h1>
-          <p className="mt-1.5 text-center text-[13px] text-white/80">
+          <p className="mt-1.5 text-center text-[17px] text-white/80">
             {copy.subtitle.replace('{name}', strings.os.hostPcName)}
           </p>
 
@@ -103,14 +103,14 @@ export function HostLoginScreen() {
               onKeyDown={(event) => {
                 if (event.key !== 'Tab') startFill()
               }}
-              className="h-9 min-w-0 flex-1 rounded-md border border-white/25 bg-white/92 px-2.5 text-[13px] text-[#1d1730] shadow-sm outline-none placeholder:text-[#8a8494] focus:border-white/60"
+              className="h-11 min-w-0 flex-1 rounded-md border border-white/25 bg-white/92 px-2.5 text-[17px] text-[#1d1730] shadow-sm outline-none placeholder:text-[#8a8494] focus:border-white/60"
             />
             <button
               type="button"
               disabled={!filled}
               onClick={signInHostOS}
               className={cn(
-                'flex h-9 shrink-0 items-center gap-1.5 rounded-md border px-3 text-[12px] font-semibold shadow-sm transition',
+                'flex h-11 shrink-0 items-center gap-1.5 rounded-md border px-3 text-[16px] font-semibold shadow-sm transition',
                 filled
                   ? 'border-white/50 bg-white text-[#1d1730] hover:bg-[#f4f0ff] active:translate-y-px'
                   : 'cursor-not-allowed border-white/15 bg-white/25 text-white/45',
@@ -122,7 +122,7 @@ export function HostLoginScreen() {
           </div>
         </motion.div>
 
-        <p className="absolute bottom-8 text-[11px] tracking-wide text-white/70">
+        <p className="absolute bottom-8 text-[14px] tracking-wide text-white/70">
           {copy.property}
         </p>
       </div>
@@ -130,7 +130,7 @@ export function HostLoginScreen() {
       <button
         type="button"
         onClick={restartSystem}
-        className="absolute right-6 bottom-6 z-20 flex h-9 items-center gap-2 rounded-md border border-white/35 bg-white/90 px-3 text-[12px] font-semibold text-[#1d1730] shadow-sm hover:bg-white active:translate-y-px"
+        className="absolute right-6 bottom-6 z-20 flex h-11 items-center gap-2 rounded-md border border-white/35 bg-white/90 px-3 text-[16px] font-semibold text-[#1d1730] shadow-sm hover:bg-white active:translate-y-px"
       >
         <RestartIcon />
         {strings.os.restartSystem}

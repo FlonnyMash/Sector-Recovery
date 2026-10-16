@@ -3,6 +3,7 @@ import { strings } from '../../i18n'
 import { useGameStore } from '../../store/useGameStore'
 import type { AppType, OsEnvironment } from '../../types/game'
 import { cn } from '../../utils/cn'
+import { RetroIcon } from './retroIcons'
 
 interface StartMenuProps {
   os: OsEnvironment
@@ -25,8 +26,8 @@ export function StartMenu({ os, onOpenApp, onRestart }: StartMenuProps) {
 
   if (modern) {
     return (
-      <div className="absolute bottom-20 left-1/2 z-[60] w-[320px] -translate-x-1/2 overflow-hidden rounded-2xl border border-white/15 bg-[#1c1c22]/80 shadow-2xl backdrop-blur-xl">
-        <div className="px-4 py-3 text-[13px] font-medium tracking-wide text-white/80">
+      <div className="absolute bottom-24 left-1/2 z-[60] w-[420px] -translate-x-1/2 overflow-hidden rounded-2xl border border-white/15 bg-[#1c1c22]/80 shadow-2xl backdrop-blur-xl">
+        <div className="px-4 py-3 text-[17px] font-medium tracking-wide text-white/80">
           {header}
         </div>
         <div className="grid grid-cols-3 gap-2 px-3 pb-3">
@@ -35,9 +36,9 @@ export function StartMenu({ os, onOpenApp, onRestart }: StartMenuProps) {
               key={app.type}
               type="button"
               onClick={() => onOpenApp(app.type)}
-              className="flex flex-col items-center gap-1.5 rounded-xl px-2 py-2.5 text-center text-[11px] text-white/90 hover:bg-white/10"
+              className="flex flex-col items-center gap-1.5 rounded-xl px-2 py-2.5 text-center text-[14px] text-white/90 hover:bg-white/10"
             >
-              {app.icon({ size: 32 })}
+              {app.icon({ size: 40 })}
               <span className="w-full truncate">{app.title}</span>
             </button>
           ))}
@@ -47,19 +48,19 @@ export function StartMenu({ os, onOpenApp, onRestart }: StartMenuProps) {
             type="button"
             onClick={restart}
             className={cn(
-              'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-[12px] text-white/90 hover:bg-white/10',
+              'flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-[16px] text-white/90 hover:bg-white/10',
               ready && 'restart-ready bg-amber-400/15 font-semibold text-amber-100',
             )}
           >
             <span>{strings.os.restartSystem}</span>
             {ready ? (
-              <span className="rounded-md bg-[#d97600] px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-white uppercase">
+              <span className="rounded-md bg-[#d97600] px-1.5 py-0.5 text-[12px] font-bold tracking-wide text-white uppercase">
                 {strings.os.updateBadge}
               </span>
             ) : null}
           </button>
           {ready ? (
-            <div className="px-3 pb-1 text-[10px] text-amber-200/80">{strings.os.bootImageReady}</div>
+            <div className="px-3 pb-1 text-[13px] text-amber-200/80">{strings.os.bootImageReady}</div>
           ) : null}
         </div>
       </div>
@@ -67,43 +68,40 @@ export function StartMenu({ os, onOpenApp, onRestart }: StartMenuProps) {
   }
 
   return (
-    <div className="absolute bottom-10 left-1 z-[60] w-[280px] overflow-hidden rounded-t-md border border-white/40 bg-[#dce9f5]/80 shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-md">
-      <div className="bg-gradient-to-r from-[#1d4f86] to-[#3d8ad0] px-3 py-2 text-[13px] font-semibold text-white">
-        {header}
-      </div>
-      <div className="p-1">
-        {apps.map((app) => (
-          <button
-            key={app.type}
-            type="button"
-            onClick={() => onOpenApp(app.type)}
-            className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-[12px] text-[#1a1a1a] hover:bg-[#3399ff] hover:text-white"
-          >
-            {app.icon({ size: 24 })}
-            <span>{app.title}</span>
-          </button>
-        ))}
-      </div>
-      <div className="border-t border-[#9ab4c8] bg-[#c5d6e6]/90 p-1">
+    <div className="classic-raised absolute bottom-[40px] left-0 z-[60] w-[290px] bg-[#c0c0c0] py-0.5">
+      {apps.map((app) => (
         <button
+          key={app.type}
           type="button"
-          onClick={restart}
-          className={cn(
-            'flex w-full items-center justify-between rounded-sm px-2 py-1.5 text-left text-[12px] text-[#1a1a1a] hover:bg-[#3399ff] hover:text-white',
-            ready && 'restart-ready bg-[#fff4cc] font-semibold',
-          )}
+          onClick={() => onOpenApp(app.type)}
+          className="flex w-full items-center gap-1.5 px-1.5 py-[5px] text-left text-[14px] text-black hover:bg-[#000080] hover:text-white"
         >
-          <span>{strings.os.restartSystem}</span>
-          {ready ? (
-            <span className="rounded-sm bg-[#d97600] px-1.5 py-0.5 text-[9px] font-bold tracking-wide text-white uppercase">
-              {strings.os.updateBadge}
-            </span>
-          ) : null}
+          {app.icon({ size: 20 })}
+          <span className="truncate">{app.title}</span>
         </button>
+      ))}
+      <div className="mx-1 my-0.5 border-t border-[#808080] shadow-[0_1px_0_#ffffff]" />
+      <button
+        type="button"
+        onClick={restart}
+        className={cn(
+          'flex w-full items-center justify-between px-1.5 py-[5px] text-left text-[14px] text-black hover:bg-[#000080] hover:text-white',
+          ready && 'restart-ready bg-[#fff4cc] font-semibold',
+        )}
+      >
+        <span className="flex min-w-0 items-center gap-1.5">
+          <RetroIcon name="plug" size={20} />
+          <span className="truncate">{strings.os.restartSystem}</span>
+        </span>
         {ready ? (
-          <div className="px-2 pb-1 text-[10px] text-[#6a4a10]">{strings.os.bootImageReady}</div>
+          <span className="bg-[#d97600] px-1 py-px text-[12px] font-bold tracking-wide text-white uppercase">
+            {strings.os.updateBadge}
+          </span>
         ) : null}
-      </div>
+      </button>
+      {ready ? (
+        <div className="px-1.5 pb-0.5 text-[13px] text-[#6a4a10]">{strings.os.bootImageReady}</div>
+      ) : null}
     </div>
   )
 }

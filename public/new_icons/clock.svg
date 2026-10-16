@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="clockR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a4456"/><stop offset="1" stop-color="#141a24"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <circle cx="32" cy="32" r="22" fill="url(#clockR)"/>
+    <circle cx="32" cy="32" r="17.6" fill="#f7f9fc"/>
+    <g stroke="#2a3142" stroke-width="1.6" stroke-linecap="round">
+      <path d="M32 16.6v3.2"/><path d="M32 44.2v3.2"/><path d="M16.6 32h3.2"/><path d="M44.2 32h3.2"/>
+    </g>
+    <path d="M32 32v-10" stroke="#2a3142" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M32 32h8" stroke="#2a3142" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M32 32l6 9" stroke="#e23d3d" stroke-width="1.7" stroke-linecap="round"/>
+    <circle cx="32" cy="32" r="2.2" fill="#2a3142"/></g>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="bez" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#414b5e"/><stop offset="1" stop-color="#161c28"/></linearGradient><linearGradient id="stand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d5deea"/><stop offset="1" stop-color="#8e9aab"/></linearGradient><linearGradient id="scrD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d2a44"/><stop offset="1" stop-color="#0b1220"/></linearGradient></defs>
+  <g filter="url(#sh)">
+  <rect x="11" y="8" width="42" height="30" rx="5.5" fill="url(#bez)"/>
+  <rect x="14.6" y="11.6" width="34.8" height="20.6" rx="2.4" fill="url(#scrD)"/>
+  <rect x="14.6" y="11.6" width="34.8" height="8" rx="2.4" fill="url(#gloss)" opacity=".28"/>
+  
+  <rect x="29" y="38" width="6" height="5.4" rx="1" fill="url(#stand)"/>
+  <rect x="21" y="43" width="22" height="3.5" rx="1.7" fill="url(#stand)"/>
+  </g>
+</svg>

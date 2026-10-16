@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e4ecf5"/></linearGradient><linearGradient id="paperF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d5deea"/><stop offset="1" stop-color="#b7c4d4"/></linearGradient></defs>
+  <g filter="url(#sh)">
+  <rect x="14" y="8" width="36" height="46" rx="5.5" fill="url(#paper)"/>
+  <path d="M38 8h7.5c2.5 0 4.5 2 4.5 4.5V20L38 8z" fill="url(#paperF)"/>
+  <path d="M38 8v9.5c0 1.4 1.1 2.5 2.5 2.5H50" stroke="#c5cedb" stroke-width=".9"/>
+  <rect x="14" y="8" width="36" height="14" rx="5.5" fill="url(#gloss)" opacity=".35"/>
+  <g stroke="#9aa7b8" stroke-width="1.7" stroke-linecap="round" opacity=".5">
+           <path d="M20 27h20"/><path d="M20 33h20"/><path d="M20 39h14"/>
+         </g>
+  </g>
+</svg>

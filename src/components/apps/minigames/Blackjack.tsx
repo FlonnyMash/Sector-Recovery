@@ -182,10 +182,10 @@ export function Blackjack() {
   }
 
   return (
-    <div className="flex h-full flex-col bg-[#14261c] p-3 font-[Tahoma,'Segoe_UI',sans-serif] text-[12px] text-[#e8f6ea]">
+    <div className="flex h-full flex-col bg-[#14261c] p-3 font-[Tahoma,'Segoe_UI',sans-serif] text-[16px] text-[#e8f6ea]">
       <div className="mb-2 flex items-center justify-between">
-        <div className="text-[14px] font-bold">{strings.arcade.blackjack.title}</div>
-        <div className="font-mono text-[11px]">
+        <div className="text-[18px] font-bold">{strings.arcade.blackjack.title}</div>
+        <div className="font-mono text-[14px]">
           {strings.arcade.blackjack.balance}: {chips} · {strings.arcade.highScore}: {best}
         </div>
       </div>
@@ -203,10 +203,10 @@ export function Blackjack() {
       />
 
       <div className="mt-auto space-y-2">
-        {message ? <div className="text-center text-[13px] font-bold">{message}</div> : null}
+        {message ? <div className="text-center text-[17px] font-bold">{message}</div> : null}
         {chips <= 0 && phase === 'betting' ? (
           <div className="text-center">
-            <div className="mb-2 text-[11px] text-[#c9e0cc]">{strings.arcade.blackjack.broke}</div>
+            <div className="mb-2 text-[14px] text-[#c9e0cc]">{strings.arcade.blackjack.broke}</div>
             <button
               type="button"
               onClick={() => setChips(STARTING_CHIPS)}
@@ -286,11 +286,11 @@ function Hand({
 }) {
   return (
     <div className="mb-3">
-      <div className="mb-1 text-[11px] tracking-wide text-[#aad4b4] uppercase">
+      <div className="mb-1 text-[14px] tracking-wide text-[#aad4b4] uppercase">
         {label}
         {total !== undefined ? ` · ${total}` : ''}
       </div>
-      <div className="flex min-h-[72px] gap-2">
+      <div className="flex min-h-[94px] gap-2">
         {cards.map((card, index) => {
           const hidden = Boolean(hideHole && index === 1)
           const red = card.suit === '♥' || card.suit === '♦'
@@ -298,7 +298,7 @@ function Hand({
             <div
               key={`${card.rank}${card.suit}${index}`}
               className={cn(
-                'flex h-[68px] w-[48px] flex-col items-center justify-center rounded-sm border text-[14px] font-bold',
+                'flex h-[90px] w-[64px] flex-col items-center justify-center rounded-sm border text-[18px] font-bold',
                 hidden
                   ? 'border-[#3a2060] bg-[#3a2060] text-white'
                   : 'border-[#d9d2c5] bg-[#f7f1e4]',

@@ -6,6 +6,7 @@ import { useGameStore } from '../../store/useGameStore'
 import { cn } from '../../utils/cn'
 import { DesktopIcon } from './DesktopIcon'
 import { OsWallpaper } from './OsWallpaper'
+import { RetroIcon } from './retroIcons'
 import { WindowManager } from './WindowManager'
 
 const UNLOCK_MS = 2600
@@ -118,14 +119,14 @@ export function LoginScreen() {
             title={devApp.title}
             selected={devSelected}
             variant="retro"
-            icon={devApp.icon({ size: 48 })}
+            icon={devApp.icon({ size: 64 })}
             onSelect={() => setDevSelected(true)}
             onOpen={() => openWindow('dev-tools-target')}
           />
         </div>
       ) : null}
 
-      <div className="pointer-events-none absolute top-4 right-5 max-w-[min(92vw,480px)] text-right font-mono text-[10px] tracking-wide text-white/70">
+      <div className="pointer-events-none absolute top-4 right-5 max-w-[min(92vw,480px)] text-right font-mono text-[13px] tracking-wide text-white/70">
         <motion.div
           animate={{ opacity: [0.4, 0.9, 0.55, 0.9] }}
           transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
@@ -160,9 +161,9 @@ export function LoginScreen() {
       <button
         type="button"
         onClick={restartSystem}
-        className="absolute right-6 bottom-6 z-20 flex h-8 items-center gap-2 rounded-[3px] border border-[#9ab4c8] bg-gradient-to-b from-[#f4f8fc] to-[#d3e1ee] px-3 text-[12px] text-[#1a1a1a] shadow-[0_2px_6px_rgba(0,0,0,0.4)] hover:from-white hover:to-[#dfeaf4] active:translate-y-px"
+        className="absolute right-6 bottom-6 z-20 flex h-10 items-center gap-2 rounded-[3px] border border-[#9ab4c8] bg-gradient-to-b from-[#f4f8fc] to-[#d3e1ee] px-3 text-[16px] text-[#1a1a1a] shadow-[0_2px_6px_rgba(0,0,0,0.4)] hover:from-white hover:to-[#dfeaf4] active:translate-y-px"
       >
-        <RestartIcon />
+        <RetroIcon name="plug" size={20} />
         {strings.os.restartSystem}
       </button>
 
@@ -175,34 +176,12 @@ export function LoginScreen() {
   )
 }
 
-function RestartIcon() {
-  return (
-    <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" aria-hidden="true">
-      <path
-        d="M13.2 8A5.2 5.2 0 1 1 8 2.8"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-      />
-      <path
-        d="M8 1.2 10.4 3.4 8 5.6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
 function BrokenProfileStack({ onOpenYuka }: { onOpenYuka: () => void }) {
   const copy = strings.login
   return (
-    <div className="relative h-[168px] w-[300px]">
+    <div className="relative h-[220px] w-[390px]">
       <div
-        className="absolute top-6 left-0 w-[150px] -rotate-[11deg] opacity-55 grayscale"
+        className="absolute top-6 left-0 w-[195px] -rotate-[11deg] opacity-55 grayscale"
         style={{ clipPath: 'polygon(0 8%, 92% 0, 100% 78%, 4% 100%)' }}
       >
         <div className="flex items-start gap-2">
@@ -210,10 +189,10 @@ function BrokenProfileStack({ onOpenYuka }: { onOpenYuka: () => void }) {
             <TaroPortrait />
           </Win7Portrait>
           <div className="pt-1">
-            <div className="text-[13px] font-semibold [text-shadow:0_1px_2px_rgba(0,0,0,0.75)]">
+            <div className="text-[17px] font-semibold [text-shadow:0_1px_2px_rgba(0,0,0,0.75)]">
               {copy.taroName}
             </div>
-            <div className="font-mono text-[11px] font-bold tracking-wide text-[#ff6b6b]">
+            <div className="font-mono text-[14px] font-bold tracking-wide text-[#ff6b6b]">
               {copy.taroError}
             </div>
           </div>
@@ -221,7 +200,7 @@ function BrokenProfileStack({ onOpenYuka }: { onOpenYuka: () => void }) {
       </div>
 
       <div
-        className="pointer-events-none absolute top-2 left-8 w-[160px] rotate-[7deg] opacity-30"
+        className="pointer-events-none absolute top-2 left-8 w-[210px] rotate-[7deg] opacity-30"
         style={{ clipPath: 'inset(12% 0 18% 22%)' }}
       >
         <Win7Portrait>
@@ -238,11 +217,11 @@ function BrokenProfileStack({ onOpenYuka }: { onOpenYuka: () => void }) {
           <YukaPortrait />
         </Win7Portrait>
         <div className="pt-1">
-          <div className="text-[16px] font-semibold [text-shadow:0_1px_3px_rgba(0,0,0,0.65)]">
+          <div className="text-[21px] font-semibold [text-shadow:0_1px_3px_rgba(0,0,0,0.65)]">
             {copy.yukaName}
           </div>
-          <div className="text-[11px] text-white/80">({copy.yukaRole})</div>
-          <div className="mt-1 font-mono text-[10px] tracking-wide text-[#ffd37a] [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
+          <div className="text-[14px] text-white/80">({copy.yukaRole})</div>
+          <div className="mt-1 font-mono text-[13px] tracking-wide text-[#ffd37a] [text-shadow:0_1px_2px_rgba(0,0,0,0.7)]">
             {copy.yukaStatus}
           </div>
         </div>
@@ -255,7 +234,7 @@ function Win7Portrait({ children, muted = false }: { children: ReactNode; muted?
   return (
     <div
       className={cn(
-        'h-[72px] w-[72px] shrink-0 overflow-hidden rounded-sm border-[3px] shadow-[0_3px_10px_rgba(0,0,0,0.45)]',
+        'h-[96px] w-[96px] shrink-0 overflow-hidden rounded-sm border-[3px] shadow-[0_3px_10px_rgba(0,0,0,0.45)]',
         muted ? 'border-white/40' : 'border-white/85',
       )}
     >
@@ -349,15 +328,15 @@ function KernelConsole({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 8 }}
-        className="w-full max-w-[560px] overflow-hidden rounded-t-[3px] border border-[#9ab4c8] shadow-[0_16px_40px_rgba(0,0,0,0.55)]"
+        className="w-full max-w-[730px] overflow-hidden rounded-t-[3px] border border-[#9ab4c8] shadow-[0_16px_40px_rgba(0,0,0,0.55)]"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div className="flex h-[30px] items-center bg-gradient-to-r from-[#1d4f86] to-[#3d8ad0] px-2 text-[12px] font-semibold text-white">
+        <div className="flex h-[40px] items-center bg-gradient-to-r from-[#1d4f86] to-[#3d8ad0] px-2 text-[16px] font-semibold text-white">
           <span className="truncate">{copy.cmdTitle}</span>
           <button
             type="button"
             onClick={onClose}
-            className="ml-auto flex h-[20px] w-[42px] items-center justify-center bg-[#c75050] text-[11px] font-bold hover:bg-[#e04343]"
+            className="ml-auto flex h-[26px] w-[54px] items-center justify-center bg-[#c75050] text-[14px] font-bold hover:bg-[#e04343]"
             aria-label="Close"
           >
             ✕
@@ -365,7 +344,7 @@ function KernelConsole({
         </div>
         <div
           ref={scrollerRef}
-          className="h-[340px] cursor-default overflow-auto bg-[#0c0c0c] p-2 font-['Lucida_Console',Consolas,monospace] text-[13px] leading-[18px] text-[#c8c8c8]"
+          className="h-[440px] cursor-default overflow-auto bg-[#0c0c0c] p-2 font-['Lucida_Console',Consolas,monospace] text-[17px] leading-[24px] text-[#c8c8c8]"
           onMouseDown={() => inputRef.current?.focus()}
         >
           {copy.taroNote.map((line) => (
@@ -413,7 +392,7 @@ function KernelConsole({
           {unlocking ? (
             <div className="mt-3">
               <div>{unlockPhase === 'override' ? copy.unlockingOverride : copy.unlockingMount}</div>
-              <div className="mt-1 h-[10px] w-[280px] border border-[#6a6a6a] bg-[#1a1a1a]">
+              <div className="mt-1 h-[10px] w-[360px] border border-[#6a6a6a] bg-[#1a1a1a]">
                 <motion.div
                   className="h-full bg-[#c8c8c8]"
                   initial={{ width: '0%' }}
@@ -466,7 +445,7 @@ function SectorRow({
       type="button"
       onClick={onClick}
       className={cn(
-        'block w-full text-left font-["Lucida_Console",Consolas,monospace] text-[13px]',
+        'block w-full text-left font-["Lucida_Console",Consolas,monospace] text-[17px]',
         synced ? 'text-[#5dff7a]' : 'text-[#c8c8c8] hover:bg-white/10',
       )}
     >

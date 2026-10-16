@@ -15,7 +15,7 @@ export function NotificationToasts() {
   return (
     <div
       className={cn(
-        'pointer-events-none absolute right-4 z-[70] flex w-[400px] flex-col gap-3',
+        'pointer-events-none absolute right-4 z-[70] flex w-[520px] flex-col gap-3',
         modern ? 'bottom-24' : 'bottom-12',
       )}
     >
@@ -106,16 +106,16 @@ function ToastCard({
       >
         <div
           className={cn(
-            'text-[13px] font-medium tracking-wide uppercase',
+            'text-[17px] font-medium tracking-wide uppercase',
             modern ? 'text-[#0a84ff]' : 'text-[#9ad4c8]',
           )}
         >
           {notification.kind === 'chat' ? strings.apps.friendChat : strings.os.hostPcName}
         </div>
-        <div className="mt-1 text-[17px] font-semibold leading-snug">{notification.title}</div>
+        <div className="mt-1 text-[22px] font-semibold leading-snug">{notification.title}</div>
         <div
           className={cn(
-            'mt-1.5 line-clamp-2 text-[14px] leading-snug',
+            'mt-1.5 line-clamp-2 text-[18px] leading-snug',
             modern ? 'text-neutral-600' : 'text-white/80',
           )}
         >

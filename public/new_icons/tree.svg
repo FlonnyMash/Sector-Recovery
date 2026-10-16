@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d4a574"/><stop offset="1" stop-color="#8a5a32"/></linearGradient><linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ee08a"/><stop offset="1" stop-color="#1e8a3c"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="28" y="40" width="8" height="14" rx="2" fill="url(#wood)"/>
+    <circle cx="32" cy="22" r="14" fill="url(#leaf)"/>
+    <circle cx="22" cy="28" r="10" fill="url(#leaf)"/>
+    <circle cx="42" cy="28" r="10" fill="url(#leaf)"/>
+    <ellipse cx="26" cy="18" rx="5" ry="3" fill="#fff" opacity=".25"/></g>
+</svg>

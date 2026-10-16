@@ -122,13 +122,13 @@ function BurstCmd({ frame }: { frame: BurstWindow }) {
       exit={{ opacity: 0, y: 8, scale: 0.98 }}
       transition={{ duration: 0.18 }}
     >
-      <div className="flex h-[26px] items-center bg-gradient-to-r from-[#1d4f86] to-[#3d8ad0] px-2 text-[11px] font-semibold text-white">
+      <div className="flex h-[34px] items-center bg-gradient-to-r from-[#1d4f86] to-[#3d8ad0] px-2 text-[14px] font-semibold text-white">
         <span className="truncate">{frame.title}</span>
-        <span className="ml-auto flex h-[16px] w-[36px] items-center justify-center bg-[#c75050] text-[10px] font-bold">
+        <span className="ml-auto flex h-[20px] w-[46px] items-center justify-center bg-[#c75050] text-[13px] font-bold">
           ✕
         </span>
       </div>
-      <div className="h-[calc(100%-26px)] overflow-hidden bg-[#0c0c0c] p-1.5 font-['Lucida_Console',Consolas,monospace] text-[11px] leading-[15px] text-[#39ff6a]">
+      <div className="h-[calc(100%-34px)] overflow-hidden bg-[#0c0c0c] p-1.5 font-['Lucida_Console',Consolas,monospace] text-[14px] leading-[15px] text-[#39ff6a]">
         {lines.map((line, index) => (
           <div key={`${index}-${line}`} className="truncate">
             {line}

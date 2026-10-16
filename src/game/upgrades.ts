@@ -1,6 +1,9 @@
+import type { RetroIconName } from '../components/os/retroIcons'
+
 export const UPGRADES = [
   {
     id: 'auto_scanner_bot',
+    icon: 'document-search' satisfies RetroIconName,
     name: 'Auto-Scanner Bot',
     description: 'A background worker that keeps reading sectors while you browse. +2 fragments/sec.',
     baseCost: 500,
@@ -9,6 +12,7 @@ export const UPGRADES = [
   },
   {
     id: 'cluster_crawler',
+    icon: 'data-nodes' satisfies RetroIconName,
     name: 'Cluster Crawler Pro',
     description: 'Walks the FAT looking for orphaned clusters. +10 fragments/sec.',
     baseCost: 2000,
@@ -17,6 +21,7 @@ export const UPGRADES = [
   },
   {
     id: 'head_calibrator',
+    icon: 'hard-drive-external' satisfies RetroIconName,
     name: 'Head Calibrator Deluxe',
     description: 'Keeps the read head aligned on damaged platters. +50 fragments/sec.',
     baseCost: 9000,

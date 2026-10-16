@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="wood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d4a574"/><stop offset="1" stop-color="#8a5a32"/></linearGradient><linearGradient id="sand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ee0ff"/><stop offset="1" stop-color="#2b78d4"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="18" y="8" width="28" height="6" rx="2" fill="url(#wood)"/>
+    <rect x="18" y="50" width="28" height="6" rx="2" fill="url(#wood)"/>
+    <path d="M22 14c0 8 10 12 10 18S22 42 22 50h20c0-8-10-12-10-18s10-10 10-18H22z" fill="#c5e8ff" opacity=".55" stroke="#7eb6e0" stroke-width="1.6"/>
+    <path d="M24 16c2.4 6 8 8 8 14" fill="none"/>
+    <path d="M24 16h16c-2 6-7 9-8 14-1-5-6-8-8-14z" fill="url(#sand)"/>
+    <path d="M28 48h8c-1-4-3-6-4-10-1 4-3 6-4 10z" fill="url(#sand)"/></g>
+</svg>

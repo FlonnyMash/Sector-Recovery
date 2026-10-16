@@ -26,7 +26,7 @@ export function DesktopIcon({
       onClick={onSelect}
       onDoubleClick={onOpen}
       className={cn(
-        'flex w-[76px] cursor-pointer flex-col items-center gap-1 px-1 py-1.5 text-center',
+        'flex w-[100px] cursor-pointer flex-col items-center gap-1 px-1 py-1.5 text-center',
         modern
           ? cn(
               'rounded-xl hover:bg-white/10',
@@ -41,7 +41,7 @@ export function DesktopIcon({
       {icon}
       <span
         className={cn(
-          'w-full truncate text-[11px] leading-tight text-white',
+          'w-full truncate text-[14px] leading-tight text-white',
           modern ? 'font-medium' : '[text-shadow:1px_1px_2px_rgba(0,0,0,0.9)]',
         )}
       >

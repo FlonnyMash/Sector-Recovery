@@ -43,7 +43,7 @@ export function MiniGame() {
         <button
           type="button"
           onClick={() => setPlaying(null)}
-          className="h-8 shrink-0 border-b border-white/15 bg-[#1c1c1c] px-3 text-left text-[11px] text-[#f0c14a] hover:bg-[#262626]"
+          className="h-8 shrink-0 border-b border-white/15 bg-[#1c1c1c] px-3 text-left text-[14px] text-[#f0c14a] hover:bg-[#262626]"
         >
           ← {strings.arcade.back}
         </button>
@@ -61,21 +61,21 @@ export function MiniGame() {
   return (
     <div className="flex h-full flex-col bg-[#1b1d22] font-['Segoe_UI',Tahoma,sans-serif] text-[#c7d5e0]">
       <header className="flex h-10 shrink-0 items-center gap-3 border-b border-black/40 bg-[#17191e] px-3">
-        <div className="font-[Georgia,Times,serif] text-[15px] font-bold italic text-[#ffcc00]">
+        <div className="font-[Georgia,Times,serif] text-[20px] font-bold italic text-[#ffcc00]">
           {strings.arcade.title}
         </div>
         <button
           type="button"
           onClick={openGamingStore}
-          className="rounded-sm px-2 py-1 text-[12px] font-semibold text-[#9aa8b5] hover:bg-white/5 hover:text-white"
+          className="rounded-sm px-2 py-1 text-[16px] font-semibold text-[#9aa8b5] hover:bg-white/5 hover:text-white"
         >
           {strings.arcade.store}
         </button>
       </header>
 
       <div className="flex min-h-0 flex-1">
-        <aside className="flex w-[220px] shrink-0 flex-col border-r border-black/50 bg-[#14161b]">
-          <div className="px-3 py-2 text-[10px] font-bold tracking-[0.16em] text-[#6b7380] uppercase">
+        <aside className="flex w-[290px] shrink-0 flex-col border-r border-black/50 bg-[#14161b]">
+          <div className="px-3 py-2 text-[13px] font-bold tracking-[0.16em] text-[#6b7380] uppercase">
             {strings.arcade.library}
           </div>
           <div className="min-h-0 flex-1 overflow-auto">
@@ -85,7 +85,7 @@ export function MiniGame() {
                 type="button"
                 onClick={() => setSelectedId(game.id)}
                 className={cn(
-                  'flex w-full items-center px-3 py-2 text-left text-[13px]',
+                  'flex w-full items-center px-3 py-2 text-left text-[17px]',
                   selectedId === game.id
                     ? 'bg-[#2a475e] text-white'
                     : 'text-[#b8c5d1] hover:bg-white/5 hover:text-white',
@@ -100,11 +100,11 @@ export function MiniGame() {
         <main className="min-h-0 flex-1 overflow-auto bg-[#1b2838]">
           {selected ? (
             <div className="flex h-full flex-col">
-              <div className={`h-[180px] shrink-0 bg-gradient-to-r ${selected.accent}`} />
+              <div className={`h-[240px] shrink-0 bg-gradient-to-r ${selected.accent}`} />
               <div className="flex flex-1 flex-col gap-3 p-5">
-                <div className="text-[22px] font-bold text-white">{selected.title}</div>
-                <p className="text-[13px] text-[#c7d5e0]">{selected.blurb}</p>
-                <div className="flex flex-wrap gap-x-4 gap-y-0.5 font-mono text-[11px] text-[#8f98a0]">
+                <div className="text-[28px] font-bold text-white">{selected.title}</div>
+                <p className="text-[17px] text-[#c7d5e0]">{selected.blurb}</p>
+                <div className="flex flex-wrap gap-x-4 gap-y-0.5 font-mono text-[14px] text-[#8f98a0]">
                   <span>
                     {strings.wahoo.gaming.version} {selected.version}
                   </span>
@@ -117,7 +117,7 @@ export function MiniGame() {
                 <button
                   type="button"
                   onClick={() => setPlaying(selected.id)}
-                  className="mt-auto h-[36px] w-[140px] rounded-sm bg-[#5c7e10] text-[14px] font-bold text-[#beee11] hover:bg-[#6b8f14]"
+                  className="mt-auto h-[46px] w-[180px] rounded-sm bg-[#5c7e10] text-[18px] font-bold text-[#beee11] hover:bg-[#6b8f14]"
                 >
                   {strings.arcade.play}
                 </button>
@@ -125,12 +125,12 @@ export function MiniGame() {
             </div>
           ) : (
             <div className="flex h-full flex-col items-center justify-center gap-3 px-8 text-center">
-              <div className="text-[18px] font-bold text-white">{strings.arcade.emptyTitle}</div>
-              <p className="max-w-[360px] text-[13px] text-[#9aa8b5]">{strings.arcade.emptyBody}</p>
+              <div className="text-[24px] font-bold text-white">{strings.arcade.emptyTitle}</div>
+              <p className="max-w-[360px] text-[17px] text-[#9aa8b5]">{strings.arcade.emptyBody}</p>
               <button
                 type="button"
                 onClick={openGamingStore}
-                className="h-[32px] rounded-sm bg-[#7b1fa2] px-4 text-[13px] font-bold text-white hover:bg-[#6a1b9a]"
+                className="h-[42px] rounded-sm bg-[#7b1fa2] px-4 text-[17px] font-bold text-white hover:bg-[#6a1b9a]"
               >
                 {strings.arcade.emptyCta}
               </button>

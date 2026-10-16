@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="bez" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#414b5e"/><stop offset="1" stop-color="#161c28"/></linearGradient><linearGradient id="stand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d5deea"/><stop offset="1" stop-color="#8e9aab"/></linearGradient><linearGradient id="scrB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ee0ff"/><stop offset="1" stop-color="#1a6dff"/></linearGradient><linearGradient id="metalD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b7688"/><stop offset="1" stop-color="#2a3142"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <g transform="translate(8 8) scale(1)">
+    <rect x="0" y="0" width="22" height="16" rx="3.2" fill="url(#bez)"/>
+    <rect x="2.2" y="2" width="17.6" height="10" rx="1.5" fill="url(#scrB)"/>
+    <rect x="9" y="16" width="4" height="2.6" fill="url(#stand)"/>
+    <rect x="5.5" y="18.4" width="11" height="2" rx="1" fill="url(#stand)"/>
+  </g>
+    <g transform="translate(34 8) scale(1)">
+    <rect x="0" y="0" width="22" height="16" rx="3.2" fill="url(#bez)"/>
+    <rect x="2.2" y="2" width="17.6" height="10" rx="1.5" fill="url(#scrB)"/>
+    <rect x="9" y="16" width="4" height="2.6" fill="url(#stand)"/>
+    <rect x="5.5" y="18.4" width="11" height="2" rx="1" fill="url(#stand)"/>
+  </g>
+    <path d="M19 28v6M45 28v6M32 40V34" stroke="#3d9ee8" stroke-width="2.1" stroke-linecap="round"/>
+    <rect x="16" y="38" width="32" height="12" rx="3" fill="url(#metalD)"/>
+    <g fill="#6bcf7a"><circle cx="22" cy="44" r="1.5"/><circle cx="27.2" cy="44" r="1.5"/><circle cx="32.4" cy="44" r="1.5"/><circle cx="37.6" cy="44" r="1.5"/><circle cx="42.8" cy="44" r="1.5"/></g></g>
+</svg>

@@ -1,0 +1,55 @@
+---
+description: Use the retro pixel icon set (public/Old_Icons) for anything shown inside the old target OS; check the catalogue before drawing new icons
+globs: src/components/**/*.tsx,src/game/**/*.ts
+alwaysApply: false
+---
+
+# Retro pixel icons for the target OS
+
+The old machine being recovered (`target_os`: Aero taskbar, `LoginScreen`, `SystemExplorer`,
+`NetExplorer`, `SectorRecover`, `OperatorNotes`, `PhotoViewer`, `Messenger`) uses a 110-piece
+32x32 pixel-art icon set in `public/Old_Icons/`. Matching modern Linux-style SVGs live in
+`public/new_icons/<name>.svg` (same keys as `RETRO_ICONS`) and are rendered with
+`<ModernIcon name="..." />`, `modernAppIcon('...')`, or `<RetroIcon variant="modern" />`.
+The host OS (`ModernDock`, `HostLoginScreen`, `news-browser`, `friend-chat`, `arcade`) keeps
+its own SVG icons in `src/components/os/icons.tsx`.
+
+## Rule
+
+When adding or changing any app, file type, toolbar button, dialog, sidebar entry, status marker,
+or other icon-like visual on the target OS:
+
+1. Open `src/components/os/retroIcons.tsx` and search `RETRO_ICONS` by meaning (each key has a
+   JSDoc describing the picture). Pick the closest match before drawing SVG, using emoji, or
+   adding a new asset.
+2. Render it with `<RetroIcon name="..." size={20|32|40|56|64} />` (pixel art) or
+   `<ModernIcon name="..." />` / `<RetroIcon name="..." variant="modern" />` (vector).
+   For app registry entries in `src/game/apps.ts` use `icon: retroAppIcon('...')` or
+   `icon: modernAppIcon('...')`. For file kinds use `fileTypeIcon(type)`.
+3. Keep sizes at the existing slots: 20 (title bar, taskbar, list rows), 32 (classic start, add-on
+   rows), 40 (dialogs, modern start tiles), 56 (explorer tiles), 64 (desktop). The `.pixelated`
+   class is applied automatically on the retro variant only.
+4. Only if nothing fits, add a new PNG to `public/Old_Icons/` (and a matching SVG in
+   `public/new_icons/`) with a descriptive kebab-case name and register it in `RETRO_ICONS`
+   with a JSDoc line.
+
+## Catalogue (by category)
+
+- Computers: `computer-blue` `computer-teal` `computer-tower` `computer-pc` (My Computer) `monitor` `laptop` `monitor-game` `computer-recovery` (backup / recovery tool)
+- Network: `network-tree` `network-cable` `network-pair` `network-hub` `server` `server-offline` `folder-network`
+- Windows / programs: `window` `window-busy` `window-shortcut` `window-user` `window-display` `windows-cascade` `folder-programs` `window-error` `window-terminal`
+- Folders: `folder` `folder-open-papers` `folder-document` `folder-plain` `folder-shortcut` `folder-tools` `folder-error` `folder-search` `folder-fonts`
+- Notepads / notes: `notepad-teal` `notepad` `notepad-pencil` `notepad-pen` `clipboard` `notes-pencil` `note-write`
+- Documents: `document` `document-search` `document-error` `document-image` `document-user` `document-video` `document-pinned` `document-web` `document-warning` `document-alert` `document-locked` `documents-stack` `font-truetype` `font-file` `data-nodes` `scroll`
+- Discs / drives: `cd` `cd-flat` `cd-video` `cd-media` `cd-music` `cd-drive` `cd-software-box` `cd-warning` `cd-error` `cd-search` `floppy` `floppy-drive` `hard-drive` `hard-drive-external`
+- Hardware: `speaker` `mobile-phone` `microphone` `chip` `printer` `cassette` `plug` (power / restart) `keyboard` `mouse` `circuit-board` (dev tools) `battery-full` `battery-half` `battery-low`
+- Comms / web: `mail` `mail-open` `mail-sync` `chat-bubble` `globe` `globe-search`
+- Status / misc: `error` `forbidden` `info-bubble` `help-book` `lightbulb` `checklist` `hourglass` `clock` `calendar` `smiley` `safe` `tree` `bookshelf` `book-open` `filing-cabinet` `calculator` `calculator-notes` `paint-tools` `joystick` `hand-pointer` `cursor-arrow`
+
+## Current assignments
+
+Apps: system-explorer `computer-pc`, net-explorer `globe`, sector-recover `computer-recovery`,
+operator-notes `notepad-pencil`, photo-viewer `document-image`, messenger `chat-bubble`,
+dev-tools-target `circuit-board`. File types: image `document-image`, audio `cd-music`,
+system `chip`, text `document`. Explorer: drive `hard-drive`, folders `folder`. Dialog error `error`.
+Restart `plug`. Upgrades: `document-search`, `data-nodes`, `hard-drive-external`.

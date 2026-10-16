@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="wterm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c2230"/><stop offset="1" stop-color="#0c1018"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="8" y="8" width="48" height="48" rx="14" fill="url(#wterm)"/>
+    <rect x="8" y="8" width="48" height="18" rx="14" fill="url(#gloss)" opacity=".12"/>
+    <text x="18" y="40" fill="#7ee0ff" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" font-weight="700">&gt;_</text></g>
+</svg>

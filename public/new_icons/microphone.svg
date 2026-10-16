@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef3f9"/><stop offset="1" stop-color="#9aa7b8"/></linearGradient><linearGradient id="metalD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b7688"/><stop offset="1" stop-color="#2a3142"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="24" y="8" width="16" height="28" rx="8" fill="url(#metal)"/>
+    <rect x="27" y="12" width="10" height="20" rx="5" fill="#c5cedb"/>
+    <path d="M20 28c0 6.6 5.4 12 12 12s12-5.4 12-12" fill="none" stroke="#2a3142" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M32 40v8" stroke="#2a3142" stroke-width="2.6" stroke-linecap="round"/>
+    <rect x="22" y="48" width="20" height="5" rx="2.4" fill="url(#metalD)"/></g>
+</svg>

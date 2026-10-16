@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eef3f9"/><stop offset="1" stop-color="#9aa7b8"/></linearGradient><linearGradient id="metalD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b7688"/><stop offset="1" stop-color="#2a3142"/></linearGradient><linearGradient id="batR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff6b73"/><stop offset="1" stop-color="#c81e28"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="10" y="20" width="40" height="24" rx="5" fill="url(#metal)"/>
+    <rect x="50" y="26" width="5" height="12" rx="2" fill="url(#metalD)"/>
+    <rect x="14" y="24" width="8" height="16" rx="3" fill="url(#batR)"/>
+    <path d="M32 24v8" stroke="#c81e28" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="32" cy="36.4" r="1.5" fill="#c81e28"/></g>
+</svg>

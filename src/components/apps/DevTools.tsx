@@ -66,13 +66,13 @@ export function DevTools() {
   const [tab, setTab] = useState<DevTab>('tools')
 
   return (
-    <div className="flex h-full flex-col bg-[#15171c] font-mono text-[12px] text-[#d8dbe2]">
+    <div className="flex h-full flex-col bg-[#15171c] font-mono text-[16px] text-[#d8dbe2]">
       <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-        <span className="rounded-sm bg-[#e23d3d] px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-white">
+        <span className="rounded-sm bg-[#e23d3d] px-1.5 py-0.5 text-[13px] font-bold tracking-wide text-white">
           DEV
         </span>
-        <span className="text-[14px] font-bold text-white">{COPY.title}</span>
-        <span className="ml-auto text-[10px] text-[#6a7080]">{COPY.devOnly}</span>
+        <span className="text-[18px] font-bold text-white">{COPY.title}</span>
+        <span className="ml-auto text-[13px] text-[#6a7080]">{COPY.devOnly}</span>
       </div>
 
       <div className="flex flex-wrap gap-2 border-b border-white/10 px-4 py-2">
@@ -127,7 +127,7 @@ function EnvironmentSection() {
 
   return (
     <Section title={COPY.sections.environment}>
-      <p className="text-[11px] leading-snug text-[#8a90a0]">{COPY.environment.hint}</p>
+      <p className="text-[14px] leading-snug text-[#8a90a0]">{COPY.environment.hint}</p>
 
       <InfoGrid
         rows={[
@@ -155,11 +155,11 @@ function EnvironmentSection() {
               )}
             >
               <div>
-                <div className="text-[13px] font-bold text-white">{env.label}</div>
-                <div className="text-[11px] text-white/75">{env.pcName}</div>
-                <div className="mt-1 text-[10px] text-white/50">{env.os}</div>
+                <div className="text-[17px] font-bold text-white">{env.label}</div>
+                <div className="text-[14px] text-white/75">{env.pcName}</div>
+                <div className="mt-1 text-[13px] text-white/50">{env.os}</div>
               </div>
-              <div className="mt-3 w-full rounded-sm bg-black/35 px-2 py-1 text-center text-[11px] font-semibold text-white">
+              <div className="mt-3 w-full rounded-sm bg-black/35 px-2 py-1 text-center text-[14px] font-semibold text-white">
                 {isActive
                   ? COPY.environment.active
                   : COPY.environment.switchTo.replace('{name}', env.label)}
@@ -213,7 +213,7 @@ function EconomySection() {
           if (valid) apply(devAddFragments)
         }}
       >
-        <label className="flex flex-col gap-1 text-[11px] text-[#8a90a0]">
+        <label className="flex flex-col gap-1 text-[14px] text-[#8a90a0]">
           {COPY.economy.amountLabel}
           <input
             type="text"
@@ -221,7 +221,7 @@ function EconomySection() {
             value={input}
             onChange={(event) => setInput(event.target.value)}
             placeholder={COPY.economy.amountPlaceholder}
-            className="h-8 rounded-sm border border-white/15 bg-black/40 px-2 text-[12px] text-white outline-none placeholder:text-[#555b68] focus:border-[#ffd166]"
+            className="h-8 rounded-sm border border-white/15 bg-black/40 px-2 text-[16px] text-white outline-none placeholder:text-[#555b68] focus:border-[#ffd166]"
           />
         </label>
         <div className="flex flex-wrap gap-2">
@@ -244,7 +244,7 @@ function EconomySection() {
       </form>
 
       <div className="flex flex-col gap-1">
-        <span className="text-[11px] text-[#8a90a0]">{COPY.economy.quickAdd}</span>
+        <span className="text-[14px] text-[#8a90a0]">{COPY.economy.quickAdd}</span>
         <div className="flex flex-wrap gap-2">
           {QUICK_AMOUNTS.map((amount) => (
             <DevButton key={amount} onClick={() => devAddFragments(amount)}>
@@ -255,7 +255,7 @@ function EconomySection() {
       </div>
 
       <div className="flex flex-col gap-1">
-        <span className="text-[11px] text-[#8a90a0]">{COPY.economy.timeScale}</span>
+        <span className="text-[14px] text-[#8a90a0]">{COPY.economy.timeScale}</span>
         <div className="flex flex-wrap gap-2">
           {TIME_SCALES.map((scale) => (
             <DevButton
@@ -299,7 +299,7 @@ function UnlocksSection() {
 
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] text-[#8a90a0]">
+          <span className="text-[14px] text-[#8a90a0]">
             {COPY.unlocks.inventory} · {inventory.length} / {LOOT_NAMES.length}
           </span>
           <div className="flex gap-2">
@@ -320,7 +320,7 @@ function UnlocksSection() {
                 type="button"
                 onClick={() => toggleItem(item)}
                 className={cn(
-                  'rounded-sm border px-2 py-1 text-[11px] transition',
+                  'rounded-sm border px-2 py-1 text-[14px] transition',
                   owned
                     ? 'border-[#3ea74a]/60 bg-[#3ea74a]/20 text-[#9fe8a8]'
                     : 'border-white/15 bg-black/30 text-[#8a90a0] hover:border-white/40',
@@ -338,7 +338,7 @@ function UnlocksSection() {
         <DevButton onClick={unlockEverythingNow} variant="primary">
           {COPY.unlocks.unlockEverything}
         </DevButton>
-        <p className="mt-2 text-[10px] leading-snug text-[#c9b77a]">
+        <p className="mt-2 text-[13px] leading-snug text-[#c9b77a]">
           {COPY.unlocks.unlockEverythingHint}
         </p>
       </div>
@@ -373,7 +373,7 @@ function ProgramsSection() {
   return (
     <Section title={COPY.sections.programs}>
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[11px] text-[#8a90a0]">{COPY.programs.openHint}</span>
+        <span className="text-[14px] text-[#8a90a0]">{COPY.programs.openHint}</span>
         <DevButton
           onClick={installAll}
           disabled={allInstalled}
@@ -388,7 +388,7 @@ function ProgramsSection() {
         if (envPrograms.length === 0) return null
         return (
           <div key={env.os} className="flex flex-col gap-1">
-            <span className="text-[10px] tracking-wide text-[#8a90a0] uppercase">
+            <span className="text-[13px] tracking-wide text-[#8a90a0] uppercase">
               {env.label} · {env.pcName}
             </span>
             <div className="flex flex-col divide-y divide-white/5 rounded-sm border border-white/10 bg-black/30">
@@ -398,8 +398,8 @@ function ProgramsSection() {
                   <div key={app.type} className="flex items-center gap-3 px-3 py-2">
                     <span className="shrink-0">{app.icon({ size: 20 })}</span>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[11px] text-white">{app.title}</div>
-                      <div className="flex items-center gap-1.5 text-[10px]">
+                      <div className="truncate text-[14px] text-white">{app.title}</div>
+                      <div className="flex items-center gap-1.5 text-[13px]">
                         <span
                           className={cn(
                             'h-1.5 w-1.5 rounded-full',
@@ -582,7 +582,7 @@ function PrologueSection() {
           return (
             <label
               key={flag.key}
-              className="flex cursor-pointer items-center gap-3 px-3 py-2 text-[11px] hover:bg-white/5"
+              className="flex cursor-pointer items-center gap-3 px-3 py-2 text-[14px] hover:bg-white/5"
             >
               <input
                 type="checkbox"
@@ -598,14 +598,14 @@ function PrologueSection() {
 
       <div className="flex flex-col gap-2 rounded-sm border border-white/10 bg-black/30 p-3">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="text-[11px] text-[#8a90a0]">{COPY.prologue.narrativeClock}</span>
-          <span className="text-[11px] text-white">{clockStatus}</span>
+          <span className="text-[14px] text-[#8a90a0]">{COPY.prologue.narrativeClock}</span>
+          <span className="text-[14px] text-white">{clockStatus}</span>
         </div>
         <div className="flex items-baseline justify-between gap-2">
-          <span className="text-[11px] text-[#8a90a0]">{COPY.prologue.kenjiAuctionNudge}</span>
-          <span className="text-[11px] text-white">{auctionClockStatus}</span>
+          <span className="text-[14px] text-[#8a90a0]">{COPY.prologue.kenjiAuctionNudge}</span>
+          <span className="text-[14px] text-white">{auctionClockStatus}</span>
         </div>
-        <span className="text-[11px] text-[#8a90a0]">{COPY.prologue.narrativeSpeed}</span>
+        <span className="text-[14px] text-[#8a90a0]">{COPY.prologue.narrativeSpeed}</span>
         <div className="flex flex-wrap gap-2">
           {NARRATIVE_SCALES.map((scale) => (
             <DevButton
@@ -647,8 +647,8 @@ function UpgradesSection() {
           return (
             <div key={upgrade.id} className="flex items-center gap-3 px-3 py-2">
               <div className="min-w-0 flex-1">
-                <div className="truncate text-[11px] text-white">{upgrade.name}</div>
-                <div className="text-[10px] text-[#8a90a0]">
+                <div className="truncate text-[14px] text-white">{upgrade.name}</div>
+                <div className="text-[13px] text-[#8a90a0]">
                   +{upgrade.fragmentsPerSecond} KB/s · {COPY.upgrades.owned}: {owned}
                 </div>
               </div>
@@ -679,25 +679,25 @@ function EconomySimTab() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-4">
       <div className="flex flex-col gap-2">
-        <h2 className="text-[10px] font-bold tracking-[0.18em] text-[#ffd166] uppercase">
+        <h2 className="text-[13px] font-bold tracking-[0.18em] text-[#ffd166] uppercase">
           {copy.title}
         </h2>
-        <p className="text-[11px] text-[#8a90a0]">
+        <p className="text-[14px] text-[#8a90a0]">
           {copy.clicks
             .replace('{clicks}', String(CLICKS_PER_SECOND))
             .replace('{fragments}', String(FRAGMENTS_PER_CLICK))}
         </p>
-        <p className="text-[11px] leading-snug text-[#8a90a0]">{ECONOMY_SIM_STRATEGY}</p>
+        <p className="text-[14px] leading-snug text-[#8a90a0]">{ECONOMY_SIM_STRATEGY}</p>
         <div>
           <DevButton onClick={() => setResult(runEconomySim())} variant="primary">
             {result ? copy.runAgain : copy.start}
           </DevButton>
         </div>
         {result?.stoppedEarly ? (
-          <p className="text-[11px] text-[#ffb3b3]">{result.stoppedEarly}</p>
+          <p className="text-[14px] text-[#ffb3b3]">{result.stoppedEarly}</p>
         ) : null}
         {result ? (
-          <p className="text-[11px] leading-snug text-white">{summarizeEconomySim(result.state)}</p>
+          <p className="text-[14px] leading-snug text-white">{summarizeEconomySim(result.state)}</p>
         ) : null}
       </div>
       {result ? (
@@ -771,9 +771,9 @@ function EconomySimTab() {
 function SimTable({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1">
-      <h3 className="text-[10px] font-bold tracking-[0.18em] text-[#ffd166] uppercase">{title}</h3>
+      <h3 className="text-[13px] font-bold tracking-[0.18em] text-[#ffd166] uppercase">{title}</h3>
       <div className="overflow-x-auto rounded-sm border border-white/10">
-        <table className="w-full border-collapse text-left text-[10px] whitespace-nowrap [&_td]:border-t [&_td]:border-white/10 [&_td]:px-2 [&_td]:py-1 [&_th]:bg-black/40 [&_th]:px-2 [&_th]:py-1.5 [&_th]:font-semibold [&_th]:text-[#8a90a0]">
+        <table className="w-full border-collapse text-left text-[13px] whitespace-nowrap [&_td]:border-t [&_td]:border-white/10 [&_td]:px-2 [&_td]:py-1 [&_th]:bg-black/40 [&_th]:px-2 [&_th]:py-1.5 [&_th]:font-semibold [&_th]:text-[#8a90a0]">
           {children}
         </table>
       </div>
@@ -839,7 +839,7 @@ function ToolsSection() {
         <DevButton onClick={handleReset} variant="danger">
           {confirmReset ? COPY.tools.resetGameConfirm : COPY.tools.resetGame}
         </DevButton>
-        <p className="mt-2 text-[10px] leading-snug text-[#e8a0a0]">{COPY.tools.resetGameHint}</p>
+        <p className="mt-2 text-[13px] leading-snug text-[#e8a0a0]">{COPY.tools.resetGameHint}</p>
       </div>
     </Section>
   )
@@ -863,7 +863,7 @@ function TabButton({
       type="button"
       onClick={onClick}
       className={cn(
-        'border-b-2 px-3 py-2 text-[11px] font-semibold tracking-wide uppercase',
+        'border-b-2 px-3 py-2 text-[14px] font-semibold tracking-wide uppercase',
         active
           ? 'border-[#ffd166] text-[#ffe6a3]'
           : 'border-transparent text-[#8a90a0] hover:text-white',
@@ -877,7 +877,7 @@ function TabButton({
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-[10px] font-bold tracking-[0.18em] text-[#ffd166] uppercase">{title}</h2>
+      <h2 className="text-[13px] font-bold tracking-[0.18em] text-[#ffd166] uppercase">{title}</h2>
       {children}
     </section>
   )
@@ -885,7 +885,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 function InfoGrid({ rows }: { rows: [string, string][] }) {
   return (
-    <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-sm border border-white/10 bg-black/30 p-3 text-[11px]">
+    <div className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-sm border border-white/10 bg-black/30 p-3 text-[14px]">
       {rows.map(([label, value]) => (
         <RowPair key={label} label={label} value={value} />
       ))}
@@ -913,7 +913,7 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-sm border border-white/10 bg-black/30 px-3 py-2">
-      <div className="flex items-center gap-2 text-[11px]">
+      <div className="flex items-center gap-2 text-[14px]">
         {status !== undefined ? (
           <span
             className={cn(
@@ -954,7 +954,7 @@ function DevButton({
       title={title}
       className={cn(
         'rounded-sm border font-semibold transition active:scale-[0.97]',
-        size === 'sm' ? 'h-6 px-2 text-[10px]' : 'h-8 px-3 text-[11px]',
+        size === 'sm' ? 'h-6 px-2 text-[13px]' : 'h-8 px-3 text-[14px]',
         variant === 'default' &&
           'border-white/15 bg-white/5 text-white hover:border-white/40 hover:bg-white/10',
         variant === 'primary' &&

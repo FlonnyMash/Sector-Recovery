@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="foldB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3d94ee"/><stop offset="1" stop-color="#1557c8"/></linearGradient><linearGradient id="foldF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ed8ff"/><stop offset="1" stop-color="#2d86f8"/></linearGradient><linearGradient id="foldT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ec8ff"/><stop offset="1" stop-color="#3d94ee"/></linearGradient><linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient><linearGradient id="wbg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7f9fc"/><stop offset="1" stop-color="#e3ebf4"/></linearGradient><linearGradient id="whd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5aa2f0"/><stop offset="1" stop-color="#2b78d4"/></linearGradient></defs>
+  <g filter="url(#sh)">
+  <rect x="10" y="19" width="44" height="31.5" rx="6.5" fill="url(#foldB)"/>
+  <path d="M14 15.5h16.8c1.2 0 2.28.66 2.84 1.72L36 21.5H14V15.5z" fill="url(#foldT)"/>
+  
+  <path d="M9 25.2c0-2.7 2.2-4.9 4.9-4.9h14.8l3.5 3.9H50.1c2.7 0 4.9 2.2 4.9 4.9v18c0 2.7-2.2 4.9-4.9 4.9H13.9c-2.7 0-4.9-2.2-4.9-4.9v-18z" fill="url(#foldF)"/>
+  <path d="M9 25.2c0-2.7 2.2-4.9 4.9-4.9h14.8l3.5 3.9H50.1c2.7 0 4.9 2.2 4.9 4.9v6.4H9V25.2z" fill="url(#gloss)" opacity=".38"/>
+  <path d="M9 25.2c0-2.7 2.2-4.9 4.9-4.9h14.8l3.5 3.9H50.1c2.7 0 4.9 2.2 4.9 4.9" stroke="#fff" stroke-opacity=".28" stroke-width="1"/>
+  <g transform="translate(22 30)">
+      <rect x="0" y="0" width="14" height="12" rx="2.4" fill="url(#wbg)" stroke="#5aa2f0" stroke-width="1.2"/>
+      <rect x="6" y="4" width="14" height="12" rx="2.4" fill="url(#whd)"/>
+    </g></g>
+</svg>

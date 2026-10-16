@@ -183,10 +183,10 @@ export function JumpRun() {
   }, [])
 
   return (
-    <div className="flex h-full flex-col bg-[#140c1e] p-3 font-[Tahoma,'Segoe_UI',sans-serif] text-[12px] text-[#f7e6c8]">
+    <div className="flex h-full flex-col bg-[#140c1e] p-3 font-[Tahoma,'Segoe_UI',sans-serif] text-[16px] text-[#f7e6c8]">
       <div className="mb-2 flex items-center justify-between">
-        <div className="text-[14px] font-bold">{strings.arcade.jumpRun.title}</div>
-        <div className="font-mono text-[11px]">
+        <div className="text-[18px] font-bold">{strings.arcade.jumpRun.title}</div>
+        <div className="font-mono text-[14px]">
           {strings.arcade.highScore}: {best} · {strings.arcade.jumpRun.distance}: {distance}
         </div>
       </div>
@@ -194,7 +194,8 @@ export function JumpRun() {
         ref={canvasRef}
         width={WIDTH}
         height={HEIGHT}
-        className="w-full rounded-sm border border-[#5a3a70] bg-[#1a1028]"
+        style={{ width: WIDTH * 1.3, height: HEIGHT * 1.3 }}
+        className="rounded-sm border border-[#5a3a70] bg-[#1a1028]"
       />
     </div>
   )

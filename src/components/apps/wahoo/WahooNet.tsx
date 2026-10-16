@@ -91,7 +91,7 @@ export function WahooNet() {
       : ADDRESSES[tab]
 
   return (
-    <div className="flex h-full flex-col bg-[#f4f5f7] font-['Segoe_UI',Tahoma,sans-serif] text-[13px] text-[#1a1a1a]">
+    <div className="flex h-full flex-col bg-[#f4f5f7] font-['Segoe_UI',Tahoma,sans-serif] text-[17px] text-[#1a1a1a]">
       <div className="flex items-center gap-2 border-b border-[#e2e4ea] bg-white px-3 py-2">
         <button
           type="button"
@@ -108,7 +108,7 @@ export function WahooNet() {
             goTab('home')
           }}
           className={cn(
-            'h-[28px] rounded-full border px-3 text-[12px]',
+            'h-[28px] rounded-full border px-3 text-[16px]',
             article || selectedLotId || tab !== 'home'
               ? 'border-[#d0d4dc] bg-white text-[#333] hover:bg-[#f6f7f9]'
               : 'cursor-not-allowed border-[#eceef2] bg-[#f6f7f9] text-[#b0b4bc]',
@@ -116,7 +116,7 @@ export function WahooNet() {
         >
           ← {COPY.back}
         </button>
-        <div className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-[#d8dce4] bg-[#f6f7f9] px-3 py-1.5 text-[12px] text-[#4a4e58]">
+        <div className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-[#d8dce4] bg-[#f6f7f9] px-3 py-1.5 text-[16px] text-[#4a4e58]">
           <span className="font-bold text-[#7b1fa2]">W</span>
           <span className="truncate">{address}</span>
         </div>
@@ -131,7 +131,7 @@ export function WahooNet() {
               type="button"
               onClick={() => goTab(bookmark.id)}
               className={cn(
-                'rounded-sm px-3 py-1 text-[12px] font-semibold',
+                'rounded-sm px-3 py-1 text-[16px] font-semibold',
                 active
                   ? 'bg-white text-[#7b1fa2] shadow-[0_1px_0_#d8c8ec]'
                   : 'text-[#5a3d78] hover:bg-white/80',
@@ -184,19 +184,19 @@ function ArticleView({
       <div className="mx-auto max-w-[680px]">
         <div
           className={cn(
-            'text-[10px] font-bold tracking-[0.16em] uppercase',
+            'text-[13px] font-bold tracking-[0.16em] uppercase',
             isKey ? 'text-[#e8a0b0]' : 'text-[#c62828]',
           )}
         >
           {article.kicker}
         </div>
-        <h1 className="mt-2 text-[22px] leading-tight font-bold">{article.title}</h1>
-        <div className={cn('mt-2 text-[11px]', isKey ? 'text-[#c9b4aa]' : 'text-[#6a6e76]')}>
+        <h1 className="mt-2 text-[28px] leading-tight font-bold">{article.title}</h1>
+        <div className={cn('mt-2 text-[14px]', isKey ? 'text-[#c9b4aa]' : 'text-[#6a6e76]')}>
           {article.date} · {strings.news.by} {article.author}
         </div>
         <div
           className={cn(
-            'mt-4 space-y-3 text-[13px] leading-relaxed',
+            'mt-4 space-y-3 text-[17px] leading-relaxed',
             isKey ? 'text-[#e5d8cf]' : 'text-[#2c3038]',
           )}
         >
@@ -208,7 +208,7 @@ function ArticleView({
           <button
             type="button"
             onClick={onOpenAuctions}
-            className="mt-5 inline-flex h-[34px] items-center rounded-sm bg-[#7b1fa2] px-3 text-[12px] font-bold text-white hover:bg-[#6a1b9a]"
+            className="mt-5 inline-flex h-[34px] items-center rounded-sm bg-[#7b1fa2] px-3 text-[16px] font-bold text-white hover:bg-[#6a1b9a]"
           >
             {COPY.news.viewAuctions}
           </button>

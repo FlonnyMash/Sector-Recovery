@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#e09b18"/></linearGradient><linearGradient id="pcb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46d07a"/><stop offset="1" stop-color="#157a40"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="8" y="12" width="48" height="40" rx="6" fill="url(#pcb)"/>
+    <rect x="8" y="12" width="48" height="12" rx="6" fill="url(#gold)" opacity=".85"/>
+    <g fill="#0b3d24" opacity=".55">
+      <rect x="14" y="30" width="12" height="8" rx="1.5"/>
+      <rect x="30" y="30" width="8" height="8" rx="1.5"/>
+      <rect x="42" y="30" width="10" height="14" rx="1.5"/>
+    </g>
+    <g stroke="#0b3d24" stroke-width="1.8" opacity=".45">
+      <path d="M20 38v8"/><path d="M34 38v8"/><path d="M20 46h14"/>
+    </g>
+    <g fill="#ffe08a"><rect x="12" y="14" width="4" height="8" rx=".6"/><rect x="19" y="14" width="4" height="8" rx=".6"/><rect x="26" y="14" width="4" height="8" rx=".6"/><rect x="33" y="14" width="4" height="8" rx=".6"/><rect x="40" y="14" width="4" height="8" rx=".6"/><rect x="47" y="14" width="4" height="8" rx=".6"/></g></g>
+</svg>

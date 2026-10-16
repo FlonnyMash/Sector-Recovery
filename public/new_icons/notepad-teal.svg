@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e4ecf5"/></linearGradient><linearGradient id="teal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5ad4c8"/><stop offset="1" stop-color="#1f8a82"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="14" y="8" width="36" height="48" rx="6" fill="url(#paper)"/>
+    <rect x="14" y="8" width="36" height="14" rx="6" fill="url(#teal)"/>
+    <rect x="14" y="16" width="36" height="6" fill="url(#teal)"/>
+    <g fill="#e24b4b"><circle cx="22" cy="15" r="1.7"/><circle cx="29" cy="15" r="1.7"/><circle cx="36" cy="15" r="1.7"/><circle cx="43" cy="15" r="1.7"/></g>
+    <g stroke="#9aa7b8" stroke-width="1.6" stroke-linecap="round" opacity=".5">
+      <path d="M20 30h24"/><path d="M20 36h24"/><path d="M20 42h16"/>
+    </g></g>
+</svg>

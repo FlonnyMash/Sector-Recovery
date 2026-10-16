@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><radialGradient id="cd" cx=".32" cy=".28" r=".8"><stop offset="0" stop-color="#e8fbff"/><stop offset="1" stop-color="#6a4dff"/></radialGradient><linearGradient id="cdH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f8ff"/><stop offset="1" stop-color="#9aa7b8"/></linearGradient></defs>
+  <g filter="url(#sh)">
+  <circle cx="32" cy="33" r="23" fill="url(#cd)"/>
+  <circle cx="32" cy="33" r="16.56" fill="none" stroke="#7ee8c8" stroke-opacity=".35" stroke-width="3.2"/>
+  <circle cx="32" cy="33" r="11.5" fill="none" stroke="#c9a6ff" stroke-opacity=".28" stroke-width="2.2"/>
+  <path d="M20 22a18 18 0 0 1 24 6" stroke="#fff" stroke-opacity=".45" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="32" cy="33" r="5.98" fill="url(#cdH)"/>
+  <circle cx="32" cy="33" r="2.3" fill="#eef4fb"/>
+  </g>
+</svg>

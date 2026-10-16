@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs><filter id="sh" x="-32%" y="-32%" width="164%" height="174%"><feDropShadow dx="0" dy="2" stdDeviation="1.7" flood-color="#071018" flood-opacity=".32"/></filter><linearGradient id="mail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ec8ff"/><stop offset="1" stop-color="#1a73e8"/></linearGradient></defs>
+  <g filter="url(#sh)">
+    <rect x="8" y="18" width="48" height="30" rx="6" fill="url(#mail)"/>
+    <path d="M8 18l24 16 24-16" fill="none" stroke="#fff" stroke-width="2.4" opacity=".75"/>
+    <path d="M18 12c-6 4-6 14 0 16" fill="none" stroke="#e23d3d" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M14 14l4-4 3 5" fill="#e23d3d"/>
+    <path d="M46 44c6-4 6-14 0-16" fill="none" stroke="#e23d3d" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M50 42l-4 4-3-5" fill="#e23d3d"/></g>
+</svg>

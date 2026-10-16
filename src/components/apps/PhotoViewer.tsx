@@ -73,9 +73,9 @@ export function PhotoViewer() {
         if (event.key === '+' || event.key === '=') stepZoom(1)
         if (event.key === '-' || event.key === '_') stepZoom(-1)
       }}
-      className="flex h-full flex-col bg-[#ececec] font-[Tahoma,'Segoe_UI',sans-serif] text-[12px] text-[#222] outline-none"
+      className="flex h-full flex-col bg-[#ececec] font-[Tahoma,'Segoe_UI',sans-serif] text-[16px] text-[#222] outline-none"
     >
-      <div className="flex h-[26px] shrink-0 items-center gap-2 border-b border-[#c8c8c8] bg-gradient-to-b from-[#f7f7f7] to-[#e6e6e6] px-2">
+      <div className="flex h-[34px] shrink-0 items-center gap-2 border-b border-[#c8c8c8] bg-gradient-to-b from-[#f7f7f7] to-[#e6e6e6] px-2">
         <span className="truncate font-semibold">{selected?.name ?? COPY.emptyTitle}</span>
         {selected ? (
           <span className="min-w-0 flex-1 truncate text-[#666]">
@@ -140,13 +140,13 @@ export function PhotoViewer() {
           )
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-1 px-6 text-center text-[#bdbdbd]">
-            <span className="text-[15px] font-semibold text-white">{COPY.emptyTitle}</span>
+            <span className="text-[20px] font-semibold text-white">{COPY.emptyTitle}</span>
             <span>{COPY.empty}</span>
           </div>
         )}
       </div>
 
-      <div className="flex h-[36px] shrink-0 items-center gap-1 border-t border-[#b8b8b8] bg-gradient-to-b from-[#f4f4f4] to-[#dcdcdc] px-2">
+      <div className="flex h-[46px] shrink-0 items-center gap-1 border-t border-[#b8b8b8] bg-gradient-to-b from-[#f4f4f4] to-[#dcdcdc] px-2">
         <ViewerButton disabled={index <= 0} onClick={() => showOffset(-1)}>
           {COPY.previous}
         </ViewerButton>
@@ -157,7 +157,7 @@ export function PhotoViewer() {
         <ViewerButton disabled={!selected} onClick={() => stepZoom(-1)}>
           {COPY.zoomOut}
         </ViewerButton>
-        <span className="win7-inset min-w-[92px] bg-white px-2 py-0.5 text-center text-[11px] text-[#333]">
+        <span className="win7-inset min-w-[92px] bg-white px-2 py-0.5 text-center text-[14px] text-[#333]">
           {zoomLabel}
         </span>
         <ViewerButton disabled={!selected} onClick={() => stepZoom(1)}>
@@ -172,7 +172,7 @@ export function PhotoViewer() {
       </div>
 
       {pictures.length > 0 ? (
-        <div className="flex h-[74px] shrink-0 items-center gap-2 overflow-auto border-t border-[#d0d0d0] bg-[#f7f7f7] px-2">
+        <div className="flex h-[96px] shrink-0 items-center gap-2 overflow-auto border-t border-[#d0d0d0] bg-[#f7f7f7] px-2">
           {pictures.map((picture) => (
             <button
               key={picture.id}
@@ -180,7 +180,7 @@ export function PhotoViewer() {
               title={picture.name}
               onClick={() => openFile(picture.id)}
               className={cn(
-                'h-[56px] w-[76px] shrink-0 overflow-hidden border-2 bg-[#1c1c1c]',
+                'h-[72px] w-[100px] shrink-0 overflow-hidden border-2 bg-[#1c1c1c]',
                 picture.id === selected?.id ? 'border-[#3399ff]' : 'border-[#c5c5c5] hover:border-[#7eb6e0]',
               )}
             >
@@ -193,13 +193,13 @@ export function PhotoViewer() {
                   className="h-full w-full bg-white object-contain"
                 />
               ) : (
-                <span className="flex h-full items-center justify-center px-1 text-[10px] text-[#888]">
+                <span className="flex h-full items-center justify-center px-1 text-[13px] text-[#888]">
                   {picture.name}
                 </span>
               )}
             </button>
           ))}
-          <span className="ml-auto shrink-0 pr-1 text-[11px] text-[#555]">
+          <span className="ml-auto shrink-0 pr-1 text-[14px] text-[#555]">
             {COPY.count
               .replace('{index}', String(index + 1))
               .replace('{count}', String(pictures.length))}
@@ -226,7 +226,7 @@ function ViewerButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'win7-raised h-[22px] shrink-0 rounded-sm border border-[#6f6f6f] bg-gradient-to-b from-[#f8f8f8] to-[#d0d0d0] px-2 text-[11px]',
+        'win7-raised h-[28px] shrink-0 rounded-sm border border-[#6f6f6f] bg-gradient-to-b from-[#f8f8f8] to-[#d0d0d0] px-2 text-[14px]',
         disabled ? 'cursor-not-allowed text-[#8a8a8a]' : 'text-[#222] hover:from-[#fcfcfc] hover:to-[#d8d8d8]',
       )}
     >
